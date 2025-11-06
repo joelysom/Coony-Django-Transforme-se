@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{% static 'img/Logo-BG.svg' %}" type="image/svg+xml">
+    <link rel="shortcut icon" href="{% static 'img/Logo-BG.svg' %}">
+    <title>Coony: Indique e Ganhe</title>
+    <!--Boxicons CDN-->
+    <link href="{% static 'css/boxicons.min.css' %}" rel="stylesheet">
+    <!--CSS-->
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+    
+    <!-- Branding (logo + placeholder text) placed beside the login/register card -->
+    <div class="brand">
+        <img src="{% static 'img/Logo.svg' %}" alt="Logo">
+        <p class="brand-text">O Saúde em Movimento (Conny) é mais do que um app, é um convite.
+    Criado para quem quer começar, recomeçar ou simplesmente se sentir bem, o aplicativo conecta pessoas a atividades físicas, eventos esportivos e experiências reais.</p>
+    </div>
+
+    <div class="wrapper">
+
+        <span class="rotate-bg"></span>
+        <span class="rotate-bg2"></span>
+
+        <div class="form-box login">
+
+            <h2 class="title animation" style="--i:0; --j:21">Entrar</h2>
+
+            <form action="#">
+
+                <div class="input-box animation" style="--i:1; --j:22">
+                    <input type="text" required>
+                    <label for="">Usuário</label>
+                    <i class='bx bxs-user'></i>
+                </div>
+
+                <div class="input-box animation" style="--i:2; --j:23">
+                    <input type="password" required>
+                    <label for="">Senha</label>
+                    <i class='bx bxs-lock-alt' ></i>
+                </div>
+
+                <button type="submit" class="btn animation" style="--i:3; --j:24">Entrar</button>
+
+                <div class="linkTxt animation" style="--i:5; --j:25">
+                    <p>Não tem uma conta? <a href="#" class="register-link">Cadastre-se</a></p>
+                </div>
+                
+            </form>
+        </div>
+
+        <div class="info-text login">
+            <h2 class="animation" style="--i:0; --j:20">Bem-vindo de volta!</h2>
+            <p class="animation" style="--i:1; --j:21">Insira seus dados cadastrados para acessar o programa.</p>
+        </div>
+
+        <div class="form-box register">
+
+            <h2 class="title animation" style="--i:17; --j:0">Cadastre-se</h2>
+            <!-- Link sempre visível para retornar ao login (não interfere nos steps) -->
+            <div class="register-always-link animation" style="--i:17; --j:1">
+                <p style="text-align:center;margin-top:6px;font-size:14px;">Já tem uma conta? <a href="#" class="login-link">Entrar</a></p>
+            </div>
+
+            <!-- Formulário de cadastro em steps (3 passos): 1-Nome/Telefone, 2-E-mail, 3-Senha/Confirmar -->
+            <form id="registerForm" action="#" novalidate>
+
+                <!-- Step 1 -->
+                <div class="register-step active">
+                    <div class="input-box animation" style="--i:18; --j:1">
+                        <input type="text" name="name" class="input-field" autocomplete="name" required>
+                        <label for="">Nome</label>
+                        <i class='bx bxs-user'></i>
+                    </div>
+
+                    <div class="input-box animation" style="--i:19; --j:2">
+                        <input type="tel" name="phone" class="input-field" inputmode="tel" autocomplete="tel" required>
+                        <label for="">Telefone</label>
+                        <i class='bx bxs-phone'></i>
+                    </div>
+
+                    <div class="linkTxt animation" style="--i:22; --j:5">
+                        <div style="display:flex;gap:12px;align-items:center;">
+                            <button class="btn step-next" style="width:160px;">Próximo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="register-step">
+                    <div class="input-box animation" style="--i:20; --j:3">
+                        <input type="email" name="email" class="input-field" autocomplete="email" required>
+                        <label for="">E-mail</label>
+                        <i class='bx bxs-envelope' ></i>
+                    </div>
+
+                    <div class="linkTxt animation" style="--i:22; --j:5">
+                        <div style="display:flex;gap:12px;align-items:center;">
+                            <button class="btn step-prev" style="width:120px;background:#ccc;color:#000;">Voltar</button>
+                            <button class="btn step-next" style="width:160px;">Próximo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="register-step">
+                    <div class="input-box animation" style="--i:21; --j:4">
+                        <input type="password" name="password" class="input-field" autocomplete="new-password" required>
+                        <label for="">Senha</label>
+                        <i class='bx bxs-lock-alt' ></i>
+                    </div>
+
+                    <div class="input-box animation" style="--i:22; --j:5">
+                        <input type="password" name="password_confirm" class="input-field" autocomplete="new-password" required>
+                        <label for="">Confirmar Senha</label>
+                        <i class='bx bxs-lock-alt' ></i>
+                    </div>
+
+                    <div class="linkTxt animation" style="--i:22; --j:5">
+                        <div style="display:flex;gap:12px;align-items:center;">
+                            <button class="btn step-prev" style="width:120px;background:#ccc;color:#000;">Voltar</button>
+                            <button class="btn" type="submit" style="width:160px;">Cadastrar</button>
+                        </div>
+                    </div>
+
+                    <div class="linkTxt animation" style="--i:23; --j:6; margin-top:8px; text-align:center;">
+                        <p>Já tem uma conta? <a href="#" class="login-link">Entrar</a></p>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+
+        <div class="info-text register">
+            <h2 class="animation" style="--i:17; --j:0;">Bem-vindo!</h2>
+            <p class="animation" style="--i:18; --j:1;">Insira seus dados para criar uma nova conta.</p>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <h3>Coony</h3>
+                <p id="footer-desc">Plataforma que conecta pessoas e permite indicações com reconhecimento.</p>
+            </div>
+
+            <div class="footer-actions">
+                <div class="footer-lang">
+                    <label for="langSelect">Idioma:</label>
+                    <select id="langSelect" aria-label="Selecionar idioma">
+                        <option value="pt">Português</option>
+                        <option value="en">English</option>
+                        <option value="jp">日本語</option>
+                        <option value="kr">한국어</option>
+                    </select>
+                </div>
+                <div class="footer-links">
+                    <a href="#">Sobre</a>
+                    <a href="#">Ajuda</a>
+                    <a href="#">Privacidade</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- JavaScript -->
+    <script src="{% static 'script/app.js' %}"></script>
+    
+    <script>
+    function redirectByWidth() {
+    const currentUrl = window.location.href;
+
+    if (window.innerWidth > 768) {
+        // Desktop
+        if (currentUrl.includes('/mobile')) {
+        window.location.href = '/';
+        }
+    } else {
+        // Mobile
+        if (!currentUrl.includes('/mobile')) {
+        window.location.href = '/mobile/';
+        }
+    }
+    }
+
+    // Executa no carregamento da página
+    window.addEventListener("load", redirectByWidth);
+
+    // Executa sempre que a janela for redimensionada
+    window.addEventListener("resize", redirectByWidth);
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,281 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  /* allow vertical scrolling on small devices */
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  /* let the container grow with content and allow scrolling */
+  min-height: 100vh;
+  margin: 0 12px;
+}
+/* header/footer heights (adjust if needed) */
+:root {
+  --header-height: 120px; /* space for header (logo + language) */
+  --footer-height: 110px; /* space for footer */
+}
+/* header and shared footer */
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  z-index: 6;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 14px;
+  background: transparent;
+}
+
+.shared-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--footer-height);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+}
+
+/* telas base */
+.form-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  /* add padding to avoid header/footer overlap */
+  padding: calc(var(--header-height) + 8px) 25px calc(var(--footer-height) + 8px);
+  text-align: center;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.form-wrapper.active {
+  z-index: 3;
+}
+
+.language,
+.logo,
+.shared-footer,
+footer {
+  z-index: 5;
+}
+
+/* apenas conteúdo do formulário animará */
+.form-content {
+  position: relative;
+  z-index: 2;
+  transition:
+    transform 1.4s cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 1.4s ease,
+    filter 1.2s ease;
+  /* ensure form content stacks and doesn't overflow hidden areas */
+  will-change: transform, opacity;
+}
+
+/* estado padrão */
+.login.active .form-content {
+  transform: translateX(0);
+  opacity: 1;
+  filter: blur(0);
+}
+
+.register .form-content {
+  transform: translateX(100%);
+  opacity: 0;
+  filter: blur(15px);
+}
+
+.register.active .form-content {
+  transform: translateX(0);
+  opacity: 1;
+  filter: blur(0);
+}
+
+.login:not(.active) .form-content {
+  transform: translateX(-100%);
+  opacity: 0;
+  filter: blur(15px);
+}
+
+/* conteúdo visual */
+.language {
+  color: #7f7f7f;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.logo img {
+  width: 155px;
+  height: 155px;
+  /* diminuir margem superior para levantar o logo */
+  margin: -28px 0 18px;
+  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2)); /* Soft shadow for SVG content */
+}
+
+.meta-logo img {
+  width: 95px;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.footer-links {
+  display: flex;
+  gap: 15px;
+}
+
+.footer-links a {
+  font-size: 13px;
+  color: #7f7f7f;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+  color: #ED864B;
+}
+
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.input-field {
+  width: 100%;
+  height: 48px;
+  padding: 0 15px;
+  border: 1px solid #dddfe2;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.input-field:focus {
+  border-color: #ED864B;
+}
+
+.login-btn {
+  width: 100%;
+  height: 48px;
+  background-color: #ED864B;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 5px;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #1a5e13;
+  transform: scale(1.02);
+}
+
+.forgot-password {
+  display: block;
+  color: #000;
+  font-size: 13px;
+  margin: 15px 0 30px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+  color: #ED864B;
+}
+
+.divider {
+  height: 1px;
+  background-color: transparent;
+  margin-bottom: 25px;
+}
+
+.create-account-btn {
+  width: 100%;
+  height: 46px;
+  border: 1px solid #ED864B;
+  border-radius: 25px;
+  background: #fff;
+  color: #ED864B;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 35px;
+  transition: all 0.3s ease;
+}
+
+.create-account-btn:hover {
+  background-color: #f5f6f7;
+}
+
+footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.meta-logo img {
+  width: 85px;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+  filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2)); /* Soft shadow for SVG content */
+}
+
+.footer-links {
+  display: flex;
+  gap: 15px;
+}
+
+.footer-links a {
+  font-size: 13px;
+  color: #7f7f7f;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+  color: #ED864B;
+}
+

@@ -1,0 +1,165 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background-color: #f9f7f3;
+  color: #333;
+  padding-bottom: 80px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px;
+  background-color: #f5efe7;
+}
+
+.header-icons span {
+  margin-left: 15px;
+  font-size: 26px;
+  color: #a06132;
+}
+
+/* WELCOME */
+.welcome {
+  padding: 20px;
+}
+
+.welcome h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.welcome p {
+  font-size: 14px;
+  color: #777;
+}
+
+/* SEARCH */
+.search-container {
+  position: relative;
+  margin: 0 20px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 12px 45px 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+/* CATEGORIES */
+.categories {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 15px 20px;
+}
+
+.categories button {
+  border: none;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-weight: 500;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  color: #555;
+}
+
+.categories .active {
+  background-color: #f68b4a;
+  color: white;
+}
+
+/* EVENT CARD */
+.event-card {
+  background-color: #fff;
+  margin: 15px 20px;
+  border-radius: 15px;
+  padding-bottom: 15px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+.event-img {
+  position: relative;
+  border-radius: 15px 15px 0 0;
+  overflow: hidden;
+}
+
+.event-img img {
+  width: 100%;
+  display: block;
+}
+
+.favorite {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: #f68b4a;
+  background: #fff;
+  border-radius: 50%;
+  padding: 4px;
+}
+
+.event-card h3 {
+  margin: 10px 15px 5px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.event-card p {
+  margin: 0 15px 10px;
+  font-size: 13px;
+  color: #666;
+}
+
+.event-info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0 15px 10px;
+  color: #888;
+}
+
+.btn {
+  display: block;
+  width: calc(100% - 30px);
+  margin: 0 auto;
+  background-color: #f68b4a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background-color: #e97b3d;
+}
+
+/* NAVBAR */
+.navbar-frame {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  border: none;
+}

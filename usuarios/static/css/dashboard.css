@@ -1,0 +1,307 @@
+:root {
+  --bg: #f2f4f7;
+  --white: #fff;
+  --primary: #258d19;
+  --text: #1d1d1d;
+  --gray: #666;
+  --border: #ddd;
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* Navbar estilo LinkedIn */
+.dashboard-navbar {
+  width: 100%;
+  background: var(--white);
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.dashboard-navbar .logo {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary);
+  height: 40px;
+  width: auto;
+}
+.dashboard-navbar .search-bar {
+  flex: 1;
+  max-width: 380px;
+  margin: 0 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  background: #eef3f8;
+}
+.dashboard-navbar .nav-right {
+  display: flex;
+  gap: 24px;
+}
+.dashboard-navbar .nav-right a {
+  text-decoration: none;
+  color: var(--gray);
+  font-size: 13px;
+  font-weight: 500;
+}
+.dashboard-navbar .nav-right a:hover {
+  color: var(--primary);
+}
+
+/* Layout Principal */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 250px 1fr 300px;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* Sidebar Esquerda */
+.dashboard-sidebar {
+  background: var(--white);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.profile-card {
+  text-align: center;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.profile-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(135deg, #258d19, #1f7316);
+  z-index: 1;
+}
+.profile-card .avatar {
+  position: relative;
+  z-index: 2;
+  width: 80px;
+  height: 80px;
+  background: #bbb;
+  border-radius: 50%;
+  margin: auto;
+  border: 3px solid var(--white);
+}
+.profile-card h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.profile-card p {
+  font-size: 13px;
+  color: var(--gray);
+}
+.dashboard-sidebar nav {
+  padding: 12px;
+}
+.dashboard-sidebar li {
+  list-style: none;
+  margin: 8px 0;
+}
+.dashboard-sidebar a {
+  font-size: 14px;
+  color: var(--text);
+  text-decoration: none;
+}
+.dashboard-sidebar a:hover {
+  color: var(--primary);
+}
+
+/* Feed Central */
+.dashboard-feed h2 {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.feed-banner {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+.feed-banner strong {
+  color: var(--primary);
+}
+.item-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.item-info {
+  display: flex;
+  gap: 12px;
+}
+.item-photo {
+  width: 60px;
+  height: 60px;
+  background: #e1e9ee;
+  border-radius: 6px;
+}
+.item-info h3 {
+  font-size: 15px;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+.item-info p {
+  font-size: 13px;
+  color: var(--gray);
+}
+.btn-indicar {
+  background: var(--primary);
+  border: none;
+  color: var(--white);
+  padding: 8px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.btn-indicar:hover {
+  background: #1f7316;
+}
+
+/* Sidebar Direita */
+.dashboard-right .stats-card,
+.dashboard-right .achievements-card,
+.dashboard-right .promo-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.stats-card h3,
+.achievements-card h3,
+.promo-card h3 {
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+.stats-card p,
+.achievements-card p,
+.promo-card p {
+  font-size: 13px;
+  margin: 6px 0;
+  color: var(--gray);
+}
+.achievements-card ul {
+  font-size: 13px;
+  padding-left: 16px;
+}
+.promo-card {
+  text-align: center;
+  background: #eef3f8;
+  border: 1px dashed var(--primary);
+}
+.promo-card strong {
+  color: var(--primary);
+}
+
+/* Preferences Card */
+.preferences-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.preferences-card h3 {
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+.preferences-card ul {
+  list-style: none;
+  padding: 0;
+}
+.preferences-card li {
+  margin: 8px 0;
+}
+.preferences-card a {
+  text-decoration: none;
+  color: var(--text);
+  font-size: 14px;
+}
+.preferences-card a:hover {
+  color: var(--primary);
+}
+
+/* Footer */
+.dashboard-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--gray);
+}
+.dashboard-footer nav {
+  margin-top: 8px;
+}
+.dashboard-footer a {
+  text-decoration: none;
+  color: var(--text);
+  margin: 0 8px;
+}
+.dashboard-footer a:hover {
+  color: var(--primary);
+}
+
+/* Responsivo */
+@media (max-width: 1000px) {
+  .dashboard-container {
+    grid-template-columns: 1fr 300px;
+  }
+  .dashboard-sidebar {
+    display: none;
+  }
+}
+@media (max-width: 768px) {
+  .dashboard-container {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-right {
+    display: none;
+  }
+  .dashboard-navbar {
+    flex-wrap: wrap;
+  }
+  .dashboard-navbar .search-bar {
+    margin: 8px 0;
+    flex: 100%;
+  }
+}

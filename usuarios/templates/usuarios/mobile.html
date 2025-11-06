@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+{% load static %}
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Indicações</title>
+  <link rel="stylesheet" href="{% static 'css/estilos(mobile).css' %}" />
+  <link rel="shortcut icon" href="{% static 'img/Logo-BG.svg' %}">
+</head>
+<body>
+  <div class="container">
+
+    <!-- shared header (moved from inside wrappers to avoid duplication) -->
+    <div class="header">
+      <div class="language" id="header-language">Português (Brasil)</div>
+
+      <div class="logo">
+        <img src="{% static 'img/Logo.svg' %}" alt="Logo" />
+      </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="form-wrapper login active" data-lang="Português (Brasil)">
+
+      <div class="form-content">
+        <form class="login-form">
+          <input type="text" placeholder="Número do celular ou email" class="input-field" />
+          <input type="password" placeholder="Senha" class="input-field" />
+          <button type="submit" class="login-btn">Entrar</button>
+        </form>
+
+        <a href="#" class="forgot-password">Esqueceu a senha?</a>
+
+        <div class="divider"></div>
+
+        <button class="create-account-btn" id="open-register">Criar nova conta</button>
+      </div>
+
+    </div>
+
+    <!-- CADASTRO -->
+    <div class="form-wrapper register" data-lang="Criar nova conta">
+
+        <div class="form-content">
+          <form class="login-form" id="register-form">
+            <input type="text" name="name" placeholder="Nome" class="input-field" autocomplete="name" />
+            <input type="tel" name="phone" placeholder="Telefone" class="input-field" inputmode="tel" autocomplete="tel" />
+            <input type="email" name="email" placeholder="E-mail" class="input-field" autocomplete="email" />
+            <input type="password" name="password" placeholder="Senha" class="input-field" autocomplete="new-password" />
+            <input type="password" name="password_confirm" placeholder="Confirmar Senha" class="input-field" autocomplete="new-password" />
+            <button type="submit" class="login-btn">Cadastrar</button>
+          </form>
+
+          <div class="divider"></div>
+
+          <button class="create-account-btn" id="open-login">Já tem uma conta?</button>
+        </div>
+
+    </div>
+
+    <!-- shared footer (single instance to remove duplication) -->
+    <footer class="shared-footer">
+      <div class="meta-logo">
+        <img src="{% static 'img/Logo.svg' %}" alt="Logo" />
+      </div>
+      <div class="footer-links">
+        <a href="#">Sobre</a>
+        <a href="#">Ajuda</a>
+        <a href="#">Política</a>
+        <a href="#">Privacidade</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    const login = document.querySelector('.form-wrapper.login');
+    const register = document.querySelector('.form-wrapper.register');
+    const openRegister = document.getElementById('open-register');
+    const openLogin = document.getElementById('open-login');
+    const headerLanguage = document.getElementById('header-language');
+
+    function updateHeaderLang() {
+      const active = document.querySelector('.form-wrapper.active');
+      if (!active) return;
+      const lang = active.getAttribute('data-lang') || '';
+      headerLanguage.textContent = lang;
+    }
+
+    openRegister.addEventListener('click', () => {
+      login.classList.remove('active');
+      register.classList.add('active');
+      updateHeaderLang();
+    });
+
+    openLogin.addEventListener('click', () => {
+      register.classList.remove('active');
+      login.classList.add('active');
+      updateHeaderLang();
+    });
+
+    // initialize header language on load
+    document.addEventListener('DOMContentLoaded', updateHeaderLang);
+    // also call once in case DOMContentLoaded already fired
+    updateHeaderLang();
+  </script>
+
+    <!-- Redirect script -->
+    <script>
+    function redirectByWidth() {
+    if (window.innerWidth > 768) {
+        // Desktop
+        if (window.location.pathname.includes('/mobile')) {
+        window.location.href = '/';
+        }
+    } else {
+        // Mobile
+        if (!window.location.pathname.includes('/mobile')) {
+        window.location.href = '/mobile/';
+        }
+    }
+    }
+
+    // Roda no carregamento
+    redirectByWidth();
+
+    // Roda sempre que a tela é redimensionada
+    window.addEventListener("resize", redirectByWidth);
+    </script>
+
+</body>
+</html>

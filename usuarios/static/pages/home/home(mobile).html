@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tela Principal</title>
+  <link rel="stylesheet" href="/css/home(mobile).css">
+  <!-- Ícones Google -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Topo -->
+  <header class="header">
+    <div class="header-icons">
+      <span class="material-symbols-outlined">add</span>
+      <span class="material-symbols-outlined">chat_bubble</span>
+      <span class="material-symbols-outlined">notifications</span>
+    </div>
+  </header>
+
+  <!-- Saudação -->
+  <section class="welcome">
+    <h2>Olá, Maria Eduarda</h2>
+    <p>Confira os eventos e atividades próximas</p>
+  </section>
+
+  <!-- Busca -->
+  <div class="search-container">
+    <input type="text" placeholder="Buscar eventos ou atividades...">
+    <span class="material-symbols-outlined search-icon">search</span>
+  </div>
+
+  <!-- Categorias -->
+  <div class="categories">
+    <button class="active">Todos</button>
+    <button>Corrida</button>
+    <button>Ciclismo</button>
+    <button>Funcional</button>
+  </div>
+
+  <!-- Cartão de evento -->
+  <div class="event-card">
+    <div class="event-img">
+      <img src="https://i.ibb.co/5Yc2fQ3/bikefest.png" alt="1º Bike Fest Recife">
+      <span class="material-symbols-outlined favorite">favorite</span>
+    </div>
+    <h3>1º Bike Fest Recife</h3>
+    <p>Uma manhã para pedalar pelas ruas da cidade praticando esporte e lazer.</p>
+    <div class="event-info">
+      <span class="material-symbols-outlined">location_on</span>
+      <p>Boa Viagem - PE</p>
+      <span class="material-symbols-outlined">calendar_month</span>
+      <p>29/09/2025</p>
+    </div>
+    <button class="btn">Participar</button>
+  </div>
+    <!-- Redirect script -->
+    <script>
+    function redirectByWidth() {
+    if (window.innerWidth > 768) {
+        // Desktop
+        if (!window.location.href.includes("index.html")) {
+        window.location.href = "home.html";
+        }
+    } else {
+        // Mobile
+        if (!window.location.href.includes("home(mobile).html")) {
+        window.location.href = "home(mobile).html";
+        }
+    }
+    }
+
+    // Roda no carregamento
+    redirectByWidth();
+
+    // Roda sempre que a tela é redimensionada
+    window.addEventListener("resize", redirectByWidth);
+    </script>
+
+  <!-- Importa o Navbar -->
+  <iframe src="/component/NavbarINF.html" class="navbar-frame" frameborder="0"></iframe>
+
+</body>
+</html>

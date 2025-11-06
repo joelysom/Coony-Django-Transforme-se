@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden; /* Remove scrollbars */
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 70px;
+      background: #fff;
+      border-top: 1px solid #ddd;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .navbar span {
+      font-size: 28px;
+      color: #000; /* Default black color */
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      padding: 5px 16px;
+    }
+
+    .navbar span:hover {
+      color: #f68b4a; /* Orange on hover */
+    }
+
+    .navbar span::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 4px;
+      background-color: #f68b4a;
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    .navbar span.active {
+      color: #f68b4a; /* Orange color for active state */
+    }
+
+    .navbar span.active::after {
+      width: 32px; /* Width of the bottom indicator */
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <span class="material-symbols-outlined">home</span>
+    <span class="material-symbols-outlined">directions_run</span>
+    <span class="material-symbols-outlined">add_circle</span>
+    <span class="material-symbols-outlined">chat</span>
+    <span class="material-symbols-outlined">account_circle</span>
+  </div>
+  <script src="navbar.js"></script>
+</body>
+</html>

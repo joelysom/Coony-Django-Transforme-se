@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tela Principal - Desktop</title>
+  <link rel="stylesheet" href="/css/home.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+<body>
+  
+  <!-- Sidebar como componente externo -->
+  <iframe src="/component/sidebar.html" class="sidebar-frame" frameborder="0"></iframe>
+
+  <!-- Conteúdo principal -->
+  <main class="content">
+
+    <!-- Cabeçalho -->
+    <section class="welcome">
+      <h2>Olá, Maria Eduarda</h2>
+      <p>Confira os eventos e atividades próximas</p>
+    </section>
+
+    <!-- Barra de busca -->
+    <div class="search-container">
+      <input type="text" placeholder="Buscar eventos ou atividades...">
+      <span class="material-symbols-outlined search-icon">search</span>
+    </div>
+
+    <!-- Categorias -->
+    <div class="categories">
+      <span class="label">Categorias:</span>
+      <button class="active">Todos</button>
+      <button>Corrida</button>
+      <button>Ciclismo</button>
+      <button>Funcional</button>
+    </div>
+
+    <!-- Lista de eventos -->
+    <div class="events-grid">
+      <!-- Card 1 -->
+      <div class="event-card">
+        <div class="event-img">
+          <img src="https://i.ibb.co/5Yc2fQ3/bikefest.png" alt="1º Bike Fest Recife">
+          <span class="material-symbols-outlined favorite">favorite</span>
+        </div>
+        <h3>1º Bike Fest Recife</h3>
+        <p>Uma manhã para pedalar pelas ruas da cidade praticando esporte e lazer.</p>
+        <div class="event-info">
+          <span class="material-symbols-outlined">location_on</span>
+          <p>Boa Viagem - PE</p>
+          <span class="material-symbols-outlined">calendar_month</span>
+          <p>29/09/2025</p>
+        </div>
+        <button class="btn">Participar</button>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="event-card">
+        <div class="event-img">
+          <img src="https://i.ibb.co/TM2CY4J/sesc-corrida.png" alt="Circuito Sesc de Corridas">
+          <span class="material-symbols-outlined favorite">favorite</span>
+        </div>
+        <h3>Circuito Sesc de Corridas</h3>
+        <p>Venha participar desse incrível circuito de corridas promovido pelo SESC.</p>
+        <div class="event-info">
+          <span class="material-symbols-outlined">location_on</span>
+          <p>Recife - PE</p>
+          <span class="material-symbols-outlined">calendar_month</span>
+          <p>04/10/2025</p>
+        </div>
+        <button class="btn">Participar</button>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="event-card">
+        <div class="event-img">
+          <img src="https://i.ibb.co/1fnLFwS/bike-clube.png" alt="2º Pedal Bike Clube">
+          <span class="material-symbols-outlined favorite">favorite</span>
+        </div>
+        <h3>2º Pedal Bike Clube</h3>
+        <p>Venha participar desse incrível passeio de bike em Arcoverde - PE.</p>
+        <div class="event-info">
+          <span class="material-symbols-outlined">location_on</span>
+          <p>Arcoverde - PE</p>
+          <span class="material-symbols-outlined">calendar_month</span>
+          <p>08/11/2025</p>
+        </div>
+        <button class="btn">Participar</button>
+      </div>
+    </div>
+  </main>
+    <script>
+    function redirectByWidth() {
+    const currentUrl = window.location.href;
+
+    if (window.innerWidth > 768) {
+        // Desktop
+        if (!currentUrl.includes("home.html")) {
+        window.location.href = "home.html";
+        }
+    } else {
+        // Mobile
+        if (!currentUrl.includes("home(mobile).html")) {
+        window.location.href = "home(mobile).html";
+        }
+    }
+    }
+
+    // Executa no carregamento da página
+    window.addEventListener("load", redirectByWidth);
+
+    // Executa sempre que a janela for redimensionada
+    window.addEventListener("resize", redirectByWidth);
+    </script>
+
+</body>
+</html>
