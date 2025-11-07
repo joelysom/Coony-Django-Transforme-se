@@ -1,0 +1,26 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/home(mobile).css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+<nav class="navbar">
+    <a href="{% url 'dashboard' %}" class="nav-item">
+        <span class="material-symbols-outlined">home</span>
+        <p>Início</p>
+    </a>
+    <a href="#" class="nav-item">
+        <span class="material-symbols-outlined">calendar_month</span>
+        <p>Eventos</p>
+    </a>
+    <a href="#" class="nav-item">
+        <span class="material-symbols-outlined">maps_ugc</span>
+        <p>Feed</p>
+    </a>
+    <a href="#" class="nav-item">
+        <span class="material-symbols-outlined">person</span>
+        <p>Perfil</p>
+    </a>
+    <a href="{% url 'logout' %}" class="nav-item">
+        <span class="material-symbols-outlined">logout</span>
+        <p>Sair</p>
+    </a>
+</nav>

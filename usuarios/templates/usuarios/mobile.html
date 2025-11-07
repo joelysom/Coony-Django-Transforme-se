@@ -24,9 +24,23 @@
     <div class="form-wrapper login active" data-lang="Português (Brasil)">
 
       <div class="form-content">
-        <form class="login-form">
-          <input type="text" placeholder="Número do celular ou email" class="input-field" />
-          <input type="password" placeholder="Senha" class="input-field" />
+        <form class="login-form" action="{% url 'login' %}" method="post">
+          {% csrf_token %}
+
+          {% if login_form.errors %}
+          <div class="form-errors">
+            <ul>
+            {% for field, errors in login_form.errors.items %}
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          <input type="text" name="email" placeholder="Número do celular ou email" class="input-field" value="{{ login_form.email.value|default_if_none:'' }}" />
+          <input type="password" name="password" placeholder="Senha" class="input-field" />
           <button type="submit" class="login-btn">Entrar</button>
         </form>
 
@@ -43,10 +57,24 @@
     <div class="form-wrapper register" data-lang="Criar nova conta">
 
         <div class="form-content">
-          <form class="login-form" id="register-form">
-            <input type="text" name="name" placeholder="Nome" class="input-field" autocomplete="name" />
-            <input type="tel" name="phone" placeholder="Telefone" class="input-field" inputmode="tel" autocomplete="tel" />
-            <input type="email" name="email" placeholder="E-mail" class="input-field" autocomplete="email" />
+          <form class="login-form" id="register-form" action="{% url 'register' %}" method="post">
+            {% csrf_token %}
+
+            {% if reg_form.errors %}
+            <div class="form-errors">
+              <ul>
+              {% for field, errors in reg_form.errors.items %}
+                  {% for error in errors %}
+                  <li>{{ error }}</li>
+                  {% endfor %}
+              {% endfor %}
+              </ul>
+            </div>
+            {% endif %}
+
+            <input type="text" name="nome" placeholder="Nome" class="input-field" autocomplete="name" value="{{ reg_form.nome.value|default_if_none:'' }}" />
+            <input type="tel" name="telefone" placeholder="Telefone" class="input-field" inputmode="tel" autocomplete="tel" value="{{ reg_form.telefone.value|default_if_none:'' }}" />
+            <input type="email" name="email" placeholder="E-mail" class="input-field" autocomplete="email" value="{{ reg_form.email.value|default_if_none:'' }}" />
             <input type="password" name="password" placeholder="Senha" class="input-field" autocomplete="new-password" />
             <input type="password" name="password_confirm" placeholder="Confirmar Senha" class="input-field" autocomplete="new-password" />
             <button type="submit" class="login-btn">Cadastrar</button>

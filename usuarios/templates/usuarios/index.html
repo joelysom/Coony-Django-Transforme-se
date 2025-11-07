@@ -30,21 +30,39 @@
 
             <h2 class="title animation" style="--i:0; --j:21">Entrar</h2>
 
-            <form action="#">
+            <form action="{% url 'login' %}" method="post" class="login-form">
+                {% csrf_token %}
+
+                {% if login_form.errors %}
+                <div class="form-errors">
+                    <ul>
+                    {% for error in login_form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    {% for field, errors in login_form.errors.items %}
+                        {% if field != '__all__' %}
+                            {% for error in errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
 
                 <div class="input-box animation" style="--i:1; --j:22">
-                    <input type="text" required>
-                    <label for="">Usuário</label>
+                    <input type="text" name="email" class="input-field" value="{{ login_form.email.value|default_if_none:'' }}" required>
+                    <label>E-mail ou Usuário</label>
                     <i class='bx bxs-user'></i>
                 </div>
 
                 <div class="input-box animation" style="--i:2; --j:23">
-                    <input type="password" required>
-                    <label for="">Senha</label>
+                    <input type="password" name="password" class="input-field" required>
+                    <label>Senha</label>
                     <i class='bx bxs-lock-alt' ></i>
                 </div>
 
-                <button type="submit" class="btn animation" style="--i:3; --j:24">Entrar</button>
+                <button type="submit" class="btn animation login-btn" style="--i:3; --j:24">Entrar</button>
 
                 <div class="linkTxt animation" style="--i:5; --j:25">
                     <p>Não tem uma conta? <a href="#" class="register-link">Cadastre-se</a></p>
@@ -67,18 +85,31 @@
             </div>
 
             <!-- Formulário de cadastro em steps (3 passos): 1-Nome/Telefone, 2-E-mail, 3-Senha/Confirmar -->
-            <form id="registerForm" action="#" novalidate>
+            <form id="registerForm" action="{% url 'register' %}" method="post" novalidate>
+                {% csrf_token %}
+
+                {% if reg_form.errors %}
+                <div class="form-errors">
+                    <ul>
+                    {% for field, errors in reg_form.errors.items %}
+                        {% for error in errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
 
                 <!-- Step 1 -->
                 <div class="register-step active">
                     <div class="input-box animation" style="--i:18; --j:1">
-                        <input type="text" name="name" class="input-field" autocomplete="name" required>
+                        <input type="text" name="nome" class="input-field" autocomplete="name" value="{{ reg_form.nome.value|default_if_none:'' }}" required>
                         <label for="">Nome</label>
                         <i class='bx bxs-user'></i>
                     </div>
 
                     <div class="input-box animation" style="--i:19; --j:2">
-                        <input type="tel" name="phone" class="input-field" inputmode="tel" autocomplete="tel" required>
+                        <input type="tel" name="telefone" class="input-field" inputmode="tel" autocomplete="tel" value="{{ reg_form.telefone.value|default_if_none:'' }}" required>
                         <label for="">Telefone</label>
                         <i class='bx bxs-phone'></i>
                     </div>
@@ -93,7 +124,7 @@
                 <!-- Step 2 -->
                 <div class="register-step">
                     <div class="input-box animation" style="--i:20; --j:3">
-                        <input type="email" name="email" class="input-field" autocomplete="email" required>
+                        <input type="email" name="email" class="input-field" autocomplete="email" value="{{ reg_form.email.value|default_if_none:'' }}" required>
                         <label for="">E-mail</label>
                         <i class='bx bxs-envelope' ></i>
                     </div>

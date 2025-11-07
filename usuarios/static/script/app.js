@@ -1,26 +1,71 @@
-const wrapper = document.querySelector('.wrapper')
-const registerLink = document.querySelector('.register-link')
-const loginLink = document.querySelector('.login-link')
-const langSelect = document.getElementById('langSelect')
-const footerDesc = document.getElementById('footer-desc')
-const brandText = document.querySelector('.brand-text')
-const wrapperTexts = {
-    loginTitle: document.querySelector('.form-box.login .title'),
-    loginUserLabel: document.querySelector('.form-box.login .input-box:nth-child(1) label'),
-    loginPassLabel: document.querySelector('.form-box.login .input-box:nth-child(2) label'),
-    loginButton: document.querySelector('.form-box.login button'),
-    loginLinkText: document.querySelector('.form-box.login .linkTxt p'),
-    registerTitle: document.querySelector('.form-box.register .title'),
-    registerUserLabel: document.querySelector('.form-box.register .input-box:nth-child(1) label'),
-    registerEmailLabel: document.querySelector('.form-box.register .input-box:nth-child(2) label'),
-    registerPassLabel: document.querySelector('.form-box.register .input-box:nth-child(3) label'),
-    registerButton: document.querySelector('.form-box.register button'),
-    registerLinkText: document.querySelector('.form-box.register .linkTxt p'),
-    infoLoginTitle: document.querySelector('.info-text.login h2'),
-    infoLoginDesc: document.querySelector('.info-text.login p'),
-    infoRegisterTitle: document.querySelector('.info-text.register h2'),
-    infoRegisterDesc: document.querySelector('.info-text.register p')
-}
+document.addEventListener('DOMContentLoaded', function() {
+    const wrapper = document.querySelector('.wrapper');
+    const registerLink = document.querySelector('.register-link');
+    const loginLink = document.querySelector('.login-link');
+    const loginForm = document.querySelector('.login-form');
+    const registerForm = document.querySelector('#registerForm');
+
+    // Handle form animations and transitions
+    if (registerLink) {
+        registerLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            wrapper.classList.add('active');
+        });
+    }
+
+    if (loginLink) {
+        loginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            wrapper.classList.remove('active');
+        });
+    }
+
+    // Handle login form submission
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            const emailInput = this.querySelector('input[name="email"]');
+            const passwordInput = this.querySelector('input[name="password"]');
+            
+            if (!emailInput.value || !passwordInput.value) {
+                e.preventDefault();
+                return;
+            }
+        });
+    }
+
+    // Handle registration steps
+    const steps = document.querySelectorAll('.register-step');
+    const nextButtons = document.querySelectorAll('.step-next');
+    const prevButtons = document.querySelectorAll('.step-prev');
+    
+    let currentStep = 0;
+
+    if (nextButtons.length > 0) {
+        nextButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentStep < steps.length - 1) {
+                    steps[currentStep].classList.remove('active');
+                    currentStep++;
+                    steps[currentStep].classList.add('active');
+                }
+            });
+        });
+    }
+
+    if (prevButtons.length > 0) {
+        prevButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentStep > 0) {
+                    steps[currentStep].classList.remove('active');
+                    currentStep--;
+                    steps[currentStep].classList.add('active');
+                }
+            });
+        });
+    }
+});
 
 const translations = {
     pt: {
