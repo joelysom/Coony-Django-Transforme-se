@@ -12,6 +12,12 @@
 </head>
 <body>
 
+  <!-- Toast Notification System -->
+  {% include 'usuarios/components/toast.html' %}
+
+  <!-- Django Messages rendered as Toasts -->
+  {% include 'usuarios/components/messages.html' %}
+
   <!-- Topo -->
   <header class="header">
     <div class="header-icons">
@@ -72,8 +78,8 @@
   window.addEventListener("resize", redirectByWidth);
   </script>
 
-  <!-- Importa o Navbar -->
-  <iframe src="{% url 'sidebar' %}" class="navbar-frame" frameborder="0"></iframe>
+  <!-- Importa o Navbar Mobile -->
+  {% include 'usuarios/components/navbar_mobile.html' %}
 
 </body>
 </html>

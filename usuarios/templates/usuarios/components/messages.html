@@ -1,0 +1,19 @@
+{% if messages %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      {% for message in messages %}
+        const messageType = '{{ message.tags }}' === 'toast' ? 'info' : '{{ message.tags }}';
+        
+        {% if message.level_tag == 'error' %}
+          Toast.error('{{ message|escapejs }}', 'Erro!');
+        {% elif message.level_tag == 'success' %}
+          Toast.success('{{ message|escapejs }}', 'Sucesso!');
+        {% elif message.level_tag == 'warning' %}
+          Toast.warning('{{ message|escapejs }}', 'Aviso!');
+        {% else %}
+          Toast.info('{{ message|escapejs }}', 'Informação');
+        {% endif %}
+      {% endfor %}
+    });
+  </script>
+{% endif %}

@@ -11,8 +11,14 @@
 </head>
 <body>
   
+  <!-- Toast Notification System -->
+  {% include 'usuarios/components/toast.html' %}
+  
+  <!-- Django Messages rendered as Toasts -->
+  {% include 'usuarios/components/messages.html' %}
+  
   <!-- Sidebar como componente externo -->
-  <iframe src="{% url 'sidebar' %}" class="sidebar-frame" frameborder="0"></iframe>
+  {% include 'usuarios/components/sidebar.html' %}
 
   <!-- Conteúdo principal -->
   <main class="content">

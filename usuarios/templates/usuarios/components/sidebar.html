@@ -1,42 +1,39 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<aside class="sidebar-container">
   <style>
-    body {
-      margin: 0;
+    .sidebar-container {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 280px;
+      height: 100vh;
       background-color: #f5efe7;
-      font-family: 'Poppins', sans-serif;
+      padding: 16px 0;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 100vh;
-      overflow: hidden;
-      padding: 16px 0;
-      box-sizing: border-box;
+      z-index: 1000;
+      overflow-y: auto;
     }
 
-    .logo {
+    .sidebar-logo {
       margin: 0 0 16px;
       width: 120px;
       flex-shrink: 0;
     }
 
-    nav {
+    .sidebar-nav {
       display: flex;
       flex-direction: column;
       width: 85%;
       gap: 8px;
       flex: 1;
       min-height: 0;
-      overflow: hidden;
+      overflow-y: auto;
     }
 
-    .menu-item {
+    .sidebar-menu-item {
       display: flex;
       align-items: center;
       background: #fff;
@@ -49,48 +46,48 @@
       transition: all 0.3s ease;
       flex-shrink: 0;
       min-height: 40px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
     }
 
-    .menu-item span {
+    .sidebar-menu-item span {
       margin-right: 10px;
       color: #f68b4a;
     }
 
-    .menu-item.active,
-    .menu-item.create-event {
+    .sidebar-menu-item.active,
+    .sidebar-menu-item.create-event {
       background-color: #f68b4a;
       color: white;
       box-shadow: 0 2px 8px rgba(246, 139, 74, 0.3);
     }
 
-    .menu-item.active:hover,
-    .menu-item.create-event:hover {
+    .sidebar-menu-item.active:hover,
+    .sidebar-menu-item.create-event:hover {
       box-shadow: 0 4px 12px rgba(246, 139, 74, 0.4);
       transform: translateY(-1px);
     }
 
-    .menu-item.active span,
-    .menu-item.create-event span {
+    .sidebar-menu-item.active span,
+    .sidebar-menu-item.create-event span {
       color: white;
     }
 
-    .divider {
+    .sidebar-divider {
       width: 80%;
       height: 1px;
       background: #f68b4a;
       margin: 15px auto;
-      align-self: center;
       opacity: 0.6;
     }
 
-    .create-event {
+    .sidebar-create-event {
       background-color: #f68b4a;
       color: white;
       font-weight: 600;
     }
 
-    /* Usuário */
-    .user-box {
+    .sidebar-user-box {
       margin-top: 8px;
       width: 85%;
       background: #fff;
@@ -103,19 +100,35 @@
       flex-shrink: 0;
     }
 
-    .user-info {
+    .sidebar-user-info {
       display: flex;
       align-items: center;
       gap: 8px;
+      flex: 1;
     }
 
-    .user-info img {
+    .sidebar-user-info img {
       width: 32px;
       height: 32px;
       border-radius: 50%;
     }
 
-    .logout {
+    .sidebar-user-info div p {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .sidebar-user-info div p:first-child {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .sidebar-user-info div p:last-child {
+      font-size: 12px;
+      color: #777;
+    }
+
+    .sidebar-logout {
       width: 85%;
       background: #fff;
       border: none;
@@ -130,68 +143,80 @@
       cursor: pointer;
       color: #d9534f;
       transition: all 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-bottom: 10px;
     }
 
-    .logout:hover {
+    .sidebar-logout:hover {
       background-color: #fff5f5;
     }
-  </style>
-</head>
-<body>
-  <img src="{% static 'img/Logo.svg' %}" class="logo" alt="Coony Logo">
 
-  <nav>
-    <button class="menu-item active"><span class="material-symbols-outlined">home</span> Início</button>
-    <button class="menu-item"><span class="material-symbols-outlined">event</span> Ver Eventos</button>
-    <button class="menu-item"><span class="material-symbols-outlined">notifications</span> Notificações</button>
-    <button class="menu-item"><span class="material-symbols-outlined">favorite</span> Favoritos</button>
-    <button class="menu-item"><span class="material-symbols-outlined">calendar_month</span> Meus Eventos</button>
-    <button class="menu-item"><span class="material-symbols-outlined">account_circle</span> Perfil</button>
-    <button class="menu-item"><span class="material-symbols-outlined">help</span> Central de Ajuda</button>
-    <div class="divider"></div>
-    <button class="menu-item create-event"><span class="material-symbols-outlined">add_circle</span> Criar Evento</button>
+    /* Adjust main content to account for sidebar */
+    body {
+      margin-left: 280px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar-container {
+        position: static;
+        width: 100%;
+        height: auto;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+
+      body {
+        margin-left: 0;
+      }
+    }
+  </style>
+
+  <img src="{% static 'img/Logo.svg' %}" class="sidebar-logo" alt="Coony Logo">
+
+  <nav class="sidebar-nav">
+    <button class="sidebar-menu-item active"><span class="material-symbols-outlined">home</span> Início</button>
+    <button class="sidebar-menu-item"><span class="material-symbols-outlined">event</span> Ver Eventos</button>
+    <button class="sidebar-menu-item"><span class="material-symbols-outlined">notifications</span> Notificações</button>
+    <button class="sidebar-menu-item"><span class="material-symbols-outlined">favorite</span> Favoritos</button>
+    <button class="sidebar-menu-item"><span class="material-symbols-outlined">calendar_month</span> Meus Eventos</button>
+    <button class="sidebar-menu-item"><span class="material-symbols-outlined">account_circle</span> Perfil</button>
+    <button class="sidebar-menu-item"><span class="material-symbols-outlined">help</span> Central de Ajuda</button>
+    <div class="sidebar-divider"></div>
+    <button class="sidebar-menu-item create-event sidebar-create-event"><span class="material-symbols-outlined">add_circle</span> Criar Evento</button>
   </nav>
 
-  <div class="user-box">
-    <div class="user-info">
+  <div class="sidebar-user-box">
+    <div class="sidebar-user-info">
       <img src="https://i.ibb.co/Zm2S1xT/user-avatar.png" alt="{{ user.nome }}">
       <div>
-        <p style="font-weight:600;font-size:14px;">{{ user.nome }}</p>
-        <p style="font-size:12px;color:#777;">@{{ user.username }}</p>
+        <p>{{ user.nome }}</p>
+        <p>@{{ user.username }}</p>
       </div>
     </div>
     <span class="material-symbols-outlined">more_vert</span>
   </div>
 
-  <form id="logoutForm" action="{% url 'logout' %}" method="post">
+  <form action="{% url 'logout' %}" method="post" style="width: 100%; display: flex; justify-content: center;">
     {% csrf_token %}
-    <button type="submit" class="logout">
+    <button type="submit" class="sidebar-logout">
       <span class="material-symbols-outlined">logout</span> Sair
     </button>
   </form>
 
   <script>
-    // Get all menu items
-    const menuItems = document.querySelectorAll('.menu-item');
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuItems = document.querySelectorAll('.sidebar-menu-item');
 
-    // Add click event listener to each menu item
-    menuItems.forEach(item => {
-      item.addEventListener('click', () => {
-        // Remove active class from all items
-        menuItems.forEach(i => i.classList.remove('active'));
-        // Add active class to clicked item if it's not the create-event button
-        if (!item.classList.contains('create-event')) {
-          item.classList.add('active');
-        }
+      menuItems.forEach(item => {
+        item.addEventListener('click', function() {
+          if (!this.classList.contains('create-event')) {
+            menuItems.forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+          }
+        });
       });
     });
-
-    // Handle logout form submission
-    document.getElementById('logoutForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      // Submit the form and redirect the entire page, not just the iframe
-      window.parent.location.href = "{% url 'logout' %}";
-    });
   </script>
-</body>
-</html>
+</aside>

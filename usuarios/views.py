@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.contrib import messages
 from .forms import RegistrationForm, LoginForm
 from .models import Usuario
 
@@ -28,40 +29,50 @@ def register_view(request):
             user.save()
             # log the user in by storing id in session
             request.session['usuario_id'] = user.id
+            messages.success(request, f'Bem-vindo, {user.nome}! Cadastro realizado com sucesso.', extra_tags='toast')
             return redirect('dashboard')
         else:
             # re-render index with errors
             login_form = LoginForm()
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, error, extra_tags='toast')
             return render(request, 'usuarios/index.html', {'reg_form': form, 'login_form': login_form})
     return redirect('index')
 
 
 def login_view(request):
     if request.method == 'POST':
-        try:
-            # Get raw form data
-            email_or_username = request.POST.get('email')
-            password = request.POST.get('password')
-            
-            # Try to find user by email or username
-            try:
-                if '@' in email_or_username:
-                    user = Usuario.objects.get(email=email_or_username)
-                else:
-                    user = Usuario.objects.get(nome=email_or_username)
-            except Usuario.DoesNotExist:
-                raise ValueError('Credenciais inválidas.')
-
-            if user.check_password(password):
-                request.session['usuario_id'] = user.id
-                return redirect('dashboard')
-            else:
-                raise ValueError('Credenciais inválidas.')
-
-        except ValueError as e:
-            # Create form with error
+        email_or_username = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '').strip()
+        
+        if not email_or_username or not password:
+            messages.error(request, 'Por favor, preencha todos os campos.', extra_tags='toast')
             form = LoginForm(request.POST)
-            form.add_error(None, str(e))
+            reg_form = RegistrationForm()
+            template = 'usuarios/mobile.html' if request.user_agent.is_mobile else 'usuarios/index.html'
+            return render(request, template, {
+                'reg_form': reg_form,
+                'login_form': form
+            })
+        
+        # Try to find user by email or username
+        user = None
+        try:
+            if '@' in email_or_username:
+                user = Usuario.objects.get(email=email_or_username)
+            else:
+                user = Usuario.objects.get(nome=email_or_username)
+        except Usuario.DoesNotExist:
+            pass
+
+        if user and user.check_password(password):
+            request.session['usuario_id'] = user.id
+            messages.success(request, f'Bem-vindo de volta, {user.nome}!', extra_tags='toast')
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Email/usuário ou senha inválidos.', extra_tags='toast')
+            form = LoginForm(request.POST)
             reg_form = RegistrationForm()
             template = 'usuarios/mobile.html' if request.user_agent.is_mobile else 'usuarios/index.html'
             return render(request, template, {
@@ -72,7 +83,18 @@ def login_view(request):
 
 
 def logout_view(request):
+    usuario_nome = None
+    uid = request.session.get('usuario_id')
+    if uid:
+        try:
+            user = Usuario.objects.get(pk=uid)
+            usuario_nome = user.nome
+        except Usuario.DoesNotExist:
+            pass
+    
     request.session.pop('usuario_id', None)
+    if usuario_nome:
+        messages.success(request, f'Até logo, {usuario_nome}! Você foi desconectado.', extra_tags='toast')
     return redirect('index')
 
 
@@ -100,18 +122,3 @@ def dashboard_mobile(request):
         return redirect('index')
     
     return render(request, 'usuarios/dashboard_mobile.html', {'user': user})
-
-def sidebar(request):
-    """Render the sidebar component."""
-    uid = request.session.get('usuario_id')
-    if not uid:
-        return redirect('index')
-    try:
-        user = Usuario.objects.get(pk=uid)
-    except Usuario.DoesNotExist:
-        request.session.pop('usuario_id', None)
-        return redirect('index')
-        
-    response = render(request, 'usuarios/components/sidebar.html', {'user': user})
-    response['X-Frame-Options'] = 'SAMEORIGIN'
-    return response

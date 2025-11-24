@@ -26,10 +26,3 @@ class RegistrationForm(forms.ModelForm):
 class LoginForm(forms.Form):
     email = forms.CharField(label='E-mail ou Usuário')
     password = forms.CharField(widget=forms.PasswordInput(), label='Senha')
-
-    def add_error(self, field, error):
-        if not field:  # For non-field errors
-            self._errors.setdefault('__all__', self.error_class())
-            self._errors['__all__'].append(error)
-        else:
-            super().add_error(field, error)

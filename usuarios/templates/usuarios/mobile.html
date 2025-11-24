@@ -9,6 +9,13 @@
   <link rel="shortcut icon" href="{% static 'img/Logo-BG.svg' %}">
 </head>
 <body>
+  
+  <!-- Toast Notification System -->
+  {% include 'usuarios/components/toast.html' %}
+  
+  <!-- Django Messages rendered as Toasts -->
+  {% include 'usuarios/components/messages.html' %}
+  
   <div class="container">
 
     <!-- shared header (moved from inside wrappers to avoid duplication) -->

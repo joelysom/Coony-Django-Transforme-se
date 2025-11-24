@@ -9,5 +9,4 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('dashboard/mobile/', views.dashboard_mobile, name='dashboard_mobile'),
-    path('components/sidebar/', views.sidebar, name='sidebar'),
 ]
