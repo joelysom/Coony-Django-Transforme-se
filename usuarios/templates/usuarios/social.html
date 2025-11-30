@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Coony - Comunidade</title>
+  {% load static %}
+
+  <link rel="stylesheet" href="{% static 'pages/tela_rede_social/social.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/Logo.svg' %}" />
+</head>
+<body>
+    <!-- Navegacao/Sidebar: incluir ambas e alternar via JS -->
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegacao mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegacao desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
+  <main class="main-feed" role="main" aria-label="Feed principal">
+    <nav class="feed-tabs" role="tablist" aria-label="Navegação do feed">
+      <button role="tab" aria-selected="true" class="tab active" id="tab-feed">Feed</button>
+      <button role="tab" class="tab" id="tab-following">Seguindo</button>
+      <button role="tab" class="tab" id="tab-events">Eventos Para Mim</button>
+      <button role="tab" class="tab" id="tab-news">Novidades</button>
+      <button role="tab" class="tab" id="tab-trending">Em Alta</button>
+    </nav>
+    <!---Área do Feed fim-->
+
+    <div class="post-success" role="alert" aria-live="assertive" style="display: none;">
+      Post criado com sucesso!
+    </div>
+
+
+    <!-- Caixa de Compartilhar -->
+    <section class="share-box" aria-label="Compartilhar uma conquista">
+      <div class="share-header">
+        <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="{{ user.nome }}" class="user-avatar" />
+        <div class="share-input-wrapper">
+          <form method="post" enctype="multipart/form-data" id="post-form">
+            {% csrf_token %}
+            {{ form.texto }}
+            <div class="share-actions">
+              <div class="share-icons">
+                <label class="share-icon" id="photo-icon" for="photo-input" aria-label="Adicionar foto">
+                  <span class="material-symbols-outlined">photo_camera</span>
+                </label>
+                <div class="share-icon" id="location-icon" aria-label="Adicionar localização">
+                  <span class="material-symbols-outlined">location_on</span>
+                </div>
+                {{ form.imagem }}
+                {{ form.localizacao }}
+              </div>
+              <div class="share-buttons">
+                <button type="submit" class="share-button" id="post-button" disabled>Postar</button>
+              </div>
+            </div>
+          </form>
+          <!-- Image Preview -->
+          <div id="image-preview" class="image-preview" style="display: none; position: relative;">
+            <button type="button" id="preview-cancel" class="preview-cancel" aria-label="Remover imagem" title="Remover imagem">✖</button>
+            <img id="preview-img" src="" alt="Preview da imagem" style="max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 10px; display: block;">
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Caixa de Compartilhar Fim-->
+
+    <!-- Posts -->
+    {% for post in posts %}
+    <article class="post" aria-label="Post de {{ post.autor.nome }}">
+      <header class="post-header">
+        <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="{{ post.autor.nome }}" />
+        <div>
+          <div>{{ post.autor.nome }}</div>
+          <time datetime="{{ post.data_criacao|date:'c' }}">{{ post.data_criacao|timesince }}</time>
+        </div>
+      </header>
+      <p class="post-content">{{ post.texto }}</p>
+      {% if post.imagem %}
+      <figure class="post-media" data-post-media>
+        <img class="post-image" src="{{ post.imagem.url }}" alt="Imagem do post" loading="lazy" />
+        <button type="button" class="media-expand" aria-label="Expandir imagem" hidden>
+          <span class="material-symbols-outlined" aria-hidden="true">fullscreen</span>
+        </button>
+      </figure>
+      {% endif %}
+      <!---icon do post-->
+      <footer class="post-footer">
+        <form method="post" action="{% url 'like_post' post.id %}">
+          {% csrf_token %}
+          <button type="submit" class="like-button" aria-label="Curtir">
+            <img class="icon-post-comment" src="{% static 'icon_rede/like.png' %}" alt="Like">
+            <span class="likes-count">{{ post.likes.count }}</span>
+            {% if user in post.likes.all %}<span class="liked-indicator"> • Curtido</span>{% endif %}
+          </button>
+        </form>
+
+        <button type="button" class="toggle-comments" data-post-id="{{ post.id }}" aria-expanded="false">
+          <img src="{% static 'icon_rede/comentario.png' %}" alt="Comentários" class="icon-post-like"> <span class="comments-count">{{ post.comments.count }}</span>
+        </button>
+
+        <button type="button" aria-label="Compartilhar post">
+          <img src="{% static 'icon_rede/enviar.png' %}" alt="Compartilhar" class="icon-post-share">
+        </button>
+
+        <div class="post-comments" id="comments-{{ post.id }}" style="display:none; margin-top:12px; width:100%;">
+          {% for comment in post.comments.all %}
+          <div class="comment"><strong>{{ comment.autor.nome }}</strong> {{ comment.texto }}</div>
+          {% empty %}
+          <div class="comment empty">Seja o primeiro a comentar</div>
+          {% endfor %}
+
+          <form method="post" action="{% url 'comment_post' post.id %}" class="comment-form" style="margin-top:8px; display:flex; gap:8px;">
+            {% csrf_token %}
+            <textarea name="texto" rows="1" placeholder="Escreva um comentário..." required style="flex:1; padding:8px; border-radius:8px;"></textarea>
+            <button type="submit" class="comment-send">Comentar</button>
+          </form>
+        </div>
+
+      </footer>
+      <!---icon do post Fim-->
+    </article>
+    {% endfor %}
+  </main>
+
+  <!-- SIDEBAR DIREITA -->
+  <aside class="sidebar-right" aria-label="Sugestões para seguir">
+    <div class="search-box">
+      <input type="search" placeholder="Buscar maratonas" aria-label="Buscar maratonas" />
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" />
+        <line x1="16.5" y1="16.5" x2="21" y2="21" />
+      </svg>
+    </div>
+
+    <div>
+      <h2 class="whom-to-follow">Quem Acompanhar</h2>
+      <div class="follow-list">
+        <div class="follow-item">
+          <div class="follow-info">
+            <img src="https://randomuser.me/api/portraits/women/50.jpg" alt="Maria Alice" />
+            <div class="follow-names">
+              <strong>Maria Alice</strong>
+              <span>@juju_ba</span>
+            </div>
+          </div>
+          <button class="follow-button" type="button">Seguir</button>
+        </div>
+        <div class="follow-item">
+          <div class="follow-info">
+            <img src="https://randomuser.me/api/portraits/women/51.jpg" alt="Methues Henrique" />
+            <div class="follow-names">
+              <strong>Methues.H</strong>
+              <span>@mathueADS</span>
+            </div>
+          </div>
+          <button class="follow-button" type="button">Seguir</button>
+        </div>
+        <div class="follow-item">
+          <div class="follow-info">
+            <img src="https://randomuser.me/api/portraits/men/39.jpg" alt="Luis Fernando" />
+            <div class="follow-names">
+              <strong>Luis.FF</strong>
+              <span>@ferna_gera</span>
+            </div>
+          </div>
+          <button class="follow-button" type="button">Seguir</button>
+        </div>
+        <div class="follow-item">
+          <div class="follow-info">
+            <img src="https://randomuser.me/api/portraits/men/48.jpg" alt="Thiago Santana" />
+            <div class="follow-names">
+              <strong>Thiago.S</strong>
+              <span>@toic_2000</span>
+            </div>
+          </div>
+          <button class="follow-button" type="button">Seguir</button>
+        </div>
+      </div>
+      <div class="see-more" role="button" tabindex="0">Ver mais</div>
+    </div>
+
+    <div class="trending-runs">
+      Corridas do Momento
+    </div>
+  </aside>
+
+  <!-- Modais -->
+  <div id="location-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Adicionar Localização</h3>
+        <button class="modal-close" id="location-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="location-input" placeholder="Digite o local..." class="modal-input">
+        <div class="modal-actions">
+          <button class="modal-btn cancel" id="location-cancel">Cancelar</button>
+          <button class="modal-btn confirm" id="location-confirm">Adicionar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Elementos principais
+      const postForm = document.getElementById('post-form');
+      const textArea = document.querySelector('textarea[name="texto"]');
+      const submitBtn = document.getElementById('post-button');
+      const navMobile = document.getElementById('nav-mobile');
+      const navDesktop = document.getElementById('nav-desktop');
+      const navMediaQuery = window.matchMedia('(max-width: 768px)');
+
+      // Modais
+      const locationModal = document.getElementById('location-modal');
+      const locationInput = document.getElementById('location-input');
+      // localizar input de arquivo (fallback por name, id ou type)
+      let photoInput = document.querySelector('input[name="imagem"]') || document.getElementById('photo-input') || document.querySelector('input[type="file"]');
+      if (!photoInput) {
+        console.warn('Nenhum input de arquivo encontrado para imagem (procurado por name="imagem", id="photo-input" e input[type=file])');
+      } else {
+        console.log('photoInput resolved ->', photoInput);
+      }
+
+      // Botões
+      const photoIcon = document.getElementById('photo-icon');
+      const locationIcon = document.getElementById('location-icon');
+      const locationConfirm = document.getElementById('location-confirm');
+
+      // Estado
+      let selectedFile = null;
+      let selectedLocation = '';
+
+      // Validação do form
+      function updateFormState() {
+        const hasText = textArea.value.trim().length > 0;
+        submitBtn.disabled = !hasText;
+      }
+
+      textArea.addEventListener('input', updateFormState);
+
+      // Alterna navbar/sidebar em tempo real conforme largura
+      function applyNavMode(isMobile) {
+        if (!navMobile || !navDesktop) {
+          return;
+        }
+        navMobile.hidden = !isMobile;
+        navDesktop.hidden = isMobile;
+        document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+      }
+
+      function handleNavChange(e) {
+        applyNavMode(e.matches);
+      }
+
+      applyNavMode(navMediaQuery.matches);
+
+      if (typeof navMediaQuery.addEventListener === 'function') {
+        navMediaQuery.addEventListener('change', handleNavChange);
+      } else if (typeof navMediaQuery.addListener === 'function') {
+        navMediaQuery.addListener(handleNavChange);
+      }
+
+      // Modal de localização
+      locationIcon.addEventListener('click', function() {
+        locationModal.style.display = 'flex';
+        locationInput.focus();
+        if (selectedLocation) {
+          locationInput.value = selectedLocation;
+        }
+      });
+
+      document.getElementById('location-close').addEventListener('click', function() {
+        locationModal.style.display = 'none';
+      });
+
+      document.getElementById('location-cancel').addEventListener('click', function() {
+        locationModal.style.display = 'none';
+        locationInput.value = '';
+      });
+
+      locationConfirm.addEventListener('click', function() {
+        selectedLocation = locationInput.value.trim();
+        locationModal.style.display = 'none';
+        locationInput.value = '';
+        updateLocationIndicator();
+      });
+
+      locationInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          locationConfirm.click();
+        }
+      });
+
+      // Upload de foto direto
+      // O elemento #photo-icon é um <label for="photo-input">, então
+      // o comportamento padrão já abre o seletor. Removemos o click
+      // programático para evitar o diálogo abrindo duas vezes.
+
+      photoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        console.log('File selected:', file);
+        if (file) {
+          selectedFile = file;
+          updatePhotoIndicator();
+          showImagePreview(file);
+        } else {
+          selectedFile = null;
+          updatePhotoIndicator();
+          hideImagePreview();
+        }
+      });
+
+      // Funções auxiliares
+      function updateLocationIndicator() {
+        const indicator = locationIcon.querySelector('.location-indicator');
+        if (indicator) {
+          indicator.remove();
+        }
+        if (selectedLocation) {
+          locationIcon.innerHTML += `<span class="location-indicator" title="${selectedLocation}">📍</span>`;
+        }
+      }
+
+      function updatePhotoIndicator() {
+        const indicator = photoIcon.querySelector('.photo-indicator');
+        if (indicator) {
+          indicator.remove();
+        }
+        if (selectedFile) {
+          photoIcon.innerHTML += `<span class="photo-indicator" title="${selectedFile.name}">📷</span>`;
+        }
+      }
+
+      function showImagePreview(file) {
+        console.log('Showing preview for file:', file.name);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          console.log('Reader result:', e.target.result.substring(0, 50) + '...');
+          document.getElementById('preview-img').src = e.target.result;
+          document.getElementById('image-preview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function hideImagePreview() {
+        document.getElementById('image-preview').style.display = 'none';
+        document.getElementById('preview-img').src = '';
+      }
+
+      // Botão cancelar prévia: limpa o input e esconde a prévia
+      const previewCancelBtn = document.getElementById('preview-cancel');
+      if (previewCancelBtn) {
+        previewCancelBtn.addEventListener('click', function() {
+          if (photoInput) {
+            try {
+              photoInput.value = '';
+            } catch (err) {
+              // Alguns navegadores bloqueiam atribuição direta em inputs gerados por frameworks
+              console.warn('Não foi possível limpar o value do input diretamente:', err);
+            }
+          }
+          selectedFile = null;
+          updatePhotoIndicator();
+          hideImagePreview();
+        });
+      }
+
+      // Fechar modais clicando fora
+      locationModal.addEventListener('click', function(e) {
+        if (e.target === locationModal) {
+          locationModal.style.display = 'none';
+        }
+      });
+
+      // Toggle comments visibility
+      document.querySelectorAll('.toggle-comments').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          const pid = btn.getAttribute('data-post-id');
+          const box = document.getElementById('comments-' + pid);
+          if (!box) return;
+          const isHidden = box.style.display === 'none' || box.style.display === '';
+          box.style.display = isHidden ? 'block' : 'none';
+          btn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+        });
+      });
+
+      // Envio do form
+      postForm.addEventListener('submit', function(e) {
+        // Definir os valores dos campos ocultos
+        const imageInput = document.querySelector('input[name="imagem"]');
+        const locationInput = document.querySelector('input[name="localizacao"]');
+
+        // Para imagem, já está no input file
+        // Para localização, definir o valor
+        if (selectedLocation) {
+          locationInput.value = selectedLocation;
+        }
+
+        // O form será enviado normalmente
+      });
+
+      // Reset após envio bem-sucedido (se necessário)
+      // Isso pode ser feito verificando se há mensagens de sucesso
+
+      // ---- Post media handling (Facebook/Twitter style) ----
+      const mediaFigures = document.querySelectorAll('[data-post-media]');
+      let expandedMedia = null;
+      let resizeTimeoutId = null;
+
+      function setExpandButtonState(button, expanded) {
+        if (!button) return;
+        const icon = button.querySelector('.material-symbols-outlined');
+        if (icon) {
+          icon.textContent = expanded ? 'close_fullscreen' : 'fullscreen';
+        }
+        button.setAttribute('aria-label', expanded ? 'Fechar imagem' : 'Expandir imagem');
+      }
+
+      function injectPlaceholder(figure) {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'post-media-placeholder';
+        const rect = figure.getBoundingClientRect();
+        const computed = window.getComputedStyle(figure);
+        placeholder.style.height = `${rect.height}px`;
+        placeholder.style.marginTop = computed.marginTop;
+        placeholder.style.marginBottom = computed.marginBottom;
+        figure._mediaPlaceholder = placeholder;
+        figure.parentNode.insertBefore(placeholder, figure);
+      }
+
+      function restoreFigurePosition(figure) {
+        if (figure._mediaPlaceholder && figure._mediaPlaceholder.parentNode) {
+          figure._mediaPlaceholder.parentNode.insertBefore(figure, figure._mediaPlaceholder);
+          figure._mediaPlaceholder.remove();
+          figure._mediaPlaceholder = null;
+        }
+        figure.style.marginTop = '';
+        figure.style.marginBottom = '';
+      }
+
+      function toggleMediaExpansion(figure, forceState) {
+        const shouldExpand = typeof forceState === 'boolean'
+          ? forceState
+          : !figure.classList.contains('post-media--expanded');
+        const button = figure.querySelector('.media-expand');
+
+        if (shouldExpand) {
+          if (expandedMedia && expandedMedia !== figure) {
+            toggleMediaExpansion(expandedMedia, false);
+          }
+          if (!figure._mediaPlaceholder) {
+            injectPlaceholder(figure);
+          }
+          document.body.appendChild(figure);
+          figure.style.marginTop = '0';
+          figure.style.marginBottom = '0';
+          figure.classList.add('post-media--expanded');
+          document.body.classList.add('media-locked');
+          expandedMedia = figure;
+          setExpandButtonState(button, true);
+        } else {
+          figure.classList.remove('post-media--expanded');
+          restoreFigurePosition(figure);
+          setExpandButtonState(button, false);
+          if (expandedMedia === figure) {
+            expandedMedia = null;
+            document.body.classList.remove('media-locked');
+          }
+        }
+      }
+
+      function evaluateImageSizes(img, figure) {
+        const button = figure.querySelector('.media-expand');
+        if (!img) return;
+        const naturalWidth = img.naturalWidth;
+        const naturalHeight = img.naturalHeight;
+
+        if (!naturalWidth || !naturalHeight) return;
+
+        img.classList.remove('is-portrait', 'is-landscape', 'is-square');
+        const ratio = naturalWidth / naturalHeight;
+        if (Math.abs(ratio - 1) < 0.08) {
+          img.classList.add('is-square');
+        } else if (ratio < 1) {
+          img.classList.add('is-portrait');
+        } else {
+          img.classList.add('is-landscape');
+        }
+
+        if (!button) return;
+
+        // Determine whether expand control is useful comparando tamanhos natural vs renderizado
+        const needsExpand = (naturalHeight - img.clientHeight) > 12 || (naturalWidth - img.clientWidth) > 12;
+        button.hidden = !needsExpand;
+        button.setAttribute('aria-hidden', needsExpand ? 'false' : 'true');
+        button.tabIndex = needsExpand ? 0 : -1;
+      }
+
+      function bindMediaFigure(figure) {
+        const img = figure.querySelector('.post-image');
+        const button = figure.querySelector('.media-expand');
+        if (!img || !button) return;
+
+        const analyze = () => evaluateImageSizes(img, figure);
+
+        if (img.complete && img.naturalWidth) {
+          analyze();
+        } else {
+          img.addEventListener('load', analyze, { once: true });
+        }
+
+        button.addEventListener('click', (event) => {
+          event.stopPropagation();
+          toggleMediaExpansion(figure);
+        });
+
+        img.addEventListener('click', () => {
+          if (button.hidden) {
+            return;
+          }
+          toggleMediaExpansion(figure);
+        });
+
+        figure.addEventListener('click', (event) => {
+          if (!figure.classList.contains('post-media--expanded')) {
+            return;
+          }
+          if (event.target === figure) {
+            toggleMediaExpansion(figure, false);
+          }
+        });
+      }
+
+      function reevaluateAllMedia() {
+        mediaFigures.forEach((figure) => {
+          const img = figure.querySelector('.post-image');
+          if (img) {
+            evaluateImageSizes(img, figure);
+          }
+        });
+      }
+
+      mediaFigures.forEach(bindMediaFigure);
+
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeoutId);
+        resizeTimeoutId = setTimeout(reevaluateAllMedia, 150);
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && expandedMedia) {
+          toggleMediaExpansion(expandedMedia, false);
+        }
+      });
+
+    }); // end DOMContentLoaded
+  </script>
+
+</body>
+

@@ -1,0 +1,602 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root {
+  --orange: #f68b4a;
+  --orange-dark: #d47022;
+  --beige: #f5efe7;
+  --white: #ffffff;
+  --gray-light: #f7f5f3;
+  --gray-medium: #cec4b6;
+  --gray-dark: #5c5b61;
+  --border-radius: 12px;
+  --font-family: 'Poppins', sans-serif;
+  --box-shadow: 0 2px 6px rgb(246 139 74 / 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--beige);
+  font-family: var(--font-family);
+  color: #4a4a4a;
+  min-height: 100vh;
+  
+  /* --- RESPONSIVIDADE: Layout Principal com CSS Grid --- */
+  display: grid;
+  /* Define as 3 colunas: Sidebar Esquerda (220px), Feed (1fr), Sidebar Direita (300px) */
+  grid-template-columns: 220px 1fr 300px; 
+  grid-template-rows: 1fr;
+  overflow-x: hidden; /* Previne a barra de rolagem horizontal */
+}
+
+/* Lateral Menu (Sidebar Esquerda) */
+.sidebar {
+  grid-column: 1 / 2;
+  background: var(--white);
+  width: 100%; /* Ocupa a largura total da coluna de 220px */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid var(--gray-light);
+  height: 100vh; 
+  position: sticky; /* Mantém o menu fixo */
+  top: 0;
+}
+
+.logo {
+  width: 120px;
+  margin-bottom: 30px;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+  white-space: nowrap;
+}
+
+.menu li {
+  margin-bottom: 15px;
+}
+
+.menu button {
+  width: 100%;
+  background: none;
+  border: none;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--gray-dark);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.menu button svg {
+  flex-shrink: 0;
+  stroke: var(--gray-dark);
+  stroke-width: 1.5;
+  width: 24px;
+  height: 24px;
+}
+
+.menu button:hover {
+  background-color: var(--orange);
+  color: var(--white);
+}
+
+.menu button:hover svg {
+  stroke: var(--white);
+}
+
+.menu .active {
+  background-color: var(--orange);
+  color: var(--white);
+}
+
+.menu .active svg {
+  stroke: var(--white);
+}
+
+.button-create-event {
+  margin-top: 0px;
+  margin-bottom: 5px;
+  background-color: var(--orange);
+  color: var(--white);
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 12px 0;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+.button-create-event:hover {
+  background-color: var(--orange-dark);
+}
+
+.user-area {
+  background: var(--gray-light);
+  border-radius: var(--border-radius);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+}
+
+.user-area img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-info {
+  flex-grow: 1;
+  font-size: 14px;
+  color: var(--gray-dark);
+}
+
+.user-info strong {
+  display: block;
+  font-weight: 600;
+}
+
+/* Botão de sair com ícone */
+.logout-button-with-icon {
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 12px 20px;
+  cursor: pointer;
+  width: 100%; 
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--gray-dark);
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.logout-button-with-icon:hover {
+    background: #e0e0e0;
+}
+
+.logout-button-with-icon img {
+    width: 20px;
+    height: 20px;
+}
+
+/* ÁREA DO FEED (Main Content) */
+.main-feed {
+    grid-column: 2 / 3;
+    padding: 20px;
+    overflow-y: auto; /* Permite rolagem apenas no feed */
+}
+
+/* Centraliza e limita a largura do conteúdo do feed */
+.main-feed > * {
+    max-width: 650px; 
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+.feed-tabs {
+    display: flex;
+    gap: 10px;
+    border-bottom: 1px solid var(--gray-medium);
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+}
+
+.feed-tabs .tab {
+    background: none;
+    border: none;
+    padding: 10px 15px;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--gray-dark);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: border-bottom-color 0.3s, color 0.3s;
+}
+
+.feed-tabs .tab.active {
+    color: var(--orange);
+    border-bottom-color: var(--orange);
+}
+
+/* Share Box */
+.share-box {
+    background: var(--white);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.share-textarea {
+    width: 100%;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--border-radius);
+    padding: 10px;
+    resize: none;
+    font-family: var(--font-family);
+    font-size: 15px;
+}
+
+.share-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.share-icons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin-right: 10px;
+}
+
+.share-icons img {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+}
+
+.share-button {
+    background-color: var(--orange);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.share-button:hover:not(:disabled) {
+    background-color: var(--orange-dark);
+}
+
+.share-button:disabled {
+    background-color: var(--gray-medium);
+    cursor: not-allowed;
+}
+
+.post-success {
+    background: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Post Styling */
+.post {
+    background: var(--white);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 25px;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.post-header img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.post-header div strong {
+    font-weight: 600;
+}
+
+.post-header time {
+    display: block;
+    font-size: 12px;
+    color: var(--gray-dark);
+}
+
+.post-content {
+    margin: 0 0 15px 0;
+}
+
+.post-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+}
+
+.post-footer {
+    display: flex;
+    gap: 25px;
+    padding-top: 10px;
+    border-top: 1px solid var(--gray-light);
+    margin-bottom: 15px;
+}
+
+.post-footer button {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    color: var(--gray-dark);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.post-footer img {
+    width: 20px;
+    height: 20px;
+}
+
+/* Comments */
+.comment-section {
+    padding-top: 10px;
+}
+
+.comment {
+    background: var(--gray-light);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.comment strong {
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+.comment-actions {
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--orange);
+}
+
+.comment-actions span {
+    margin-right: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.comment-input-box {
+    display: flex;
+    gap: 10px;
+}
+
+.comment-input {
+    flex-grow: 1;
+    border: 1px solid var(--gray-medium);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: var(--font-family);
+}
+
+.comment-send {
+    background-color: var(--orange);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.comment-send:hover:not(:disabled) {
+    background-color: var(--orange-dark);
+}
+
+.comment-send:disabled {
+    background-color: var(--gray-medium);
+    cursor: not-allowed;
+}
+
+
+/* Sidebar Direita */
+.sidebar-right {
+    grid-column: 3 / 4;
+    background: var(--white);
+    padding: 20px;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    border-left: 1px solid var(--gray-light);
+    overflow-y: auto; /* Permite rolagem na sidebar direita */
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: var(--gray-light);
+    border-radius: var(--border-radius);
+    padding: 8px 12px;
+    margin-bottom: 25px;
+}
+
+.search-box input {
+    flex-grow: 1;
+    border: none;
+    background: none;
+    padding: 5px;
+    font-family: var(--font-family);
+    font-size: 14px;
+}
+
+.search-box input:focus {
+    outline: none;
+}
+
+.search-box svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+    color: var(--gray-dark);
+    flex-shrink: 0;
+}
+
+.whom-to-follow {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-dark);
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.follow-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.follow-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.follow-info img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.follow-names strong {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.follow-names span {
+    display: block;
+    font-size: 12px;
+    color: var(--gray-dark);
+}
+
+.follow-button {
+    background-color: var(--orange);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.follow-button:hover {
+    background-color: var(--orange-dark);
+}
+
+.see-more {
+    color: var(--orange);
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.trending-runs {
+    background: var(--gray-light);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-top: 30px;
+    font-weight: 600;
+    color: var(--gray-dark);
+}
+
+
+/* =================================== */
+/* === MEDIA QUERIES (RESPONSIVIDADE)=== */
+/* =================================== */
+
+/* Dispositivos de Tela Média (Ex: Laptops e Tablets em paisagem - < 1200px) */
+@media (max-width: 1200px) {
+    body {
+        /* Remove a terceira coluna (sidebar-right) */
+        grid-template-columns: 220px 1fr; 
+    }
+
+    .sidebar-right {
+        /* Oculta a sidebar da direita */
+        display: none;
+    }
+
+    /* O feed agora ocupa o restante do espaço */
+    .main-feed {
+        grid-column: 2 / 3;
+    }
+}
+
+/* Dispositivos Móveis (Ex: Tablets em retrato e Smartphones - < 768px) */
+@media (max-width: 768px) {
+    body {
+        /* Apenas uma coluna para o feed, remove o sidebar lateral esquerdo */
+        grid-template-columns: 1fr; 
+    }
+
+    .sidebar {
+        /* Oculta o menu lateral esquerdo em dispositivos móveis */
+        display: none; 
+    }
+
+    .main-feed {
+        grid-column: 1 / 2; /* O feed ocupa toda a largura */
+        padding: 10px; /* Reduz o padding em telas pequenas */
+    }
+    
+    /* Garante que elementos dentro do feed ocupem 100% da tela visível */
+    .main-feed > * {
+        max-width: 100%; 
+    }
+    
+    .feed-tabs {
+        overflow-x: auto; /* Permite rolagem horizontal nas abas (tabs) */
+        white-space: nowrap; /* Impede que as abas quebrem a linha */
+        padding-bottom: 10px;
+    }
+    
+    .feed-tabs .tab {
+        flex-shrink: 0; /* Impede que as abas encolham */
+    }
+}
+
+/* Telas muito pequenas (opcional, para garantir que o menu da sidebar caiba se for reativado) */
+@media (max-width: 480px) {
+    .post-header, .user-area {
+        align-items: flex-start;
+    }
+}

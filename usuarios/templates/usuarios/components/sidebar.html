@@ -176,7 +176,8 @@
   <img src="{% static 'img/Logo.svg' %}" class="sidebar-logo" alt="Coony Logo">
 
   <nav class="sidebar-nav">
-    <button class="sidebar-menu-item active"><span class="material-symbols-outlined">home</span> Início</button>
+    <button class="sidebar-menu-item active" onclick="window.location.href='{% url 'dashboard' %}'"><span class="material-symbols-outlined">home</span> Início</button>
+    <button class="sidebar-menu-item" onclick="window.location.href='{% url 'social' %}'"><span class="material-symbols-outlined">maps_ugc</span> Comunidade</button>
     <button class="sidebar-menu-item"><span class="material-symbols-outlined">event</span> Ver Eventos</button>
     <button class="sidebar-menu-item"><span class="material-symbols-outlined">notifications</span> Notificações</button>
     <button class="sidebar-menu-item"><span class="material-symbols-outlined">favorite</span> Favoritos</button>
@@ -208,7 +209,31 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const menuItems = document.querySelectorAll('.sidebar-menu-item');
+      const currentPath = window.location.pathname;
 
+      // Remove active class from all items first
+      menuItems.forEach(item => item.classList.remove('active'));
+
+      // Set active based on current URL
+      if (currentPath === '/' || currentPath === '/dashboard/') {
+        document.querySelector('.sidebar-menu-item:first-child').classList.add('active');
+      } else if (currentPath.includes('social')) {
+        document.querySelector('button[onclick*="social"]').classList.add('active');
+      } else if (currentPath.includes('eventos') || currentPath.includes('events')) {
+        document.querySelector('button span.material-symbols-outlined:contains("event")').closest('.sidebar-menu-item').classList.add('active');
+      } else if (currentPath.includes('notificacoes') || currentPath.includes('notifications')) {
+        document.querySelector('button span.material-symbols-outlined:contains("notifications")').closest('.sidebar-menu-item').classList.add('active');
+      } else if (currentPath.includes('favoritos') || currentPath.includes('favorites')) {
+        document.querySelector('button span.material-symbols-outlined:contains("favorite")').closest('.sidebar-menu-item').classList.add('active');
+      } else if (currentPath.includes('meus-eventos') || currentPath.includes('my-events')) {
+        document.querySelector('button span.material-symbols-outlined:contains("calendar_month")').closest('.sidebar-menu-item').classList.add('active');
+      } else if (currentPath.includes('perfil') || currentPath.includes('profile')) {
+        document.querySelector('button span.material-symbols-outlined:contains("account_circle")').closest('.sidebar-menu-item').classList.add('active');
+      } else if (currentPath.includes('ajuda') || currentPath.includes('help')) {
+        document.querySelector('button span.material-symbols-outlined:contains("help")').closest('.sidebar-menu-item').classList.add('active');
+      }
+
+      // Handle clicks to update active state
       menuItems.forEach(item => {
         item.addEventListener('click', function() {
           if (!this.classList.contains('create-event')) {

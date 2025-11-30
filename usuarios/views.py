@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
-from .forms import RegistrationForm, LoginForm
-from .models import Usuario
+from .forms import RegistrationForm, LoginForm, PostForm, CommentForm
+from .models import Usuario, Post, Comment
 
 
 def index(request):
@@ -122,3 +122,68 @@ def dashboard_mobile(request):
         return redirect('index')
     
     return render(request, 'usuarios/dashboard_mobile.html', {'user': user})
+
+def social(request):
+    """Render social network page."""
+    uid = request.session.get('usuario_id')
+    if not uid:
+        return redirect('index')
+    try:
+        user = Usuario.objects.get(pk=uid)
+    except Usuario.DoesNotExist:
+        request.session.pop('usuario_id', None)
+        return redirect('index')
+    
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.autor = user
+            post.save()
+            messages.success(request, 'Post criado com sucesso!', extra_tags='toast')
+            return redirect('social')
+    else:
+        form = PostForm()
+    
+    posts = Post.objects.all().order_by('-data_criacao')
+    return render(request, 'usuarios/social.html', {
+        'user': user,
+        'form': form,
+        'posts': posts,
+        'comment_form': CommentForm()
+    })
+
+
+def like_post(request, post_id):
+    uid = request.session.get('usuario_id')
+    if not uid or request.method != 'POST':
+        return redirect('social')
+    try:
+        user = Usuario.objects.get(pk=uid)
+        post = Post.objects.get(pk=post_id)
+    except (Usuario.DoesNotExist, Post.DoesNotExist):
+        return redirect('social')
+
+    if user in post.likes.all():
+        post.likes.remove(user)
+    else:
+        post.likes.add(user)
+    return redirect('social')
+
+
+def comment_post(request, post_id):
+    uid = request.session.get('usuario_id')
+    if not uid or request.method != 'POST':
+        return redirect('social')
+    try:
+        user = Usuario.objects.get(pk=uid)
+        post = Post.objects.get(pk=post_id)
+    except (Usuario.DoesNotExist, Post.DoesNotExist):
+        return redirect('social')
+
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        texto = form.cleaned_data['texto'].strip()
+        if texto:
+            Comment.objects.create(post=post, autor=user, texto=texto)
+    return redirect('social')

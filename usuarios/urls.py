@@ -9,4 +9,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('dashboard/mobile/', views.dashboard_mobile, name='dashboard_mobile'),
+    path('social/', views.social, name='social'),
+    path('social/like/<int:post_id>/', views.like_post, name='like_post'),
+    path('social/comment/<int:post_id>/', views.comment_post, name='comment_post'),
 ]
