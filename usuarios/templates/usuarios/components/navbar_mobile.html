@@ -60,6 +60,14 @@
       color: #f68b4a;
     }
 
+    .nav-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #f68b4a;
+    }
+
     /* Adjust body to account for navbar */
     body {
       padding-bottom: 80px;
@@ -82,8 +90,8 @@
     <span class="material-symbols-outlined">maps_ugc</span>
     <p>Comunidade</p>
   </a>
-  <a href="{% url 'dashboard_mobile' %}" class="nav-item">
-    <span class="material-symbols-outlined">account_circle</span>
+  <a href="{% url 'perfil' %}" class="nav-item {% if request.resolver_match.url_name == 'perfil' %}active{% endif %}">
+    <img src="{% if user.foto %}{{ user.foto.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="{{ user.nome }}" class="nav-avatar">
     <p>Perfil</p>
   </a>
 </nav>

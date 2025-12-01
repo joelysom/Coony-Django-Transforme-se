@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat - Coony</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/chat.css' %}">
+</head>
+<body data-static-root="{{ STATIC_URL }}">
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
+  <main class="chat-wrapper" data-current-user="{{ user.nome|default:'Você' }}" data-current-avatar="{% if user.foto %}{{ user.foto.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}">
+    <div class="container">
+      <aside class="sidebar contatos">
+        <nav>
+          <div class="app-container">
+            <div class="top-bar">
+              <h1 class="top-bar__title">
+                <button type="button" class="botao botao-ativo" data-tab="conversas">Conversas</button>
+                <span class="divider">/</span>
+                <button type="button" class="botao" data-tab="comunidades">Comunidades</button>
+              </h1>
+            </div>
+            <div class="search-wrapper">
+              <input type="text" id="busca" class="search-input" placeholder="Buscar contato..." autocomplete="off" />
+            </div>
+
+            <ul class="contacts-list" id="lista" aria-live="polite">
+              <!-- JS insere os cards aqui -->
+            </ul>
+          </div>
+        </nav>
+      </aside>
+
+      <div class="chat-app chat" aria-live="polite">
+        <header class="chat-header">
+          <div class="user" id="chatUserInfo">
+            <img src="{% static 'img/default-avatar.svg' %}" alt="Contato selecionado" id="chatUserAvatar">
+            <div class="user-info">
+              <h3 id="chatUserName">Selecione um contato</h3>
+              <p id="chatUserStatus">Online agora</p>
+            </div>
+          </div>
+          <div class="header-icons">
+            <button class="icon" type="button" aria-label="Iniciar chamada de áudio">
+              <span class="material-symbols-outlined">call</span>
+            </button>
+            <button class="icon voltarBtn" type="button" aria-label="Voltar para lista">
+              <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+          </div>
+        </header>
+
+        <main class="chat-body" id="chatBody">
+          <div id="rolagem">
+            <div class="message sent">
+              <div class="bubble">
+                <h3>Você</h3>
+                <p>Oi! Vamos falar sobre a corrida de sábado?</p>
+              </div>
+              <img src="{% if user.foto %}{{ user.foto.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="{{ user.nome|default:'Você' }}" class="avatar">
+              <span class="time">20:21<span class="confirmacaoMsg">✓✓</span></span>
+            </div>
+
+            <div class="message received">
+              <img src="{% static 'img/default-avatar.svg' %}" alt="Contato" class="avatar" id="chatPartnerFallback">
+              <div class="bubble">
+                <h3>Ronaldo</h3>
+                <p>Oi! Bora sim, estou bem animado.</p>
+              </div>
+              <span class="time">20:30</span>
+            </div>
+          </div>
+        </main>
+
+        <emoji-picker id="emojiPicker" class="hidden"></emoji-picker>
+
+        <footer class="chat-footer">
+          <button class="emoji-btn" type="button" aria-label="Inserir emoji">
+            <span class="material-symbols-outlined">mood</span>
+          </button>
+
+          <button id="imgBtn" type="button" aria-label="Enviar imagem">
+            <span class="material-symbols-outlined">image</span>
+          </button>
+          <input type="file" id="imgInput" accept="image/*" hidden>
+
+          <button id="audioBtn" class="audio-btn" type="button" aria-label="Gravar áudio">
+            <span class="material-symbols-outlined mic-icon">mic</span>
+          </button>
+
+          <span id="recordTimer" class="record-timer hidden">00:00</span>
+
+          <input type="text" id="msgInput" placeholder="Digite uma mensagem..." autocomplete="off">
+
+          <button id="sendBtn" class="botaoDesativo" type="button" aria-label="Enviar mensagem" disabled>
+            <span class="material-symbols-outlined">send</span>
+          </button>
+        </footer>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    window.CHAT_STATIC = {
+      defaultAvatar: "{% static 'img/default-avatar.svg' %}",
+      currentUserName: "{{ user.nome|default:'Você'|escapejs }}",
+      currentUserAvatar: "{% if user.foto %}{{ user.foto.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}"
+    };
+  </script>
+  <script src="https://unpkg.com/emoji-picker-element@^1/index.js" type="module"></script>
+  <script src="{% static 'script/chat.js' %}" defer></script>
+</body>
+</html>

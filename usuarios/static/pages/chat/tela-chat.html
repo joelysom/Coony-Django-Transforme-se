@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- Estilos globais do projeto -->
+  <link rel="stylesheet" href="../../css/chattela.css" />
+  <link rel="stylesheet" href="../../css/GLOBAL.css">
+
+  <!-- Estilos específicos do chat -->
+  <link rel="stylesheet" href="../../css/chat.css">
+
+  <!-- Bibliotecado emoji-picker -->
+  <script src="https://unpkg.com/emoji-picker-element@^1/index.js" type="module"></script>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- ============================
+         MENU LATERAL
+    ============================= -->
+    <aside class="sidebar contatos">
+      <nav>
+        <div class="app-container">
+          <div class="top-bar">
+            <h1 class="top-bar__title"><button class="botao ">Conversas</button> / <button class="botao">Comunidades</button></h1>
+          </div>
+          <div class="search-wrapper">
+            <input type="text" id="busca" class="search-input" placeholder="Buscar contato..." />
+          </div>
+
+          <ul class="contacts-list" id="lista">
+            <!-- JS insere os cards aqui -->
+          </ul>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- ============================
+         ÁREA PRINCIPAL DO CHAT
+    ============================= -->
+    <div class="chat-app chat">
+
+      <!-- ============================
+           CABEÇALHO DO CHAT
+      ============================= -->
+      <header class="chat-header">
+
+        <!-- Informações do usuário -->
+        <div class="user">
+          <img src="../../img/imgChat/persona1.jpg" alt="Ronaldo">
+          <div class="user-info">
+            <h3>Ronaldo</h3>
+            <p>Online</p>
+          </div>
+        </div>
+
+        <!-- Ícones do cabeçalho -->
+        <div class="header-icons">
+          <button class="icon"><img src='../../img/imgChat/telefone.png'/></button>
+          <button class="icon voltarBtn"><img src='../../img/imgChat/setaEsquerda.png'/></button>
+        </div>
+
+      </header>
+
+      <!-- ============================
+           CORPO DO CHAT (mensagens)
+      ============================= -->
+      <main class="chat-body" id="chatBody">
+
+        <!-- Div responsável pela rolagem das mensagens -->
+        <div id="rolagem">
+
+          <!-- Exemplo de mensagem enviada -->
+          <div class="message sent">
+            <div class="bubble">
+              <h3>Eu</h3>
+              <p>oi!</p>
+            </div>
+
+            <!-- Avatar do usuário -->
+            <img src="../../img/imgChat/persona2.jpg" alt="Eu" class="avatar">
+            <span class="time">20:21<span class="confirmacaoMsg">✓✓</span></span>
+          </div>
+
+          <!-- Exemplo de mensagem recebida -->
+          <div class="message received">
+            <img src="../../img/imgChat/persona1.jpg" alt="Ronaldo" class="avatar">
+            <div class="bubble">
+              <h3>Ronaldo</h3>
+              <p>oi!</p>
+            </div>
+            <span class="time">20:30</span>
+          </div>
+
+        </div>
+      </main>
+
+      <!-- Picker de emoji (fica oculto até clicar no botão) -->
+      <emoji-picker id="emojiPicker" class="hidden"></emoji-picker>
+
+      <!-- ============================
+           FOOTER (envio de mensagens)
+      ============================= -->
+      <footer class="chat-footer">
+
+        <!-- Botão do Emoji -->
+        <button class="emoji-btn">
+          <img src="../../img/imgChat/emoji.png" alt="botão emojis">
+        </button>
+
+        <!-- Botão de enviar imagem -->
+        <button id="imgBtn">
+          <img src="../../img/imgChat/galeria.png" alt="galeria">
+        </button>
+
+        <!-- Input oculto para selecionar a imagem -->
+        <input type="file" id="imgInput" accept="image/*" style="display: none;">
+
+        <!-- Botão para gravar áudio -->
+        <button id="audioBtn" class="audio-btn">
+          <img src="../../img/imgChat/microfone.png" class="mic-icon" alt="mic">
+        </button>
+
+        <!-- Cronômetro da gravação -->
+        <span id="recordTimer" class="record-timer hidden">00:00</span>
+
+        <!-- Input para digitar mensagem -->
+        <input type="text" id="msgInput" placeholder="Digite uma mensagem...">
+
+        <!-- Botão de enviar -->
+        <button id="sendBtn" class="botaoDesativo">➤</button>
+
+      </footer>
+
+    </div>
+  </div>
+
+<!-- ============================
+     JAVASCRIPT DO CHAT
+============================= -->
+<script src="../../script/funcionalidadesChat.js"></script>
+
+</body>
+</html>

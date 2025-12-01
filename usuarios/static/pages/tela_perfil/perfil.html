@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalizar Perfil</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+  <link rel="stylesheet" href="/css/perfil.css">
+</head>
+<body>
+
+  <header>
+    <h1>Personalize o seu Perfil</h1>
+  </header>
+
+  <main class = "tela">
+    <section class="profile-section">
+  <div class="profile-pic">
+    <i class="ri-user-3-fill"></i>
+    <div class="edit-icon">
+      <i class="ri-pencil-fill"></i>
+    </div>
+  </div>
+</section>
+
+
+    <form>
+    <div class="input-group">
+        <label>Nome do Usuário</label>
+        <input type="text" placeholder="Digite seu nome de usuário">
+      </div>
+
+      <div class="input-group">
+        <label>Nome Completo</label>
+        <input type="text" placeholder="Digite seu nome completo">
+      </div>
+
+      <div class="input-group">
+        <label>E-mail</label>
+        <input type="email" placeholder="Digite seu e-mail">
+      </div>
+
+      <div class="input-group location-field">
+        <label>Localização</label>
+        <input type="text" placeholder="Digite sua localização">
+        <i class="ri-map-pin-line"></i>
+      </div>
+
+      <div class="modalidades">
+        <div class="modalidades-header">
+          <label>Modalidades</label>
+          <button type="button" class="add-btn" onclick="addModalidade()">+</button>
+        </div>
+        <div class="tags-container"></div>
+      </div>
+
+      <div class="input-group">
+        <label>Bio</label>
+        <textarea placeholder="Escreva algo sobre você..."></textarea>
+      </div>
+
+      <div class="illustration">
+        <img src="https://cdn-icons-png.flaticon.com/512/706/706164.png" alt="Ilustração de alimentos saudaveis">
+      </div>
+
+      <button type="button" class="save-btn">Salvar Alterações</button>
+    </form>
+  </main>
+
+  <iframe src="/component/NavbarINF.html" class="navbar-frame" frameborder="0"></iframe>
+
+  <script>
+    function addModalidade() {
+      const text = prompt("Digite o nome da modalidade:");
+      if (text && text.trim() !== "") {
+        const tag = document.createElement("div");
+        tag.classList.add("tag");
+        tag.textContent = text;
+        document.getElementById("tagsContainer").appendChild(tag);
+      }
+    }
+  </script>
+    <!-- Importa o Navbar -->,
+     
+</body>
+</html>

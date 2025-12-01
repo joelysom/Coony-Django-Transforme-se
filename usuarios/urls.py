@@ -12,4 +12,6 @@ urlpatterns = [
     path('social/', views.social, name='social'),
     path('social/like/<int:post_id>/', views.like_post, name='like_post'),
     path('social/comment/<int:post_id>/', views.comment_post, name='comment_post'),
+    path('perfil/', views.perfil, name='perfil'),
+    path('chat/', views.chat, name='chat'),
 ]

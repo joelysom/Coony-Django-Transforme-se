@@ -1,0 +1,317 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil - Coony</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+  <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+<body>
+
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
+  <header>
+    <h1>Personalize o seu Perfil</h1>
+  </header>
+
+  <main class="tela">
+    <form method="post" action="{% url 'perfil' %}" enctype="multipart/form-data" id="perfilForm" class="profile-form">
+      {% csrf_token %}
+      <input type="hidden" name="remove_foto" id="removeFotoInput" value="0">
+
+      <section class="profile-section">
+        <div class="profile-pic">
+          <img
+            id="profilePhotoPreview"
+            src="{% if user.foto %}{{ user.foto.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}"
+            data-fallback="{% static 'img/default-avatar.svg' %}"
+            alt="Foto de {{ user.nome|default:'Usuário' }}"
+          >
+          <button type="button" class="edit-icon" onclick="document.getElementById('fotoInput').click();" aria-label="Alterar foto">
+            <i class="ri-pencil-fill"></i>
+          </button>
+        </div>
+        <div class="photo-actions">
+          <button type="button" class="photo-upload-button" id="fotoTrigger">
+            Atualizar foto
+          </button>
+          <input type="file" id="fotoInput" name="foto" accept="image/*" hidden>
+          <button type="button" class="photo-remove-btn" onclick="markPhotoRemoval()">Remover foto</button>
+        </div>
+      </section>
+
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Nome do Usuário</label>
+          <input type="text" name="nome" value="{{ user.nome|default:'' }}" placeholder="Digite seu nome de usuário" required>
+        </div>
+
+        <div class="input-group">
+          <label>Nome Completo</label>
+          <input type="text" name="nome_completo" value="{{ user.nome_completo|default:user.nome }}" placeholder="Digite seu nome completo">
+        </div>
+
+        <div class="input-group">
+          <label>E-mail</label>
+          <input type="email" name="email" value="{{ user.email|default:'' }}" placeholder="Digite seu e-mail" required>
+        </div>
+
+        <div class="input-group location-field">
+          <label>Localização</label>
+          <input type="text" name="localizacao" value="{{ user.localizacao|default:'' }}" placeholder="Digite sua localização">
+          <i class="ri-map-pin-line"></i>
+        </div>
+      </div>
+
+      <div class="modalidades">
+        <div class="modalidades-header">
+          <label>Modalidades</label>
+          <button type="button" class="add-btn" onclick="addModalidade()">+</button>
+        </div>
+        <div class="tags-container" id="tagsContainer">
+          {% for modalidade in modalidades %}
+            <div class="tag" data-value="{{ modalidade }}">{{ modalidade }}</div>
+          {% empty %}
+          {% endfor %}
+        </div>
+        <input type="hidden" name="modalidades" id="modalidadesInput" value="{{ user.modalidades|default:'' }}">
+      </div>
+
+      <div class="input-group">
+        <label>Bio</label>
+        <textarea name="bio" placeholder="Escreva algo sobre você...">{{ user.bio|default:'' }}</textarea>
+      </div>
+
+      <div class="illustration">
+        <img src="{% static 'img/perfil_art.png' %}" alt="Arte ilustrativa de perfil">
+      </div>
+
+      <button type="submit" class="save-btn">Salvar Alterações</button>
+    </form>
+  </main>
+
+  <div id="cropModal" class="cropper-modal" aria-hidden="true">
+    <div class="cropper-dialog" role="dialog" aria-modal="true">
+      <header class="cropper-dialog-header">
+        <h2>Ajuste sua foto</h2>
+        <button type="button" class="cropper-close" id="cropClose" aria-label="Fechar">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </header>
+      <div class="cropper-image-wrapper">
+        <img id="cropperImage" alt="Pré-visualização do corte">
+      </div>
+      <div class="cropper-actions">
+        <button type="button" class="photo-remove-btn" id="cropCancel">Cancelar</button>
+        <button type="button" class="photo-upload-button" id="cropApply">Aplicar corte</button>
+      </div>
+      <p class="cropper-hint">Arraste para reposicionar, use a roda do mouse para aplicar zoom.</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+  <script>
+    function syncModalidadesInput() {
+      const container = document.getElementById('tagsContainer');
+      const values = Array.from(container.querySelectorAll('.tag')).map(tag => tag.dataset.value);
+      document.getElementById('modalidadesInput').value = values.join(', ');
+    }
+
+    function addModalidade() {
+      const text = prompt('Digite o nome da modalidade:');
+      if (text && text.trim() !== '') {
+        const container = document.getElementById('tagsContainer');
+        const tag = document.createElement('div');
+        tag.classList.add('tag');
+        tag.dataset.value = text.trim();
+        tag.textContent = text.trim();
+        tag.addEventListener('click', () => {
+          tag.remove();
+          syncModalidadesInput();
+        });
+        container.appendChild(tag);
+        syncModalidadesInput();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const navMobile = document.getElementById('nav-mobile');
+      const navDesktop = document.getElementById('nav-desktop');
+      const navMediaQuery = window.matchMedia('(max-width: 768px)');
+
+      const applyNavMode = (isMobile) => {
+        if (!navMobile || !navDesktop) {
+          return;
+        }
+        navMobile.hidden = !isMobile;
+        navDesktop.hidden = isMobile;
+        document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+      };
+
+      const handleNavChange = (event) => applyNavMode(event.matches);
+
+      applyNavMode(navMediaQuery.matches);
+      if (typeof navMediaQuery.addEventListener === 'function') {
+        navMediaQuery.addEventListener('change', handleNavChange);
+      } else if (typeof navMediaQuery.addListener === 'function') {
+        navMediaQuery.addListener(handleNavChange);
+      }
+
+      document.querySelectorAll('#tagsContainer .tag').forEach(tag => {
+        tag.addEventListener('click', () => {
+          tag.remove();
+          syncModalidadesInput();
+        });
+      });
+
+      const fotoInput = document.getElementById('fotoInput');
+      const fotoTrigger = document.getElementById('fotoTrigger');
+      const fotoPreview = document.getElementById('profilePhotoPreview');
+      const removeFotoInput = document.getElementById('removeFotoInput');
+      const fallbackFoto = fotoPreview ? fotoPreview.dataset.fallback : '';
+      const cropModal = document.getElementById('cropModal');
+      const cropperImage = document.getElementById('cropperImage');
+      const cropApplyBtn = document.getElementById('cropApply');
+      const cropCancelBtn = document.getElementById('cropCancel');
+      const cropCloseBtn = document.getElementById('cropClose');
+      let cropperInstance = null;
+      let pendingObjectUrl = null;
+
+      const destroyCropper = () => {
+        if (cropperInstance) {
+          cropperInstance.destroy();
+          cropperInstance = null;
+        }
+        if (pendingObjectUrl) {
+          URL.revokeObjectURL(pendingObjectUrl);
+          pendingObjectUrl = null;
+        }
+      };
+
+      const closeCropModal = (resetSelection = false) => {
+        if (cropModal) {
+          cropModal.classList.remove('show');
+          cropModal.setAttribute('aria-hidden', 'true');
+        }
+        document.body.style.overflow = '';
+        destroyCropper();
+        if (resetSelection && fotoInput) {
+          fotoInput.value = '';
+        }
+      };
+
+      const openCropModal = (file) => {
+        if (!cropModal || !cropperImage) {
+          return;
+        }
+        destroyCropper();
+        const objectUrl = URL.createObjectURL(file);
+        pendingObjectUrl = objectUrl;
+        cropperImage.src = objectUrl;
+        cropperImage.onload = () => {
+          if (cropperInstance) {
+            cropperInstance.destroy();
+          }
+          cropperInstance = new Cropper(cropperImage, {
+            aspectRatio: 1,
+            viewMode: 2,
+            dragMode: 'move',
+            responsive: true,
+            background: false,
+            autoCropArea: 1,
+            movable: true,
+            zoomable: true,
+          });
+        };
+        cropModal.classList.add('show');
+        cropModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+
+      if (fotoInput) {
+        fotoInput.addEventListener('change', () => {
+          if (!fotoInput.files || !fotoInput.files[0]) {
+            return;
+          }
+          removeFotoInput.value = '0';
+          openCropModal(fotoInput.files[0]);
+        });
+      }
+
+      fotoTrigger?.addEventListener('click', () => fotoInput?.click());
+
+      const applyCroppedImage = () => {
+        if (!cropperInstance || !fotoInput || !fotoPreview) {
+          return;
+        }
+        const canvas = cropperInstance.getCroppedCanvas({
+          width: 640,
+          height: 640,
+          imageSmoothingEnabled: true,
+          imageSmoothingQuality: 'high',
+        });
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            closeCropModal();
+            return;
+          }
+          const originalName = (fotoInput.files && fotoInput.files[0] && fotoInput.files[0].name) || 'avatar.png';
+          const croppedFile = new File([blob], originalName, { type: blob.type });
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(croppedFile);
+          fotoInput.files = dataTransfer.files;
+
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            fotoPreview.src = event.target.result;
+          };
+          reader.readAsDataURL(croppedFile);
+          removeFotoInput.value = '0';
+          closeCropModal();
+        }, 'image/png');
+      };
+
+      cropApplyBtn?.addEventListener('click', applyCroppedImage);
+      cropCancelBtn?.addEventListener('click', () => closeCropModal(true));
+      cropCloseBtn?.addEventListener('click', () => closeCropModal(true));
+      cropModal?.addEventListener('click', (event) => {
+        if (event.target === cropModal) {
+          closeCropModal(true);
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && cropModal?.classList.contains('show')) {
+          closeCropModal(true);
+        }
+      });
+
+      window.markPhotoRemoval = function() {
+        if (removeFotoInput) {
+          removeFotoInput.value = '1';
+        }
+        if (fotoInput) {
+          fotoInput.value = '';
+        }
+        if (fotoPreview && fallbackFoto) {
+          fotoPreview.src = fallbackFoto;
+        }
+        closeCropModal();
+      };
+    });
+  </script>
+</body>
+</html>

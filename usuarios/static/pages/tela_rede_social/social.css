@@ -189,6 +189,9 @@ body {
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
 }
 
 .tab.active {
@@ -198,6 +201,10 @@ body {
 
 .tab:hover {
   background-color: var(--secondary-color);
+}
+
+.chat-tab {
+  font-weight: 600;
 }
 
 /* Mensagem de sucesso */

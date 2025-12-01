@@ -27,6 +27,7 @@
       <button role="tab" class="tab" id="tab-events">Eventos Para Mim</button>
       <button role="tab" class="tab" id="tab-news">Novidades</button>
       <button role="tab" class="tab" id="tab-trending">Em Alta</button>
+      <a href="{% url 'chat' %}" class="tab chat-tab" role="link" aria-label="Ir para o chat">Chat</a>
     </nav>
     <!---Área do Feed fim-->
 
@@ -38,7 +39,7 @@
     <!-- Caixa de Compartilhar -->
     <section class="share-box" aria-label="Compartilhar uma conquista">
       <div class="share-header">
-        <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="{{ user.nome }}" class="user-avatar" />
+        <img src="{% if user.foto %}{{ user.foto.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="{{ user.nome }}" class="user-avatar" />
         <div class="share-input-wrapper">
           <form method="post" enctype="multipart/form-data" id="post-form">
             {% csrf_token %}
@@ -73,7 +74,7 @@
     {% for post in posts %}
     <article class="post" aria-label="Post de {{ post.autor.nome }}">
       <header class="post-header">
-        <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="{{ post.autor.nome }}" />
+        <img src="{% if post.autor.foto %}{{ post.autor.foto.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="{{ post.autor.nome }}" />
         <div>
           <div>{{ post.autor.nome }}</div>
           <time datetime="{{ post.data_criacao|date:'c' }}">{{ post.data_criacao|timesince }}</time>

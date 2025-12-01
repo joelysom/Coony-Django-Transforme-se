@@ -1,5 +1,5 @@
+from django.db import IntegrityError
 from django.shortcuts import render, redirect
-from django.urls import reverse
 from django.contrib import messages
 from .forms import RegistrationForm, LoginForm, PostForm, CommentForm
 from .models import Usuario, Post, Comment
@@ -154,6 +154,22 @@ def social(request):
     })
 
 
+def chat(request):
+    """Render chat interface."""
+    uid = request.session.get('usuario_id')
+    if not uid:
+        return redirect('index')
+    try:
+        user = Usuario.objects.get(pk=uid)
+    except Usuario.DoesNotExist:
+        request.session.pop('usuario_id', None)
+        return redirect('index')
+
+    return render(request, 'usuarios/chat.html', {
+        'user': user,
+    })
+
+
 def like_post(request, post_id):
     uid = request.session.get('usuario_id')
     if not uid or request.method != 'POST':
@@ -187,3 +203,49 @@ def comment_post(request, post_id):
         if texto:
             Comment.objects.create(post=post, autor=user, texto=texto)
     return redirect('social')
+
+
+def perfil(request):
+    uid = request.session.get('usuario_id')
+    if not uid:
+        return redirect('index')
+    try:
+        user = Usuario.objects.get(pk=uid)
+    except Usuario.DoesNotExist:
+        request.session.pop('usuario_id', None)
+        return redirect('index')
+
+    if request.method == 'POST':
+        nome = request.POST.get('nome', '').strip()
+        email = request.POST.get('email', '').strip()
+        localizacao = request.POST.get('localizacao', '').strip()
+        modalidades = request.POST.get('modalidades', '').strip()
+        bio = request.POST.get('bio', '').strip()
+        foto = request.FILES.get('foto')
+        remove_foto = request.POST.get('remove_foto') == '1'
+
+        if nome:
+            user.nome = nome
+        if email:
+            user.email = email
+        user.localizacao = localizacao or ''
+        user.modalidades = modalidades or ''
+        user.bio = bio or ''
+        if foto:
+            user.foto = foto
+        elif remove_foto and user.foto:
+            user.foto.delete(save=False)
+            user.foto = None
+
+        try:
+            user.save()
+            messages.success(request, 'Perfil atualizado com sucesso!', extra_tags='toast')
+        except IntegrityError:
+            user.refresh_from_db()
+            messages.error(request, 'Este e-mail já está em uso. Escolha outro.', extra_tags='toast')
+
+    modalidades_list = [m.strip() for m in (user.modalidades or '').split(',') if m.strip()]
+    return render(request, 'usuarios/perfil.html', {
+        'user': user,
+        'modalidades': modalidades_list,
+    })

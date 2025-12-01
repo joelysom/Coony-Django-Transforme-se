@@ -1,6 +1,15 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/home(mobile).css' %}">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+<style>
+    .navbar .nav-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #f68b4a;
+    }
+</style>
 
 <nav class="navbar">
     <a href="{% url 'dashboard' %}" class="nav-item">
@@ -15,8 +24,12 @@
         <span class="material-symbols-outlined">maps_ugc</span>
         <p>Comunidade</p>
     </a>
-    <a href="#" class="nav-item">
-        <span class="material-symbols-outlined">person</span>
+    <a href="{% url 'perfil' %}" class="nav-item">
+        {% if user and user.foto %}
+            <img src="{{ user.foto.url }}" alt="{{ user.nome }}" class="nav-avatar">
+        {% else %}
+            <img src="{% static 'img/default-avatar.svg' %}" alt="Perfil" class="nav-avatar">
+        {% endif %}
         <p>Perfil</p>
     </a>
     <a href="{% url 'logout' %}" class="nav-item">
