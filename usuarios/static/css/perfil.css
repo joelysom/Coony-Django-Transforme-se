@@ -308,6 +308,47 @@ header i {
   gap: 18px;
 }
 
+.handle-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  background-color: #F8F8F8;
+  padding: 0 14px;
+  transition: all 0.3s ease-in-out;
+}
+
+.handle-input span {
+  font-weight: 600;
+  color: var(--laranja);
+}
+
+.handle-input input {
+  border: none;
+  background: transparent;
+  padding: 14px 0;
+  height: auto;
+  flex: 1;
+}
+
+.handle-input:focus-within {
+  border-color: var(--laranja);
+  box-shadow: 0 0 0 2px rgba(236, 132, 65, 0.25);
+}
+
+.handle-input input:focus {
+  border: none;
+  box-shadow: none;
+}
+
+.input-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--texto-secundario);
+}
+
 /* MODALIDADES */
 .modalidades {
   display: flex;

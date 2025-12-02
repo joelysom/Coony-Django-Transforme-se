@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
   <link rel="stylesheet" href="{% static 'css/chat.css' %}">
 </head>
-<body data-static-root="{{ STATIC_URL }}">
+<body class="page-chat" data-static-root="{{ STATIC_URL }}">
   {% include 'usuarios/components/toast.html' %}
   {% include 'usuarios/components/messages.html' %}
 
@@ -22,7 +22,18 @@
     {% include 'usuarios/components/sidebar.html' %}
   </div>
 
-  <main class="chat-wrapper" data-current-user="{{ user.nome|default:'Você' }}" data-current-avatar="{% if user.foto %}{{ user.foto.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}">
+  <main
+    class="chat-wrapper"
+    data-current-user="{{ user.nome|default:'Você' }}"
+    data-current-handle="@{{ user.username }}"
+    data-current-avatar="{% if user.foto %}{{ user.foto.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}"
+    data-conversations-url="{% url 'chat_conversations_api' %}"
+    data-search-url="{% url 'chat_search_users_api' %}"
+    data-start-url="{% url 'chat_start_conversation_api' %}"
+    data-messages-url-template="{% url 'chat_conversations_api' %}__ID__/messages/"
+    data-send-url-template="{% url 'chat_conversations_api' %}__ID__/messages/send/"
+    data-delete-url-template="{% url 'chat_delete_message_api' 0 %}"
+  >
     <div class="container">
       <aside class="sidebar contatos">
         <nav>
@@ -35,8 +46,9 @@
               </h1>
             </div>
             <div class="search-wrapper">
-              <input type="text" id="busca" class="search-input" placeholder="Buscar contato..." autocomplete="off" />
+              <input type="text" id="busca" class="search-input" placeholder="Buscar por nome ou @..." autocomplete="off" />
             </div>
+            <div class="search-results" id="searchResults" aria-live="polite" hidden></div>
 
             <ul class="contacts-list" id="lista" aria-live="polite">
               <!-- JS insere os cards aqui -->
@@ -114,6 +126,31 @@
     </div>
   </main>
 
+  <script>
+    (function() {
+      const navMobile = document.getElementById('nav-mobile');
+      const navDesktop = document.getElementById('nav-desktop');
+      const navQuery = window.matchMedia('(max-width: 768px)');
+
+      const applyNavMode = (isMobile) => {
+        if (!navMobile || !navDesktop) {
+          return;
+        }
+        navMobile.hidden = !isMobile;
+        navDesktop.hidden = isMobile;
+        document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+      };
+
+      const handleChange = (event) => applyNavMode(event.matches);
+
+      applyNavMode(navQuery.matches);
+      if (typeof navQuery.addEventListener === 'function') {
+        navQuery.addEventListener('change', handleChange);
+      } else if (typeof navQuery.addListener === 'function') {
+        navQuery.addListener(handleChange);
+      }
+    })();
+  </script>
   <script>
     window.CHAT_STATIC = {
       defaultAvatar: "{% static 'img/default-avatar.svg' %}",

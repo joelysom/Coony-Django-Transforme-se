@@ -23,6 +23,7 @@ class RegistrationForm(forms.ModelForm):
             self.add_error('password_confirm', 'As senhas não coincidem.')
         return cleaned
 
+
 class LoginForm(forms.Form):
     email = forms.CharField(label='E-mail ou Usuário')
     password = forms.CharField(widget=forms.PasswordInput(), label='Senha')

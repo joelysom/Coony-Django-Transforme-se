@@ -193,7 +193,7 @@
       <img src="{% if user.foto %}{{ user.foto.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="{{ user.nome }}">
       <div>
         <p>{{ user.nome }}</p>
-        <p>@{{ user.username }}</p>
+        <p>@{{ user.username|default:'coony' }}</p>
       </div>
     </div>
     <span class="material-symbols-outlined">more_vert</span>

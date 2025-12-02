@@ -1,8 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const chatWrapper = document.querySelector('.chat-wrapper');
+  if (!chatWrapper) {
+    return;
+  }
+
   const contactsListEl = document.getElementById('lista');
+  const searchResultsEl = document.getElementById('searchResults');
   const searchInput = document.getElementById('busca');
-  const chatBody = document.getElementById('rolagem');
-  const chatContainer = document.querySelector('.chat-wrapper');
+  const messagesContainer = document.getElementById('rolagem');
+  const chatBody = document.getElementById('chatBody') || messagesContainer;
   const chatUserName = document.getElementById('chatUserName');
   const chatUserStatus = document.getElementById('chatUserStatus');
   const chatUserAvatar = document.getElementById('chatUserAvatar');
@@ -17,220 +23,710 @@ document.addEventListener('DOMContentLoaded', () => {
   const sendBtn = document.getElementById('sendBtn');
   const backBtn = document.querySelector('.voltarBtn');
   const sidebar = document.querySelector('.sidebar.contatos');
+  const mobileQuery = window.matchMedia('(max-width: 768px)');
+  const isMobile = () => mobileQuery.matches;
 
+  const dataset = chatWrapper.dataset || {};
   const staticConfig = window.CHAT_STATIC || {};
-  const defaultAvatar = staticConfig.defaultAvatar || '';
-  const currentUserName = staticConfig.currentUserName || 'Você';
-  const currentUserAvatar = staticConfig.currentUserAvatar || defaultAvatar;
+  const defaultAvatar = staticConfig.defaultAvatar || dataset.currentAvatar || '';
+  const currentUserName = dataset.currentUser || staticConfig.currentUserName || 'Você';
+  const currentUserAvatar = dataset.currentAvatar || staticConfig.currentUserAvatar || defaultAvatar;
 
-  const contacts = [
-    { id: 1, name: 'Ronaldo', lastMessage: 'Treino às 7h?', time: '20:30', status: 'Online agora' },
-    { id: 2, name: 'Amanda', lastMessage: 'Enviei o cronograma', time: '19:10', status: 'Visto há 5 min' },
-    { id: 3, name: 'Equipe Coony', lastMessage: 'Convite aprovado ✅', time: '18:45', status: 'Equipe' },
-    { id: 4, name: 'Lucas Corre', lastMessage: 'Posso te ligar?', time: 'Ontem', status: 'Disponível' },
-    { id: 5, name: 'Comunidade Trail', lastMessage: 'Novo tópico publicado', time: 'Ontem', status: 'Novidade' }
-  ];
+  const endpoints = {
+    conversations: dataset.conversationsUrl,
+    search: dataset.searchUrl,
+    start: dataset.startUrl,
+    messagesTemplate: dataset.messagesUrlTemplate,
+    sendTemplate: dataset.sendUrlTemplate,
+    deleteTemplate: dataset.deleteUrlTemplate,
+  };
 
-  function renderContacts(list) {
-    if (!contactsListEl) return;
-    contactsListEl.innerHTML = '';
-    list.forEach((contact) => {
-      const li = document.createElement('li');
-      li.className = 'contact-card';
-      li.dataset.contactId = contact.id;
-      li.innerHTML = `
-        <div class="contact-avatar" aria-hidden="true">${contact.name.charAt(0)}</div>
-        <div class="contact-preview">
-          <div class="contact-row">
-            <strong>${contact.name}</strong>
-            <span class="contact-time">${contact.time}</span>
-          </div>
-          <p>${contact.lastMessage}</p>
-        </div>`;
-      contactsListEl.appendChild(li);
-    });
-  }
+  const state = {
+    conversations: [],
+    filteredConversations: null,
+    activeConversationId: null,
+    messagesCache: {},
+    searchTimeout: null,
+    searchResults: [],
+    mobileView: null,
+  };
 
-  function filterContacts(term) {
-    const normalized = term.trim().toLowerCase();
-    if (!normalized) {
-      renderContacts(contacts);
+  const resetDesktopLayout = () => {
+    chatWrapper.classList.remove('mobile-view-list', 'mobile-view-chat');
+    sidebar?.classList.remove('hidden');
+    state.mobileView = null;
+  };
+
+  const setMobileView = (view) => {
+    if (!isMobile()) {
+      resetDesktopLayout();
       return;
     }
-    const filtered = contacts.filter((contact) => contact.name.toLowerCase().includes(normalized));
-    renderContacts(filtered);
-  }
 
-  function updateConversationHeader(contact) {
-    chatUserName.textContent = contact ? contact.name : 'Selecione um contato';
-    chatUserStatus.textContent = contact ? contact.status : 'Offline';
-    chatUserAvatar.src = defaultAvatar;
-    chatPartnerFallback.src = defaultAvatar;
-  }
+    state.mobileView = view === 'chat' ? 'chat' : 'list';
+    chatWrapper.classList.toggle('mobile-view-chat', state.mobileView === 'chat');
+    chatWrapper.classList.toggle('mobile-view-list', state.mobileView === 'list');
+  };
 
-  function updateSendState() {
-    const hasText = msgInput.value.trim().length > 0;
-    sendBtn.disabled = !hasText;
-    sendBtn.classList.toggle('botaoDesativo', !hasText);
-    sendBtn.classList.toggle('botaoEnviarAtivo', hasText);
-  }
+  const handleViewportChange = () => {
+    if (isMobile()) {
+      const nextView = state.activeConversationId ? 'chat' : 'list';
+      setMobileView(nextView);
+    } else {
+      resetDesktopLayout();
+    }
+  };
 
-  function scrollToBottom() {
+  const getCsrfToken = () => {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : '';
+  };
+
+  const csrfToken = getCsrfToken();
+
+  const notify = (text, type = 'info') => {
+    if (!text) return;
+    if (window.Toast && typeof window.Toast.show === 'function') {
+      window.Toast.show(text, type);
+    } else {
+      console[type === 'error' ? 'error' : 'log'](text);
+    }
+  };
+
+  const buildUrl = (template, id) => {
+    if (!template || !id) return null;
+    return template.replace('__ID__', String(id));
+  };
+
+  const buildDeleteUrl = (template, messageId) => {
+    if (!template || !messageId) return null;
+    if (template.includes('__ID__')) {
+      return template.replace('__ID__', String(messageId));
+    }
+    return template.replace(/0(\/delete\/?)$/, `${messageId}$1`);
+  };
+
+  const apiFetch = async (url, options = {}) => {
+    const config = {
+      method: options.method || 'GET',
+      credentials: 'same-origin',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        ...(options.body ? { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken } : {}),
+        ...options.headers,
+      },
+      body: options.body,
+    };
+
+    const response = await fetch(url, config);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const detail = data?.detail || 'Não foi possível completar a ação.';
+      throw new Error(detail);
+    }
+    return data;
+  };
+
+  const formatTime = (isoString) => {
+    if (!isoString) return '';
+    try {
+      const date = new Date(isoString);
+      return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+    } catch (_) {
+      return '';
+    }
+  };
+
+  const getPartnerInitials = (name = '') => {
+    const trimmed = name.trim();
+    if (!trimmed) return '?';
+    const parts = trimmed.split(' ').filter(Boolean);
+    if (parts.length === 1) {
+      return parts[0][0]?.toUpperCase() || '?';
+    }
+    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+  };
+
+  const updateConversationHeader = (partner) => {
+    if (!partner) {
+      chatUserName.textContent = 'Selecione um contato';
+      chatUserStatus.textContent = 'Busque um @ para começar';
+      if (chatUserAvatar) chatUserAvatar.src = defaultAvatar;
+      if (chatPartnerFallback) chatPartnerFallback.src = defaultAvatar;
+      return;
+    }
+
+    chatUserName.textContent = partner.name || partner.handle || 'Contato';
+    chatUserStatus.textContent = partner.handle || 'Disponível';
+    const avatarUrl = partner.avatar_url || defaultAvatar;
+    if (chatUserAvatar) chatUserAvatar.src = avatarUrl;
+    if (chatPartnerFallback) chatPartnerFallback.src = avatarUrl;
+  };
+
+  const setSendEnabled = (enabled) => {
+    sendBtn.disabled = !enabled;
+    sendBtn.classList.toggle('botaoDesativo', !enabled);
+    sendBtn.classList.toggle('botaoEnviarAtivo', enabled);
+  };
+
+  const scrollMessagesToBottom = () => {
+    const target = messagesContainer || chatBody;
+    if (!target) return;
     requestAnimationFrame(() => {
-      chatBody.scrollTop = chatBody.scrollHeight;
+      target.scrollTop = target.scrollHeight;
     });
-  }
+  };
 
-  function createMessageElement({ text, type = 'sent', imageSrc }) {
+  const renderEmptyMessagesState = (text) => {
+    if (!messagesContainer) return;
+    messagesContainer.innerHTML = `
+      <div class="message-placeholder">
+        <p>${text || 'Envie uma mensagem para iniciar a conversa.'}</p>
+      </div>
+    `;
+  };
+
+  const renderMessage = (message, partner) => {
+    if (!messagesContainer) return;
+    const isDeleted = Boolean(message.is_deleted_for_all);
+    const canDeleteForSelf = Boolean(message.can_delete_for_self);
+    const canDeleteForAll = Boolean(message.can_delete_for_all);
+    const displayText = isDeleted
+      ? (message.deleted_label || 'Mensagem apagada.')
+      : (message.display_text || message.text || '');
+
     const wrapper = document.createElement('div');
-    wrapper.className = `message ${type}`;
+    wrapper.className = `message ${message.is_self ? 'sent' : 'received'}`;
+    wrapper.dataset.messageId = message.id;
+    if (isDeleted) {
+      wrapper.classList.add('message--deleted');
+    }
 
-    if (type === 'received') {
+    if (!message.is_self) {
       const avatar = document.createElement('img');
-      avatar.src = defaultAvatar;
-      avatar.alt = 'Contato';
       avatar.className = 'avatar';
+      avatar.alt = partner?.name || 'Contato';
+      avatar.src = partner?.avatar_url || defaultAvatar;
       wrapper.appendChild(avatar);
     }
 
     const bubble = document.createElement('div');
-    bubble.className = imageSrc ? 'bubble image-bubble' : 'bubble';
+    bubble.className = 'bubble';
 
-    const heading = document.createElement('h3');
-    heading.textContent = type === 'sent' ? currentUserName : chatUserName.textContent;
-    bubble.appendChild(heading);
-
-    if (imageSrc) {
-      const img = document.createElement('img');
-      img.src = imageSrc;
-      img.alt = 'Imagem enviada';
-      img.className = 'sent-image';
-      bubble.appendChild(img);
+    if (!isDeleted) {
+      const heading = document.createElement('h3');
+      heading.textContent = message.is_self ? currentUserName : partner?.name || partner?.handle || 'Contato';
+      bubble.appendChild(heading);
     }
 
-    if (text) {
-      const paragraph = document.createElement('p');
-      paragraph.textContent = text;
-      bubble.appendChild(paragraph);
-    }
+    const paragraph = document.createElement('p');
+    paragraph.textContent = displayText;
+    bubble.appendChild(paragraph);
 
     wrapper.appendChild(bubble);
 
-    if (type === 'sent') {
+    if (message.is_self) {
       const avatar = document.createElement('img');
-      avatar.src = currentUserAvatar;
-      avatar.alt = currentUserName;
       avatar.className = 'avatar';
+      avatar.alt = currentUserName;
+      avatar.src = currentUserAvatar || defaultAvatar;
       wrapper.appendChild(avatar);
     }
 
     const time = document.createElement('span');
     time.className = 'time';
-    const now = new Date();
-    time.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    time.textContent = formatTime(message.created_at) || '';
     wrapper.appendChild(time);
 
-    chatBody.appendChild(wrapper);
-    scrollToBottom();
-  }
+    if (canDeleteForSelf || canDeleteForAll) {
+      const actions = document.createElement('div');
+      actions.className = 'message-actions';
 
-  function handleSendMessage() {
-    const text = msgInput.value.trim();
-    if (!text) return;
-    createMessageElement({ text, type: 'sent' });
-    msgInput.value = '';
-    updateSendState();
-  }
-
-  let recording = false;
-  let recordingInterval;
-  let elapsedSeconds = 0;
-
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const secs = (seconds % 60).toString().padStart(2, '0');
-    return `${mins}:${secs}`;
-  }
-
-  function toggleRecording() {
-    recording = !recording;
-    audioBtn.classList.toggle('recording', recording);
-    recordTimer.classList.toggle('hidden', !recording);
-    if (recording) {
-      elapsedSeconds = 0;
-      recordTimer.textContent = '00:00';
-      recordingInterval = setInterval(() => {
-        elapsedSeconds += 1;
-        recordTimer.textContent = formatTime(elapsedSeconds);
-      }, 1000);
-    } else {
-      clearInterval(recordingInterval);
-      recordTimer.classList.add('hidden');
-      if (elapsedSeconds > 0) {
-        createMessageElement({ text: `Mensagem de áudio (${formatTime(elapsedSeconds)})`, type: 'sent' });
+      if (canDeleteForSelf) {
+        const deleteSelfBtn = document.createElement('button');
+        deleteSelfBtn.type = 'button';
+        deleteSelfBtn.className = 'message-action-btn';
+        deleteSelfBtn.dataset.action = 'self';
+        deleteSelfBtn.dataset.messageId = message.id;
+        deleteSelfBtn.textContent = 'Apagar p/ mim';
+        actions.appendChild(deleteSelfBtn);
       }
+
+      if (canDeleteForAll) {
+        const deleteAllBtn = document.createElement('button');
+        deleteAllBtn.type = 'button';
+        deleteAllBtn.className = 'message-action-btn';
+        deleteAllBtn.dataset.action = 'all';
+        deleteAllBtn.dataset.messageId = message.id;
+        deleteAllBtn.textContent = 'Apagar geral';
+        actions.appendChild(deleteAllBtn);
+      }
+
+      wrapper.appendChild(actions);
     }
-  }
 
-  function handleImageSelection(event) {
-    const file = event.target.files && event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      createMessageElement({ text: 'Imagem enviada', type: 'sent', imageSrc: e.target.result });
-    };
-    reader.readAsDataURL(file);
-    imgInput.value = '';
-  }
+    messagesContainer.appendChild(wrapper);
+  };
 
-  function toggleEmojiPicker() {
-    emojiPicker.classList.toggle('hidden');
-  }
+  const renderMessages = (conversationId) => {
+    if (!messagesContainer) return;
+    const conversation = state.conversations.find((conv) => conv.id === conversationId);
+    const partner = conversation?.partner;
+    const messages = state.messagesCache[conversationId] || [];
 
-  function closeEmojiPicker(event) {
-    if (!emojiPicker || emojiPicker.classList.contains('hidden')) return;
-    if (event.target === emojiPicker || emojiPicker.contains(event.target) || event.target === emojiBtn) {
+    messagesContainer.innerHTML = '';
+    if (!messages.length) {
+      renderEmptyMessagesState('Ainda não há mensagens nesta conversa.');
       return;
     }
-    emojiPicker.classList.add('hidden');
-  }
 
-  function wireEvents() {
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => filterContacts(e.target.value));
+    messages.forEach((message) => renderMessage(message, partner));
+    scrollMessagesToBottom();
+  };
+
+  const conversationMatchesTerm = (conversation, term) => {
+    const partner = conversation.partner;
+    const target = `${partner?.name || ''} ${partner?.handle || ''}`.toLowerCase();
+    return target.includes(term.toLowerCase());
+  };
+
+  const renderConversations = () => {
+    if (!contactsListEl) return;
+    const conversations = state.filteredConversations ?? state.conversations;
+    contactsListEl.innerHTML = '';
+
+    if (!conversations.length) {
+      const empty = document.createElement('li');
+      empty.className = 'contact-card contact-card--empty';
+      empty.innerHTML = '<p>Busque um @ e comece uma nova conversa.</p>';
+      contactsListEl.appendChild(empty);
+      return;
     }
 
-    if (contactsListEl) {
-      contactsListEl.addEventListener('click', (event) => {
-        const card = event.target.closest('li[data-contact-id]');
-        if (!card) return;
-        const contactId = Number(card.dataset.contactId);
-        const contact = contacts.find((c) => c.id === contactId);
-        if (!contact) return;
-        contactsListEl.querySelectorAll('.contact-card').forEach((item) => item.classList.remove('active'));
-        card.classList.add('active');
-        updateConversationHeader(contact);
-        if (window.matchMedia('(max-width: 768px)').matches) {
-          sidebar?.classList.add('hidden');
+    conversations.forEach((conversation) => {
+      const partner = conversation.partner;
+      const item = document.createElement('li');
+      item.className = 'contact-card';
+      item.dataset.conversationId = conversation.id;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'contact-avatar';
+      if (partner?.avatar_url) {
+        avatar.innerHTML = `<img src="${partner.avatar_url}" alt="${partner.name || 'Contato'}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+      } else {
+        avatar.textContent = getPartnerInitials(partner?.name || partner?.handle || '?');
+      }
+
+      const preview = document.createElement('div');
+      preview.className = 'contact-preview';
+      preview.innerHTML = `
+        <div class="contact-row">
+          <strong>${partner?.name || partner?.handle || 'Contato'}</strong>
+          <span class="contact-time">${formatTime(conversation.last_message_at) || ''}</span>
+        </div>
+        <p>${conversation.last_message || 'Sem mensagens ainda'}</p>
+      `;
+
+      if (conversation.id === state.activeConversationId) {
+        item.classList.add('active');
+      }
+
+      item.appendChild(avatar);
+      item.appendChild(preview);
+      contactsListEl.appendChild(item);
+    });
+  };
+
+  const highlightConversation = (conversationId) => {
+    if (!contactsListEl) return;
+    contactsListEl.querySelectorAll('.contact-card').forEach((el) => {
+      el.classList.toggle('active', Number(el.dataset.conversationId) === conversationId);
+    });
+  };
+
+  const upsertConversation = (conversation) => {
+    const idx = state.conversations.findIndex((conv) => conv.id === conversation.id);
+    if (idx >= 0) {
+      state.conversations[idx] = conversation;
+    } else {
+      state.conversations.unshift(conversation);
+    }
+
+    state.conversations.sort((a, b) => {
+      const dateA = a.last_message_at ? new Date(a.last_message_at).getTime() : 0;
+      const dateB = b.last_message_at ? new Date(b.last_message_at).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    renderConversations();
+  };
+
+  const ensureMessages = async (conversationId, { force = false } = {}) => {
+    if (!force && state.messagesCache[conversationId]) {
+      return state.messagesCache[conversationId];
+    }
+
+    const url = buildUrl(endpoints.messagesTemplate, conversationId);
+    if (!url) {
+      throw new Error('Endpoint de mensagens indisponível.');
+    }
+
+    const data = await apiFetch(url);
+    state.messagesCache[conversationId] = data.messages || [];
+    return state.messagesCache[conversationId];
+  };
+
+  const selectConversation = async (conversationId) => {
+    state.activeConversationId = conversationId;
+    highlightConversation(conversationId);
+    const conversation = state.conversations.find((conv) => conv.id === conversationId);
+    updateConversationHeader(conversation?.partner);
+    renderEmptyMessagesState('Carregando mensagens...');
+
+    try {
+      await ensureMessages(conversationId);
+      renderMessages(conversationId);
+      if (isMobile()) {
+        setMobileView('chat');
+      }
+    } catch (error) {
+      notify(error.message, 'error');
+      renderEmptyMessagesState('Não foi possível carregar as mensagens.');
+    }
+  };
+
+  const loadConversations = async () => {
+    if (!endpoints.conversations) return;
+    try {
+      const data = await apiFetch(endpoints.conversations);
+      state.conversations = data.conversations || [];
+      renderConversations();
+      if (state.conversations.length && !state.activeConversationId && !isMobile()) {
+        selectConversation(state.conversations[0].id);
+      } else if (!state.conversations.length && isMobile()) {
+        setMobileView('list');
+      }
+    } catch (error) {
+      notify(error.message, 'error');
+    }
+  };
+
+  const handleSendMessage = async () => {
+    const text = msgInput.value.trim();
+    if (!text) return;
+    if (!state.activeConversationId) {
+      notify('Selecione ou crie uma conversa antes de enviar mensagens.', 'error');
+      return;
+    }
+
+    const url = buildUrl(endpoints.sendTemplate, state.activeConversationId);
+    if (!url) {
+      notify('Endpoint de envio indisponível.', 'error');
+      return;
+    }
+
+    setSendEnabled(false);
+
+    try {
+      const payload = JSON.stringify({ text });
+      const data = await apiFetch(url, { method: 'POST', body: payload });
+      if (!state.messagesCache[state.activeConversationId]) {
+        state.messagesCache[state.activeConversationId] = [];
+      }
+      state.messagesCache[state.activeConversationId].push(data.message);
+      renderMessages(state.activeConversationId);
+
+      const conversation = state.conversations.find((conv) => conv.id === state.activeConversationId);
+      if (conversation) {
+        conversation.last_message = data.message.display_text || data.message.text;
+        conversation.last_message_at = data.message.created_at;
+        upsertConversation(conversation);
+      }
+
+      msgInput.value = '';
+      scrollMessagesToBottom();
+    } catch (error) {
+      notify(error.message, 'error');
+    } finally {
+      setSendEnabled(Boolean(msgInput.value.trim()));
+    }
+  };
+
+  const deleteMessage = async (messageId, scope) => {
+    if (!endpoints.deleteTemplate) {
+      notify('Endpoint de exclusão indisponível.', 'error');
+      return;
+    }
+
+    const url = buildDeleteUrl(endpoints.deleteTemplate, messageId);
+    if (!url) {
+      notify('Endpoint de exclusão indisponível.', 'error');
+      return;
+    }
+
+    try {
+      const payload = JSON.stringify({ scope });
+      const data = await apiFetch(url, { method: 'POST', body: payload });
+      const conversationId = data.conversation?.id;
+      if (conversationId) {
+        delete state.messagesCache[conversationId];
+        await ensureMessages(conversationId, { force: true });
+        if (state.activeConversationId === conversationId) {
+          renderMessages(conversationId);
         }
-      });
+        upsertConversation(data.conversation);
+      } else {
+        loadConversations();
+      }
+
+      notify(scope === 'all' ? 'Mensagem apagada para todos.' : 'Mensagem apagada para você.', 'success');
+    } catch (error) {
+      notify(error.message, 'error');
+    }
+  };
+
+  const startConversation = async (handle) => {
+    if (!endpoints.start) {
+      notify('Endpoint de criação de conversa indisponível.', 'error');
+      return;
     }
 
-    emojiBtn?.addEventListener('click', toggleEmojiPicker);
-    document.addEventListener('click', closeEmojiPicker);
+    const normalized = (handle || '').trim();
+    if (!normalized) return;
+    try {
+      const payload = JSON.stringify({ username: normalized });
+      const data = await apiFetch(endpoints.start, { method: 'POST', body: payload });
+      const conversation = data.conversation;
+      upsertConversation(conversation);
+      await selectConversation(conversation.id);
+    } catch (error) {
+      notify(error.message, 'error');
+    }
+  };
+
+  const renderSearchResults = (results, term) => {
+    if (!searchResultsEl) return;
+
+    if (!term) {
+      searchResultsEl.hidden = true;
+      searchResultsEl.innerHTML = '';
+      return;
+    }
+
+    if (!results.length) {
+      searchResultsEl.hidden = false;
+      searchResultsEl.innerHTML = '<p class="search-empty">Nenhum usuário encontrado.</p>';
+      return;
+    }
+
+    searchResultsEl.hidden = false;
+    searchResultsEl.innerHTML = results.map((user) => {
+      const avatar = user.avatar_url
+        ? `<img src="${user.avatar_url}" alt="${user.name}" class="search-avatar" />`
+        : `<span class="search-avatar">${getPartnerInitials(user.name || user.handle)}</span>`;
+      return `
+        <div class="search-result-item" tabindex="0" data-handle="${user.handle || ''}">
+          ${avatar}
+          <div>
+            <strong>${user.name || user.handle}</strong>
+            <span>${user.handle || ''}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  const performRemoteSearch = async (term) => {
+    if (!endpoints.search || term.length < 2) {
+      renderSearchResults([], '');
+      return;
+    }
+
+    try {
+      const url = `${endpoints.search}?q=${encodeURIComponent(term)}`;
+      const data = await apiFetch(url);
+      state.searchResults = data.results || [];
+      renderSearchResults(state.searchResults, term);
+    } catch (error) {
+      notify(error.message, 'error');
+    }
+  };
+
+  const handleSearchInput = (term) => {
+    const trimmed = term.trim();
+    if (!trimmed) {
+      state.filteredConversations = null;
+      renderConversations();
+      renderSearchResults([], '');
+    } else {
+      state.filteredConversations = state.conversations.filter((conversation) => conversationMatchesTerm(conversation, trimmed));
+      renderConversations();
+    }
+
+    clearTimeout(state.searchTimeout);
+    if (trimmed) {
+      state.searchTimeout = setTimeout(() => performRemoteSearch(trimmed), 250);
+    }
+  };
+
+  const handleSearchEnter = (event) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    const value = event.target.value.trim();
+    if (!value) return;
+    const handle = value.startsWith('@') ? value : `@${value}`;
+    startConversation(handle);
+  };
+
+  const bindEvents = () => {
+    contactsListEl?.addEventListener('click', (event) => {
+      const item = event.target.closest('[data-conversation-id]');
+      if (!item) return;
+      selectConversation(Number(item.dataset.conversationId));
+    });
+
+    searchInput?.addEventListener('input', (event) => handleSearchInput(event.target.value));
+    searchInput?.addEventListener('keydown', handleSearchEnter);
+
+    const searchResultHandler = (item) => {
+      if (!item) return;
+      const handle = item.dataset.handle || '';
+      if (handle) {
+        searchInput.value = '';
+        handleSearchInput('');
+        startConversation(handle);
+      }
+    };
+
+    searchResultsEl?.addEventListener('click', (event) => {
+      const item = event.target.closest('.search-result-item');
+      searchResultHandler(item);
+    });
+
+    searchResultsEl?.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter') return;
+      const item = event.target.closest('.search-result-item');
+      if (!item) return;
+      event.preventDefault();
+      searchResultHandler(item);
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!searchResultsEl || searchResultsEl.hidden) return;
+      const isClickInside = searchResultsEl.contains(event.target) || (searchInput && searchInput.contains(event.target));
+      if (!isClickInside) {
+        searchResultsEl.hidden = true;
+      }
+    });
+
+    emojiBtn?.addEventListener('click', () => {
+      emojiPicker?.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!emojiPicker || emojiPicker.classList.contains('hidden')) return;
+      if (event.target === emojiPicker || emojiPicker.contains(event.target) || event.target === emojiBtn) {
+        return;
+      }
+      emojiPicker.classList.add('hidden');
+    });
 
     emojiPicker?.addEventListener('emoji-click', (event) => {
       const emoji = event.detail?.unicode;
       if (!emoji) return;
       msgInput.value += emoji;
-      updateSendState();
+      setSendEnabled(Boolean(msgInput.value.trim()));
     });
 
     imgBtn?.addEventListener('click', () => imgInput?.click());
-    imgInput?.addEventListener('change', handleImageSelection);
-    audioBtn?.addEventListener('click', toggleRecording);
+    imgInput?.addEventListener('change', (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (!state.activeConversationId) {
+          notify('Selecione uma conversa antes de enviar imagens.', 'error');
+          return;
+        }
+        const localMessage = {
+          id: Date.now(),
+          text: 'Imagem enviada (apenas visualização local).',
+          created_at: new Date().toISOString(),
+          is_self: true,
+        };
+        if (!state.messagesCache[state.activeConversationId]) {
+          state.messagesCache[state.activeConversationId] = [];
+        }
+        state.messagesCache[state.activeConversationId].push(localMessage);
+        renderMessages(state.activeConversationId);
+        notify('Envio de imagens ainda não está disponível no servidor.', 'info');
+      };
+      reader.readAsDataURL(file);
+      imgInput.value = '';
+    });
 
-    msgInput?.addEventListener('input', updateSendState);
+    let recording = false;
+    let recordingInterval;
+    let elapsedSeconds = 0;
+
+    const stopRecording = () => {
+      recording = false;
+      clearInterval(recordingInterval);
+      audioBtn?.classList.remove('recording');
+      recordTimer?.classList.add('hidden');
+      if (elapsedSeconds > 0) {
+        const localMessage = {
+          id: Date.now(),
+          text: `Mensagem de áudio (${elapsedSeconds}s) ainda não suportada no servidor.`,
+          created_at: new Date().toISOString(),
+          is_self: true,
+        };
+        if (state.activeConversationId) {
+          if (!state.messagesCache[state.activeConversationId]) {
+            state.messagesCache[state.activeConversationId] = [];
+          }
+          state.messagesCache[state.activeConversationId].push(localMessage);
+          renderMessages(state.activeConversationId);
+        }
+      }
+    };
+
+    audioBtn?.addEventListener('click', () => {
+      recording = !recording;
+      audioBtn.classList.toggle('recording', recording);
+      recordTimer?.classList.toggle('hidden', !recording);
+      if (recording) {
+        elapsedSeconds = 0;
+        recordTimer.textContent = '00:00';
+        recordingInterval = setInterval(() => {
+          elapsedSeconds += 1;
+          const mins = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+          const secs = String(elapsedSeconds % 60).padStart(2, '0');
+          recordTimer.textContent = `${mins}:${secs}`;
+        }, 1000);
+      } else {
+        stopRecording();
+      }
+    });
+
+    messagesContainer?.addEventListener('click', (event) => {
+      const actionBtn = event.target.closest('.message-action-btn');
+      if (!actionBtn) return;
+      const messageId = Number(actionBtn.dataset.messageId);
+      const scope = actionBtn.dataset.action;
+      if (!messageId || !scope) return;
+      const confirmText = scope === 'all'
+        ? 'Apagar esta mensagem para todos?'
+        : 'Apagar esta mensagem apenas para você?';
+      const confirmed = typeof window.confirm === 'function' ? window.confirm(confirmText) : true;
+      if (!confirmed) return;
+      deleteMessage(messageId, scope);
+    });
+
+    msgInput?.addEventListener('input', () => {
+      setSendEnabled(Boolean(msgInput.value.trim()));
+    });
+
     msgInput?.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
@@ -241,14 +737,20 @@ document.addEventListener('DOMContentLoaded', () => {
     sendBtn?.addEventListener('click', handleSendMessage);
 
     backBtn?.addEventListener('click', () => {
-      if (window.matchMedia('(max-width: 768px)').matches) {
-        sidebar?.classList.toggle('hidden');
+      if (isMobile()) {
+        setMobileView('list');
       }
     });
-  }
+  };
 
-  renderContacts(contacts);
-  updateConversationHeader(null);
-  updateSendState();
-  wireEvents();
+  renderEmptyMessagesState('Selecione uma conversa ou busque alguém pelo @.');
+  setSendEnabled(false);
+  bindEvents();
+  handleViewportChange();
+  if (typeof mobileQuery.addEventListener === 'function') {
+    mobileQuery.addEventListener('change', handleViewportChange);
+  } else if (typeof mobileQuery.addListener === 'function') {
+    mobileQuery.addListener(handleViewportChange);
+  }
+  loadConversations();
 });

@@ -2,29 +2,46 @@
    **LAYOUT PRINCIPAL**
 ================================ */
 
+html,
 body {
-    display: inherit;
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
     background: #f7f5f0;
 }
 
+body.page-chat {
+    padding-bottom: 0 !important;
+}
+
 .chat-wrapper {
-    width: calc(100% - 32px);
-    margin: 24px 32px 24px 0;
-    min-height: calc(100vh - 48px);
+    flex: 1;
+    width: 100%;
+    margin: 0;
+    height: 100vh;
+    min-height: 100vh;
+    padding: 0;
 }
 
 .container {
     display: flex;
-    height: calc(100vh - 48px);
+    width: 100%;
+    min-height: 100vh;
     background: #fff;
-    border-radius: 24px;
-    box-shadow: 0 25px 70px rgba(26,26,26,0.08);
+    border-radius: 0;
+    box-shadow: 0 25px 70px rgba(26, 26, 26, 0.08);
     overflow: hidden;
 }
 
 #rolagem {
     overflow-y: auto;
-    min-height: 70vh;
+    flex: 1;
+    min-height: 0;
 }
 
 
@@ -38,66 +55,106 @@ body {
     border-right: 1px solid #e0ddd9;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 32px 18px;
-    transition: transform 0.3s ease;
 }
 
-.sidebar.hidden {
-    display: none;
-}
-
-.app-container {
+.top-bar {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
 }
 
 .top-bar__title {
-    font-size: 20px;
-    font-weight: 600;
-    font-family: "Montserrat", sans-serif;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 600;
     color: #1f1f1f;
+}
+
+.divider {
+    color: #d0ccc7;
+    font-weight: 400;
 }
 
 .botao {
     border: none;
-    background: transparent;
-    font-size: 16px;
-    font-weight: 600;
-    font-family: "Montserrat", sans-serif;
-    color: #999;
+    background: none;
+    font-size: 15px;
+    font-weight: 500;
+    color: #b5afa8;
     cursor: pointer;
     transition: color 0.2s ease;
 }
 
 .botao-ativo,
-.botao:hover {
+.botao:hover,
+.botao:focus-visible {
     color: #ed864b;
-}
-
-.divider {
-    color: #ccc;
-    font-weight: 400;
+    outline: none;
 }
 
 .search-wrapper {
-    background: #fff;
-    border: 1px solid #e5e5e5;
-    border-radius: 999px;
-    padding: 10px 18px;
+    position: relative;
+    margin-bottom: 16px;
 }
 
 .search-input {
-    width: 100%;
-    border: none;
-    outline: none;
+    width: 90%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    border: 1px solid #e0ddd9;
+    background: #fff;
     font-size: 14px;
-    color: #333;
-    background: transparent;
+    font-family: "Roboto", sans-serif;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #ed864b;
+    box-shadow: 0 0 0 3px rgba(237, 134, 75, 0.2);
+}
+
+.search-results {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #f0ece7;
+    box-shadow: 0 22px 50px rgba(20, 20, 20, 0.08);
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 10;
+    padding: 8px 0;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.search-result-item:hover,
+.search-result-item:focus-visible {
+    background: #fff7ef;
+}
+
+.search-result-item strong {
+    font-size: 14px;
+    color: #1f1f1f;
+}
+
+.search-result-item span {
+    font-size: 12px;
+    color: #a1a1a1;
 }
 
 .contacts-list {
@@ -107,7 +164,7 @@ body {
     gap: 10px;
     padding: 0;
     margin: 0;
-    max-height: calc(100vh - 220px);
+    flex: 1;
     overflow-y: auto;
 }
 
@@ -126,6 +183,14 @@ body {
 .contact-card.active {
     border-color: #ed864b;
     transform: translateY(-1px);
+}
+
+.contact-card--empty {
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    color: #888;
+    font-size: 14px;
 }
 
 .contact-avatar {
@@ -198,8 +263,8 @@ body {
     display: flex;
     flex-direction: column;
     background-color: #F3F0EB;
+    overflow: hidden;
 }
-
 
 /* HEADER DO CHAT */
 
@@ -266,7 +331,90 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    overflow-y: auto;
+    overflow: hidden;
+}
+
+.message-placeholder {
+    text-align: center;
+    padding: 32px 16px;
+    color: #888;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .chat-wrapper {
+        width: 100%;
+        margin: 0;
+        height: calc(100vh - 70px);
+        min-height: calc(100vh - 70px);
+        padding: 0;
+    }
+
+    .container {
+        flex-direction: column;
+        height: 100%;
+        min-height: 100%;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e0ddd9;
+        padding: 16px 12px;
+        height: auto;
+        max-height: none;
+        overflow-y: auto;
+    }
+
+    .chat-app {
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+        padding-bottom: 70px;
+        box-sizing: border-box;
+    }
+
+    body.page-chat {
+        padding-bottom: 0;
+    }
+
+    .chat-header {
+        padding: 12px;
+    }
+
+    .chat-body {
+        min-height: 0;
+    }
+
+    .chat-footer {
+        padding: 12px;
+    }
+
+    .contacts-list {
+        max-height: none;
+    }
+
+    .chat-wrapper.mobile-view-list .chat-app {
+        display: none;
+    }
+
+    .chat-wrapper.mobile-view-chat .sidebar {
+        display: none;
+    }
+
+    .chat-wrapper.mobile-view-chat .chat-app {
+        display: flex;
+    }
+
+    .chat-wrapper.mobile-view-list .sidebar {
+        display: flex;
+    }
+
+    .header-icons .voltarBtn {
+        display: inline-flex;
+    }
 }
 
 .message {
@@ -276,6 +424,38 @@ body {
     padding: 10px 0;
     margin: 24px 0;
     position: relative;
+}
+
+.message-actions {
+    position: absolute;
+    top: -12px;
+    right: 8px;
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.message:hover .message-actions,
+.message-actions:focus-within {
+    opacity: 1;
+}
+
+.message-action-btn {
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    cursor: pointer;
+    color: #666;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.message-action-btn:hover,
+.message-action-btn:focus-visible {
+    color: #ed864b;
+    outline: none;
 }
 
 .message h3,
@@ -307,6 +487,16 @@ body {
     font-size: 14px;
     max-width: 70%;
     word-wrap: break-word;
+}
+
+.message--deleted .bubble {
+    background-color: #f7f5f0;
+    border: 1px dashed #d6d3cf;
+    color: #7a7a7a;
+}
+
+.message--deleted .bubble p {
+    font-style: italic;
 }
 
 
@@ -470,14 +660,14 @@ body {
     }
 
     .chat-wrapper {
-        margin: 16px;
-        width: calc(100% - 32px);
+        width: 100%;
+        margin: 0;
     }
 
     .container {
         flex-direction: column;
-        height: auto;
-        border-radius: 16px;
+        min-height: 100vh;
+        border-radius: 0;
     }
 
     .sidebar {
@@ -489,50 +679,9 @@ body {
 }
 
 
-/* 📌 Celulares até 768px */
+/* 📌 Ajustes extras até 768px */
 
 @media (max-width: 768px) {
-
-    .app-container {
-        width: 100vw;
-        height: 100vh;
-        max-width: none;
-    }
-
-    .sidebar.contatos {
-        width: 100%;
-        left: auto;
-        display: none; 
-    }
-
-    .chat-app {
-        width: 100%;
-        display: flex; /* começa escondido no celular */
-    }
-    /* Sidebar vira menu oculto */
-    .sidebar {
-        position: fixed;
-        left: -260px;
-        top: 0;
-        width: 240px;
-        height: 100vh;
-        background-color: #fffafa;
-        z-index: 999;
-        padding: 0;
-        align-items: center;
-        transition: 0.3s ease;
-        border-right: 1px solid #ddd;
-    }
-    /* Classe ativada via JS (se quiser implementar depois) */
-    .sidebar.active {
-        left: 0;
-    }
-    /* O chat ocupa a tela toda */
-    .chat-app {
-        width: 100%;
-        height: 100vh;
-    }
-    /* Header mais compacto */
     .chat-header {
         padding: 8px 12px;
     }
@@ -549,7 +698,6 @@ body {
     .header-icons .icon img {
         width: 26px;
     }
-    /* Área de mensagens */
     .chat-body {
         padding: 0 6px;
     }
@@ -558,8 +706,7 @@ body {
     
     #rolagem {
         padding: 10px 0;
-        max-height: calc(100vh - 140px);
-        overflow-y: auto;
+        max-height: none;
     }
     .message .bubble {
         font-size: 13px;

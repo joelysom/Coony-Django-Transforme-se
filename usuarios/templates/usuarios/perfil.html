@@ -55,8 +55,17 @@
 
       <div class="form-grid">
         <div class="input-group">
-          <label>Nome do Usuário</label>
-          <input type="text" name="nome" value="{{ user.nome|default:'' }}" placeholder="Digite seu nome de usuário" required>
+          <label>Nome de Exibição</label>
+          <input type="text" name="nome" value="{{ user.nome|default:'' }}" placeholder="Digite seu nome" required>
+        </div>
+
+        <div class="input-group handle-group">
+          <label>@ do Usuário</label>
+          <div class="handle-input">
+            <span>@</span>
+            <input type="text" name="username" value="{{ user.username|default:'' }}" placeholder="ex: joelyson-9368493" maxlength="60">
+          </div>
+          <small class="input-hint">Esse identificador é único na plataforma e será usado para buscas e no chat.</small>
         </div>
 
         <div class="input-group">

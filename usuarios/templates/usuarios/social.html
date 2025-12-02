@@ -79,6 +79,14 @@
           <div>{{ post.autor.nome }}</div>
           <time datetime="{{ post.data_criacao|date:'c' }}">{{ post.data_criacao|timesince }}</time>
         </div>
+        {% if post.autor_id == user.id %}
+        <form method="post" action="{% url 'delete_post' post.id %}" class="post-delete-form" onsubmit="return confirm('Deseja realmente deletar este post?');" aria-label="Deletar post">
+          {% csrf_token %}
+          <button type="submit" class="post-delete-button" title="Excluir post" aria-label="Excluir post">
+            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+          </button>
+        </form>
+        {% endif %}
       </header>
       <p class="post-content">{{ post.texto }}</p>
       {% if post.imagem %}
