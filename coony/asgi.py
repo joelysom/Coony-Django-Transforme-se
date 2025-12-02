@@ -15,5 +15,5 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'coony.settings')
 
 application = get_asgi_application()
 
-# Vercel expects the callable to be named `app`
+# Some platforms (Render, Vercel, etc.) expect the ASGI callable to be named `app`
 app = application

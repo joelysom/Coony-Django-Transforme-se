@@ -34,8 +34,8 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-z*0uubc#y@wjeehx(6%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = _csv(os.getenv('DJANGO_ALLOWED_HOSTS', '.vercel.app,localhost,127.0.0.1')) or ['localhost']
-CSRF_TRUSTED_ORIGINS = _csv(os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', 'https://*.vercel.app'))
+ALLOWED_HOSTS = _csv(os.getenv('DJANGO_ALLOWED_HOSTS', '.onrender.com,localhost,127.0.0.1')) or ['localhost']
+CSRF_TRUSTED_ORIGINS = _csv(os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', 'https://*.onrender.com'))
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
