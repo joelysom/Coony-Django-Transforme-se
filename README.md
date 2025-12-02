@@ -1,55 +1,55 @@
 # Coony-Django-Transforme-se
 
-Django social app pronto para rodar localmente e ser publicado na plataforma **Render.com**. Este guia explica os pré-requisitos, variáveis de ambiente e o fluxo de build/deploy automatizado via `render.yaml`.
+Aplicação Django preparada para desenvolvimento local e publicação na **Vercel** usando banco **Neon Postgres**. Este guia descreve o setup, variáveis de ambiente e o fluxo de deploy com funções serverless Python.
 
 ## Pré-requisitos
 - Python 3.11 (definido em `runtime.txt`).
-- Gerenciador de virtualenv (venv, pipenv, etc.) e `pip` atualizado.
-- Conta na Render com acesso a Web Services + Postgres (opcional, porém recomendado).
-- GitHub conectado à Render (o deploy automático usa o repositório público).
+- Virtualenv ativo (`python -m venv .venv && .venv\\Scripts\\activate`).
+- Conta na Vercel e Vercel CLI (`npm i -g vercel`).
+- Projeto Postgres criado no Neon (ou outro provedor compatível) + string `DATABASE_URL` com `sslmode=require`.
 
 ## Configuração local
-1. Crie o ambiente virtual: `python -m venv .venv && .\.venv\Scripts\activate` (PowerShell).
-2. Instale dependências: `python -m pip install -r requirements.txt`.
-3. Copie `.env.example` para `.env` e configure as variáveis (secret, hosts, `DATABASE_URL`).
-4. Execute `python manage.py migrate` e, se necessário, `python manage.py createsuperuser`.
-5. Gere arquivos estáticos quando testar o modo produção: `python manage.py collectstatic --noinput`.
-6. Suba o servidor local: `python manage.py runserver 0.0.0.0:8000`.
+1. Instale dependências: `python -m pip install -r requirements.txt`.
+2. Copie `.env.example` para `.env` e preencha as variáveis (principalmente `DJANGO_SECRET_KEY`, `DATABASE_URL`).
+3. Aplique migrações: `python manage.py migrate`.
+4. (Opcional) Crie um admin: `python manage.py createsuperuser`.
+5. Colete estáticos para simular produção: `python manage.py collectstatic --noinput`.
+6. Rode localmente: `python manage.py runserver 0.0.0.0:8000`.
 
 ## Arquivos importantes
-- `render.yaml`: descreve o Web Service da Render (build, start command, env vars).
-- `Procfile`: usado pela Render para iniciar o Gunicorn (`web: gunicorn coony.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --log-file -`).
-- `requirements.txt` e `runtime.txt`: garantem reprodutibilidade do ambiente Python 3.11.
-- `coony/settings.py`: configurações protegidas por variáveis de ambiente, WhiteNoise para servir estáticos e obrigatoriedade de `DATABASE_URL` em produção.
-- `.env.example`: referência para todas as chaves necessárias localmente e no painel da Render.
+- `vercel.json`: instrui a Vercel a usar `@vercel/python`, rodar `collectstatic` no build e direcionar todas as rotas para `coony/asgi.py`.
+- `requirements.txt`: inclui Django, WhiteNoise, `uvicorn` (ASGI worker) e `psycopg[binary]` (driver Postgres para o Neon).
+- `coony/settings.py`: controla DEBUG/hosts via env vars, usa `dj_database_url` e falha se `DATABASE_URL` estiver ausente em produção.
+- `.env.example`: referência rápida das variáveis obrigatórias.
 
 ## Variáveis de ambiente
-Defina-as tanto no `.env` local quanto no painel da Render (Service → Environment → Environment Variables):
+Configure no `.env` local e no painel da Vercel (Project → Settings → Environment Variables):
 
 | Nome | Descrição |
 | --- | --- |
-| `DJANGO_SECRET_KEY` | Gere via `python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"`. |
+| `DJANGO_SECRET_KEY` | Gere com `python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"`. |
 | `DJANGO_DEBUG` | `False` em produção. |
-| `DJANGO_ALLOWED_HOSTS` | Domínios separados por vírgula (`coony-django.onrender.com,.onrender.com`). |
-| `DJANGO_CSRF_TRUSTED_ORIGINS` | Inclua `https://coony-django.onrender.com`. |
-| `DATABASE_URL` | Use Postgres da Render (URI completa) ou `sqlite:///db.sqlite3` para desenvolvimento local. |
+| `DJANGO_ALLOWED_HOSTS` | Ex.: `coony.vercel.app,.vercel.app,localhost`. |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | Inclua `https://coony.vercel.app` e subdomínios. |
+| `DATABASE_URL` | String completa do Neon: `postgresql://<user>:<pass>@<host>/<db>?sslmode=require&channel_binding=require`. |
 
-> **Arquivos enviados pelos usuários**: Render oferece discos persistentes, mas considere provedores como S3/Cloudinary para alta disponibilidade. Ajuste `MEDIA_URL/MEDIA_ROOT` antes de liberar uploads em produção.
+> **Uploads**: o filesystem do runtime Python na Vercel é somente leitura. Para `MEDIA_ROOT`, utilize storage externo (S3, Cloudinary etc.).
 
-## Deploy na Render
-1. Faça fork/clonagem do repositório no GitHub e confirme que o branch alvo (`vercel` ou outro) contém suas alterações.
-2. Em `render.yaml`, ajuste `name`, `plan`, `region` e `branch` se necessário.
-3. Na Render, clique em **New +** → **Blueprint** e aponte para o repositório. A plataforma lerá `render.yaml` e criará o Web Service automaticamente.
-4. Preencha as variáveis marcadas com `sync: false` pelo dashboard (SECRET_KEY, DATABASE_URL, etc.).
-5. O build executa `pip install`, `collectstatic` e `migrate`. Ao final o serviço inicia com `gunicorn coony.asgi:application -k uvicorn.workers.UvicornWorker` (ASGI) servindo estáticos via WhiteNoise.
-6. Para implantações futuras, basta fazer push na branch monitorada. A Render reconstruirá o serviço automaticamente.
+## Deploy na Vercel + Neon
+1. Faça login (`vercel login`) e vincule o repositório (`vercel link`).
+2. Cadastre as variáveis acima em Project Settings → Environment Variables.
+3. Opcional: sincronize para o ambiente local com `vercel env pull .env.production`.
+4. Rode migrações contra o Neon carregando o mesmo `.env.production` localmente (PowerShell: `$env:DATABASE_URL=...; python manage.py migrate`).
+5. Execute `vercel deploy` para criar um preview. Quando estiver tudo ok, rode `vercel deploy --prod`.
+
+Durante o deploy, a Vercel instala os requisitos, executa `collectstatic` e cria uma função serverless baseada em `coony/asgi.py`. O pacote `uvicorn` fornece o worker ASGI usado pelo runtime. Logs do build e runtime podem ser vistos com `vercel logs <deployment-url>`.
 
 ## Pós-deploy
-- Conferir logs em **Render → Service → Logs** (útil após migrações ou ajustes de ambiente).
-- Executar migrações manuais quando necessário via **Shell** do serviço (`python manage.py migrate`).
-- Monitorar consumo de disco se estiver usando SQLite (não recomendado para produção). Considere migrar para Postgres e instalar `psycopg[binary]` caso necessário.
+- Sempre que o modelo mudar, execute migrações apontando para o Neon antes de promover para produção.
+- Use `python manage.py dumpdata`/`loaddata` para transferir dados entre ambientes se necessário.
+- Considere habilitar monitoramento (Sentry, etc.) e cache distribuído (Redis) para otimizar a experiência quando a base de usuários crescer.
 
 ## Próximos passos
-- Conectar um banco Postgres gerenciado e atualizar `requirements.txt` adicionando `psycopg[binary]` com a versão suportada (≥ 3.2.2).
-- Configurar CDN/armazenamento para mídia do usuário.
-- Adicionar testes automatizados (`usuarios/tests.py`) e integrá-los a um pipeline CI antes de cada deploy.
+- Automatizar migrações pós-deploy via GitHub Actions ou manualmente após cada `vercel deploy --prod`.
+- Integrar storage externo para mídia.
+- Expandir cobertura de testes em `usuarios/tests.py` e executá-los antes dos deploys.
