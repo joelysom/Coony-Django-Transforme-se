@@ -11,7 +11,7 @@ from django.templatetags.static import static
 from django.utils import timezone
 
 from .forms import RegistrationForm, LoginForm, PostForm, CommentForm
-from .models import Usuario, Post, Comment, Conversation, Message
+from .models import Usuario, Post, Comment, Conversation, Message, Dashboard
 from .utils import normalize_username
 
 
@@ -212,7 +212,8 @@ def dashboard(request):
         request.session.pop('usuario_id', None)
         return redirect('index')
     
-    return render(request, 'usuarios/dashboard.html', {'user': user})
+    events = Dashboard.objects.order_by('data_evento').all()
+    return render(request, 'usuarios/dashboard.html', {'user': user, 'events': events})
 
 def dashboard_mobile(request):
     """Render mobile version of the dashboard."""

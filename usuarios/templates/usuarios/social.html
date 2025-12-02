@@ -74,7 +74,15 @@
     {% for post in posts %}
     <article class="post" aria-label="Post de {{ post.autor.nome }}">
       <header class="post-header">
-        <img src="{% if post.autor.foto %}{{ post.autor.foto.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="{{ post.autor.nome }}" />
+        <img src="
+        {% if post.autor.foto %}
+        {
+          { post.autor.foto.url }}
+          {% else %}
+          {% static 'img/default-avatar.svg' %}
+          {% endif %}" 
+          
+          alt="{{ post.autor.nome }}" />
         <div>
           <div>{{ post.autor.nome }}</div>
           <time datetime="{{ post.data_criacao|date:'c' }}">{{ post.data_criacao|timesince }}</time>

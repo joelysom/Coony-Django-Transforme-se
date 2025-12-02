@@ -137,3 +137,10 @@ class Message(models.Model):
 
     def __str__(self):
         return f'Msg {self.autor.nome} -> {self.conversation_id}: {self.texto[:40]}'
+    
+
+class Dashboard(models.Model):
+    titulo = models.CharField(max_length=100)
+    descricao = models.CharField(max_length=255)
+    local = models.CharField(max_length=100)
+    data_evento = models.DateTimeField()

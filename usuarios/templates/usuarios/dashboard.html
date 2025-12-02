@@ -44,58 +44,27 @@
       <button>Funcional</button>
     </div>
 
-    <!-- Lista de eventos -->
+        <!-- Lista de eventos -->
     <div class="events-grid">
-      <!-- Card 1 -->
+      {% for event in events %}
       <div class="event-card">
         <div class="event-img">
-          <img src="https://i.ibb.co/5Yc2fQ3/bikefest.png" alt="1º Bike Fest Recife">
+          <img src="{% static 'img/event-default.png' %}" alt="{{ event.titulo }}">
           <span class="material-symbols-outlined favorite">favorite</span>
         </div>
-        <h3>1º Bike Fest Recife</h3>
-        <p>Uma manhã para pedalar pelas ruas da cidade praticando esporte e lazer.</p>
+        <h3>{{ event.titulo }}</h3>
+        <p>{{ event.descricao }}</p>
         <div class="event-info">
           <span class="material-symbols-outlined">location_on</span>
-          <p>Boa Viagem - PE</p>
+          <p>{{ event.local }}</p>
           <span class="material-symbols-outlined">calendar_month</span>
-          <p>29/09/2025</p>
+          <p>{{ event.data_evento|date:"d/m/Y" }}</p>
         </div>
         <button class="btn">Participar</button>
       </div>
-
-      <!-- Card 2 -->
-      <div class="event-card">
-        <div class="event-img">
-          <img src="https://i.ibb.co/TM2CY4J/sesc-corrida.png" alt="Circuito Sesc de Corridas">
-          <span class="material-symbols-outlined favorite">favorite</span>
-        </div>
-        <h3>Circuito Sesc de Corridas</h3>
-        <p>Venha participar desse incrível circuito de corridas promovido pelo SESC.</p>
-        <div class="event-info">
-          <span class="material-symbols-outlined">location_on</span>
-          <p>Recife - PE</p>
-          <span class="material-symbols-outlined">calendar_month</span>
-          <p>04/10/2025</p>
-        </div>
-        <button class="btn">Participar</button>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="event-card">
-        <div class="event-img">
-          <img src="https://i.ibb.co/1fnLFwS/bike-clube.png" alt="2º Pedal Bike Clube">
-          <span class="material-symbols-outlined favorite">favorite</span>
-        </div>
-        <h3>2º Pedal Bike Clube</h3>
-        <p>Venha participar desse incrível passeio de bike em Arcoverde - PE.</p>
-        <div class="event-info">
-          <span class="material-symbols-outlined">location_on</span>
-          <p>Arcoverde - PE</p>
-          <span class="material-symbols-outlined">calendar_month</span>
-          <p>08/11/2025</p>
-        </div>
-        <button class="btn">Participar</button>
-      </div>
+      {% empty %}
+        <p>Nenhum evento cadastrado.</p>
+      {% endfor %}
     </div>
   </main>
   
