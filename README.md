@@ -18,7 +18,7 @@ Django social app pronto para rodar localmente e ser publicado na plataforma **R
 
 ## Arquivos importantes
 - `render.yaml`: descreve o Web Service da Render (build, start command, env vars).
-- `Procfile`: usado pela Render para iniciar o Gunicorn (`web: gunicorn coony.wsgi:application --log-file -`).
+- `Procfile`: usado pela Render para iniciar o Gunicorn (`web: gunicorn coony.asgi:application -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --log-file -`).
 - `requirements.txt` e `runtime.txt`: garantem reprodutibilidade do ambiente Python 3.11.
 - `coony/settings.py`: configurações protegidas por variáveis de ambiente, WhiteNoise para servir estáticos e obrigatoriedade de `DATABASE_URL` em produção.
 - `.env.example`: referência para todas as chaves necessárias localmente e no painel da Render.
@@ -41,7 +41,7 @@ Defina-as tanto no `.env` local quanto no painel da Render (Service → Environm
 2. Em `render.yaml`, ajuste `name`, `plan`, `region` e `branch` se necessário.
 3. Na Render, clique em **New +** → **Blueprint** e aponte para o repositório. A plataforma lerá `render.yaml` e criará o Web Service automaticamente.
 4. Preencha as variáveis marcadas com `sync: false` pelo dashboard (SECRET_KEY, DATABASE_URL, etc.).
-5. O build executa `pip install`, `collectstatic` e `migrate`. Ao final o serviço inicia com `gunicorn coony.wsgi:application` servindo estáticos via WhiteNoise.
+5. O build executa `pip install`, `collectstatic` e `migrate`. Ao final o serviço inicia com `gunicorn coony.asgi:application -k uvicorn.workers.UvicornWorker` (ASGI) servindo estáticos via WhiteNoise.
 6. Para implantações futuras, basta fazer push na branch monitorada. A Render reconstruirá o serviço automaticamente.
 
 ## Pós-deploy
