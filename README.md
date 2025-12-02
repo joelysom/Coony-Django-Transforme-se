@@ -17,7 +17,7 @@ Projeto Django preparado para rodar localmente e em produção utilizando a plat
 6. Rode o servidor: `python manage.py runserver 0.0.0.0:8000`.
 
 ## Estrutura para Vercel
-- `vercel.json`: define builder `@vercel/python`, aponta para `coony/wsgi.py`, adiciona comando de build para `collectstatic` e expõe `DJANGO_SETTINGS_MODULE`.
+- `vercel.json`: define builder `@vercel/python`, aponta para `coony/asgi.py`, adiciona comando de build para `collectstatic` e expõe `DJANGO_SETTINGS_MODULE`.
 - `requirements.txt`: inclui `Django`, `django-user-agents`, `dj-database-url`, `whitenoise`, `psycopg[binary]` (driver Postgres) e `gunicorn`.
 - `runtime.txt`: fixa a versão do Python suportada pelo ambiente Vercel.
 - `coony/settings.py`: agora lê configurações via variáveis de ambiente, obriga `DATABASE_URL` em produção e utiliza WhiteNoise para servir arquivos estáticos diretamente no Lambda.

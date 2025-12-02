@@ -8,7 +8,7 @@
   },
   "builds": [
     {
-      "src": "coony/wsgi.py",
+      "src": "coony/asgi.py",
       "use": "@vercel/python",
       "config": {
         "runtime": "python3.11",
@@ -19,7 +19,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "coony/wsgi.py"
+      "dest": "coony/asgi.py"
     }
   ]
 }
