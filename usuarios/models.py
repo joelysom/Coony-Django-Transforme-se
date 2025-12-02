@@ -61,6 +61,19 @@ class Post(models.Model):
         ordering = ['-data_criacao']
 
 
+class PostLikeEvent(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='like_events')
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='generated_like_events')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ('post', 'usuario')
+
+    def __str__(self):
+        return f'{self.usuario.nome} curtiu o post {self.post_id}'
+
+
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     autor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='comments')

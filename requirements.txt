@@ -1,0 +1,5 @@
+Django==5.2.8
+# Provides UA detection used in middleware
+django-user-agents==0.4.0
+# Parses DATABASE_URL strings provided by PythonAnywhere
+dj-database-url==2.3.0

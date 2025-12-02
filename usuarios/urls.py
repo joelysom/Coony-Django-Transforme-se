@@ -13,6 +13,7 @@ urlpatterns = [
     path('social/like/<int:post_id>/', views.like_post, name='like_post'),
     path('social/comment/<int:post_id>/', views.comment_post, name='comment_post'),
     path('social/delete/<int:post_id>/', views.delete_post, name='delete_post'),
+    path('notifications/', views.notifications, name='notifications'),
     path('perfil/', views.perfil, name='perfil'),
     path('chat/', views.chat, name='chat'),
     path('chat/api/conversations/', views.chat_conversations_api, name='chat_conversations_api'),

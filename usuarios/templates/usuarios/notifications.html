@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notificações - Coony</title>
+  <link rel="stylesheet" href="{% static 'css/notifications.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+<body>
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
+  <main class="content">
+    <section class="notifications-hero">
+      <div>
+        <p class="eyebrow">Painel em tempo real</p>
+        <h2>Notificações</h2>
+        <p class="subtitle">Acompanhe novos comentários, curtidas e respostas do chat em um só lugar.</p>
+      </div>
+      <span class="material-symbols-outlined hero-icon">notifications_active</span>
+    </section>
+
+    <section class="notifications-feed">
+      {% if notifications %}
+        {% for notification in notifications %}
+          <article class="notification-card notification-{{ notification.type }}">
+            <div class="notification-icon">
+              <span class="material-symbols-outlined">{{ notification.icon }}</span>
+            </div>
+            <div class="notification-body">
+              <div class="notification-header">
+                <h3>{{ notification.title }}</h3>
+                <span class="notification-time">{{ notification.relative_time }}</span>
+              </div>
+              {% if notification.description %}
+                <p class="notification-text">{{ notification.description }}</p>
+              {% endif %}
+              {% if notification.post_excerpt %}
+                <div class="notification-target">
+                  <span>Post:</span>
+                  <p>{{ notification.post_excerpt }}</p>
+                </div>
+              {% endif %}
+              <div class="notification-actions">
+                <a href="{{ notification.cta_url }}" class="notification-link">
+                  {{ notification.cta_label }}
+                  <span class="material-symbols-outlined">arrow_outward</span>
+                </a>
+              </div>
+            </div>
+          </article>
+        {% endfor %}
+      {% else %}
+        <div class="notification-empty">
+          <span class="material-symbols-outlined">notifications_off</span>
+          <p>Sem novidades por enquanto. Assim que alguém interagir com você, tudo aparece aqui.</p>
+        </div>
+      {% endif %}
+    </section>
+  </main>
+</body>
+</html>

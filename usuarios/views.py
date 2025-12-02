@@ -6,12 +6,14 @@ from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.http import JsonResponse
+from django.urls import reverse
 from django.views.decorators.http import require_POST, require_GET
 from django.templatetags.static import static
 from django.utils import timezone
+from django.utils.timesince import timesince
 
 from .forms import RegistrationForm, LoginForm, PostForm, CommentForm
-from .models import Usuario, Post, Comment, Conversation, Message
+from .models import Usuario, Post, Comment, Conversation, Message, PostLikeEvent
 from .utils import normalize_username
 
 
@@ -258,6 +260,93 @@ def social(request):
     })
 
 
+def notifications(request):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+
+    notifications = []
+    now = timezone.now()
+
+    conversation_ids = list(user.chat_conversations.values_list('id', flat=True))
+    if conversation_ids:
+        message_events = (
+            Message.objects
+            .filter(conversation_id__in=conversation_ids)
+            .exclude(autor=user)
+            .exclude(deleted_for=user)
+            .exclude(deleted_for_everyone=True)
+            .select_related('autor', 'conversation')
+            .order_by('-created_at')[:20]
+        )
+        chat_url = reverse('chat')
+        for message in message_events:
+            preview = message.texto.strip() if message.texto else ''
+            notifications.append({
+                'type': 'message',
+                'icon': 'forum',
+                'title': f'{message.autor.nome} respondeu no chat',
+                'description': preview[:160] if preview else 'Você tem uma nova resposta na conversa.',
+                'timestamp': message.created_at,
+                'cta_url': chat_url,
+                'cta_label': 'Abrir chat'
+            })
+
+    comment_events = (
+        Comment.objects
+        .filter(post__autor=user)
+        .exclude(autor=user)
+        .select_related('autor', 'post')
+        .order_by('-data_criacao')[:20]
+    )
+    social_url = reverse('social')
+    for comment in comment_events:
+        post_excerpt = (comment.post.texto or '').strip()
+        notifications.append({
+            'type': 'comment',
+            'icon': 'chat_bubble',
+            'title': f'{comment.autor.nome} comentou no seu post',
+            'description': comment.texto.strip()[:200] if comment.texto else 'Novo comentário no seu post.',
+            'timestamp': comment.data_criacao,
+            'post_excerpt': post_excerpt[:120] if post_excerpt else None,
+            'cta_url': social_url,
+            'cta_label': 'Ver na timeline'
+        })
+
+    like_events = (
+        PostLikeEvent.objects
+        .filter(post__autor=user)
+        .exclude(usuario=user)
+        .select_related('usuario', 'post')
+        .order_by('-created_at')[:20]
+    )
+    for event in like_events:
+        post_excerpt = (event.post.texto or '').strip()
+        notifications.append({
+            'type': 'like',
+            'icon': 'favorite',
+            'title': f'{event.usuario.nome} curtiu seu post',
+            'description': post_excerpt[:200] if post_excerpt else 'Seu post recebeu um novo like.',
+            'timestamp': event.created_at,
+            'post_excerpt': post_excerpt[:120] if post_excerpt else None,
+            'cta_url': social_url,
+            'cta_label': 'Ver na timeline'
+        })
+
+    notifications.sort(key=lambda item: item['timestamp'] or now, reverse=True)
+    notifications = notifications[:40]
+
+    for item in notifications:
+        ts = item.get('timestamp') or now
+        delta = timesince(ts, now)
+        item['relative_time'] = f'{delta} atrás' if delta else 'agora mesmo'
+
+    return render(request, 'usuarios/notifications.html', {
+        'user': user,
+        'notifications': notifications
+    })
+
+
 def chat(request):
     """Render chat interface."""
     user = _get_logged_user(request)
@@ -443,6 +532,11 @@ def like_post(request, post_id):
         post.likes.remove(user)
     else:
         post.likes.add(user)
+        PostLikeEvent.objects.update_or_create(
+            post=post,
+            usuario=user,
+            defaults={'created_at': timezone.now()}
+        )
     return redirect('social')
 
 
