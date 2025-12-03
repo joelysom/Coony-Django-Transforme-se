@@ -167,7 +167,8 @@ def dashboard(request):
         return redirect('index')
     if getattr(request.user_agent, 'is_mobile', False):
         return redirect('dashboard_mobile')
-    eventos = user.eventos.all()
+    # Show events created by all users, most recent first
+    eventos = Evento.objects.all().order_by('-data', '-hora', '-criado_em')
     return render(request, 'usuarios/dashboard.html', {'user': user, 'eventos': eventos})
 
 def dashboard_mobile(request):
@@ -182,7 +183,8 @@ def dashboard_mobile(request):
         return redirect('index')
     if not getattr(request.user_agent, 'is_mobile', False):
         return redirect('dashboard')
-    eventos = user.eventos.all()
+    # Show events created by all users, most recent first
+    eventos = Evento.objects.all().order_by('-data', '-hora', '-criado_em')
     return render(request, 'usuarios/dashboard_mobile.html', {'user': user, 'eventos': eventos})
 
 def social(request):
