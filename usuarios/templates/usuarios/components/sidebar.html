@@ -185,7 +185,12 @@
     <button type="button" class="sidebar-menu-item" data-route="{% url 'perfil' %}" data-match="{% url 'perfil' %}"><span class="material-symbols-outlined">account_circle</span> Perfil</button>
     <button type="button" class="sidebar-menu-item"><span class="material-symbols-outlined">help</span> Central de Ajuda</button>
     <div class="sidebar-divider"></div>
-    <button type="button" class="sidebar-menu-item create-event sidebar-create-event"><span class="material-symbols-outlined">add_circle</span> Criar Evento</button>
+    <button type="button"
+            class="sidebar-menu-item create-event sidebar-create-event"
+            data-route="{% url 'create_event' %}"
+            data-match="{% url 'create_event' %}">
+      <span class="material-symbols-outlined">add_circle</span> Criar Evento
+    </button>
   </nav>
 
   <div class="sidebar-user-box">

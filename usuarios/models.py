@@ -150,3 +150,29 @@ class Message(models.Model):
 
     def __str__(self):
         return f'Msg {self.autor.nome} -> {self.conversation_id}: {self.texto[:40]}'
+
+
+class Evento(models.Model):
+    criador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='eventos')
+    titulo = models.CharField(max_length=120)
+    descricao = models.TextField()
+    modalidade = models.CharField(max_length=60)
+    nivel_dificuldade = models.CharField(max_length=60, blank=True)
+    data = models.DateField()
+    hora = models.TimeField()
+    local = models.CharField(max_length=120)
+    distancia = models.CharField(max_length=40, blank=True)
+    max_participantes = models.PositiveIntegerField(null=True, blank=True)
+    imagem_capa = models.ImageField(upload_to='eventos/capa/', blank=True)
+    favorited_by = models.ManyToManyField('Usuario', related_name='favorited_eventos', blank=True)
+    imagem_detalhe_1 = models.ImageField(upload_to='eventos/detalhes/', blank=True)
+    imagem_detalhe_2 = models.ImageField(upload_to='eventos/detalhes/', blank=True)
+    imagem_detalhe_3 = models.ImageField(upload_to='eventos/detalhes/', blank=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-data', '-hora', '-criado_em']
+
+    def __str__(self):
+        return f'{self.titulo} - {self.data:%d/%m/%Y}'

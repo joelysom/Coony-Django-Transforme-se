@@ -1,0 +1,236 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Evento - Coony</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/create-event.css' %}">
+</head>
+<body class="page-create-event" data-static-root="{{ STATIC_URL }}">
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
+  <main class="event-layout">
+    <section class="event-hero">
+      <p class="eyebrow">Organize experiências reais</p>
+      <h1>Crie eventos com a cara da comunidade</h1>
+      <p>Conecte novos participantes, defina rotas e compartilhe detalhes importantes. Tudo centralizado e ligado à sua conta.</p>
+    </section>
+
+    <section class="event-form-card" aria-labelledby="formTitle">
+      <header>
+        <div>
+          <p class="eyebrow">Novo evento</p>
+          <h2 id="formTitle">Detalhes principais</h2>
+        </div>
+      </header>
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="form-errors">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="form-grid">
+          <div class="form-field full">
+            <label for="{{ form.titulo.id_for_label }}">{{ form.titulo.label }}</label>
+            {{ form.titulo }}
+            {% if form.titulo.errors %}<span class="field-error">{{ form.titulo.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field full">
+            <label for="{{ form.descricao.id_for_label }}">{{ form.descricao.label }}</label>
+            {{ form.descricao }}
+            {% if form.descricao.errors %}<span class="field-error">{{ form.descricao.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
+            <label for="{{ form.modalidade.id_for_label }}">{{ form.modalidade.label }}</label>
+            {{ form.modalidade }}
+            {% if form.modalidade.errors %}<span class="field-error">{{ form.modalidade.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
+            <label for="{{ form.nivel_dificuldade.id_for_label }}">{{ form.nivel_dificuldade.label }}</label>
+            {{ form.nivel_dificuldade }}
+            {% if form.nivel_dificuldade.errors %}<span class="field-error">{{ form.nivel_dificuldade.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
+            <label for="{{ form.data.id_for_label }}">{{ form.data.label }}</label>
+            {{ form.data }}
+            {% if form.data.errors %}<span class="field-error">{{ form.data.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
+            <label for="{{ form.hora.id_for_label }}">{{ form.hora.label }}</label>
+            {{ form.hora }}
+            {% if form.hora.errors %}<span class="field-error">{{ form.hora.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
+            <label for="{{ form.local.id_for_label }}">{{ form.local.label }}</label>
+            {{ form.local }}
+            {% if form.local.errors %}<span class="field-error">{{ form.local.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
+            <label for="{{ form.distancia.id_for_label }}">{{ form.distancia.label }}</label>
+            {{ form.distancia }}
+            {% if form.distancia.errors %}<span class="field-error">{{ form.distancia.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
+            <label for="{{ form.max_participantes.id_for_label }}">{{ form.max_participantes.label }}</label>
+            {{ form.max_participantes }}
+            {% if form.max_participantes.errors %}<span class="field-error">{{ form.max_participantes.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field full media-instructions">
+            <strong>Imagens do evento</strong>
+            <p>Envie uma imagem principal obrigatória e até três fotos extras que aparecerão no detalhe do evento.</p>
+          </div>
+
+          <div class="form-field full">
+            <label for="{{ form.imagem_capa.id_for_label }}">{{ form.imagem_capa.label }}</label>
+            {{ form.imagem_capa }}
+            {% if form.imagem_capa.errors %}<span class="field-error">{{ form.imagem_capa.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
+            <label for="{{ form.imagem_detalhe_1.id_for_label }}">{{ form.imagem_detalhe_1.label }}</label>
+            {{ form.imagem_detalhe_1 }}
+            {% if form.imagem_detalhe_1.errors %}<span class="field-error">{{ form.imagem_detalhe_1.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
+            <label for="{{ form.imagem_detalhe_2.id_for_label }}">{{ form.imagem_detalhe_2.label }}</label>
+            {{ form.imagem_detalhe_2 }}
+            {% if form.imagem_detalhe_2.errors %}<span class="field-error">{{ form.imagem_detalhe_2.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
+            <label for="{{ form.imagem_detalhe_3.id_for_label }}">{{ form.imagem_detalhe_3.label }}</label>
+            {{ form.imagem_detalhe_3 }}
+            {% if form.imagem_detalhe_3.errors %}<span class="field-error">{{ form.imagem_detalhe_3.errors|join:', ' }}</span>{% endif %}
+          </div>
+        </div>
+        <button type="submit" class="primary-btn">Criar evento</button>
+      </form>
+    </section>
+
+    <section class="event-list" aria-live="polite">
+      <header>
+        <p class="eyebrow">Meus eventos</p>
+        <h2>Próximas atividades</h2>
+      </header>
+      {% if meus_eventos %}
+        <ul class="event-cards">
+          {% for evento in meus_eventos %}
+            <li class="event-card">
+              {% if evento.imagem_capa %}
+              <div class="event-card__media">
+                <img src="{{ evento.imagem_capa.url }}" alt="Imagem principal do evento {{ evento.titulo }}" class="event-card__cover">
+                {% if evento.imagem_detalhe_1 or evento.imagem_detalhe_2 or evento.imagem_detalhe_3 %}
+                <div class="event-card__gallery">
+                  {% if evento.imagem_detalhe_1 %}
+                  <img src="{{ evento.imagem_detalhe_1.url }}" alt="Imagem extra do evento {{ evento.titulo }}" class="event-card__thumb">
+                  {% endif %}
+                  {% if evento.imagem_detalhe_2 %}
+                  <img src="{{ evento.imagem_detalhe_2.url }}" alt="Imagem extra do evento {{ evento.titulo }}" class="event-card__thumb">
+                  {% endif %}
+                  {% if evento.imagem_detalhe_3 %}
+                  <img src="{{ evento.imagem_detalhe_3.url }}" alt="Imagem extra do evento {{ evento.titulo }}" class="event-card__thumb">
+                  {% endif %}
+                </div>
+                {% endif %}
+              </div>
+              {% endif %}
+              <div class="event-card__header">
+                <h3>{{ evento.titulo }}</h3>
+                <span class="event-card__date">{{ evento.data|date:'d/m/Y' }} · {{ evento.hora|time:'H\hi' }}</span>
+              </div>
+              <p class="event-card__description">{{ evento.descricao }}</p>
+              <dl class="event-card__meta">
+                <div>
+                  <dt>Modalidade</dt>
+                  <dd>{{ evento.modalidade }}</dd>
+                </div>
+                {% if evento.nivel_dificuldade %}
+                <div>
+                  <dt>Nível</dt>
+                  <dd>{{ evento.nivel_dificuldade }}</dd>
+                </div>
+                {% endif %}
+                <div>
+                  <dt>Local</dt>
+                  <dd>{{ evento.local }}</dd>
+                </div>
+                {% if evento.distancia %}
+                <div>
+                  <dt>Distância</dt>
+                  <dd>{{ evento.distancia }}</dd>
+                </div>
+                {% endif %}
+                {% if evento.max_participantes %}
+                <div>
+                  <dt>Limite</dt>
+                  <dd>{{ evento.max_participantes }} pessoas</dd>
+                </div>
+                {% endif %}
+              </dl>
+              <footer>
+                <span>Criado em {{ evento.criado_em|date:'d/m/Y H:i' }}</span>
+              </footer>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="event-empty">
+          <h3>Você ainda não cadastrou eventos.</h3>
+          <p>Use o formulário ao lado para planejar o primeiro encontro da sua comunidade.</p>
+        </div>
+      {% endif %}
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      const navMobile = document.getElementById('nav-mobile');
+      const navDesktop = document.getElementById('nav-desktop');
+      const navQuery = window.matchMedia('(max-width: 768px)');
+
+      const applyNavMode = (isMobile) => {
+        if (!navMobile || !navDesktop) {
+          return;
+        }
+        navMobile.hidden = !isMobile;
+        navDesktop.hidden = isMobile;
+        document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+      };
+
+      const handleChange = (event) => applyNavMode(event.matches);
+
+      applyNavMode(navQuery.matches);
+      if (typeof navQuery.addEventListener === 'function') {
+        navQuery.addEventListener('change', handleChange);
+      } else if (typeof navQuery.addListener === 'function') {
+        navQuery.addListener(handleChange);
+      }
+    })();
+  </script>
+</body>
+</html>

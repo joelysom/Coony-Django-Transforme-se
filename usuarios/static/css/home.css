@@ -151,7 +151,23 @@ body {
   color: #f68b4a;
   background: #fff;
   border-radius: 50%;
-  padding: 4px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 140ms ease;
+  /* Material Symbols: outlined supports FILL axis — default to outline (FILL=0) */
+  font-variation-settings: "FILL" 0, "wght" 400;
+}
+
+.favorite.favorited {
+  background-color: #f68b4a;
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(246,139,74,0.18);
+  transform: translateY(-1px);
+  /* request filled glyph from the Material Symbols font */
+  font-variation-settings: "FILL" 1, "wght" 600;
 }
 
 .event-card h3 {
@@ -188,6 +204,7 @@ body {
   display: flex;
   align-items: center;
 }
+
 
 .btn {
   display: block;

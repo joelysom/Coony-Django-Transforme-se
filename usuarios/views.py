@@ -12,8 +12,8 @@ from django.templatetags.static import static
 from django.utils import timezone
 from django.utils.timesince import timesince
 
-from .forms import RegistrationForm, LoginForm, PostForm, CommentForm
-from .models import Usuario, Post, Comment, Conversation, Message, PostLikeEvent
+from .forms import RegistrationForm, LoginForm, PostForm, CommentForm, EventoForm
+from .models import Usuario, Post, Comment, Conversation, Message, PostLikeEvent, Evento
 from .utils import normalize_username
 
 
@@ -213,8 +213,10 @@ def dashboard(request):
     except Usuario.DoesNotExist:
         request.session.pop('usuario_id', None)
         return redirect('index')
-    
-    return render(request, 'usuarios/dashboard.html', {'user': user})
+    if getattr(request.user_agent, 'is_mobile', False):
+        return redirect('dashboard_mobile')
+    eventos = user.eventos.all()
+    return render(request, 'usuarios/dashboard.html', {'user': user, 'eventos': eventos})
 
 def dashboard_mobile(request):
     """Render mobile version of the dashboard."""
@@ -226,8 +228,10 @@ def dashboard_mobile(request):
     except Usuario.DoesNotExist:
         request.session.pop('usuario_id', None)
         return redirect('index')
-    
-    return render(request, 'usuarios/dashboard_mobile.html', {'user': user})
+    if not getattr(request.user_agent, 'is_mobile', False):
+        return redirect('dashboard')
+    eventos = user.eventos.all()
+    return render(request, 'usuarios/dashboard_mobile.html', {'user': user, 'eventos': eventos})
 
 def social(request):
     """Render social network page."""
@@ -257,6 +261,35 @@ def social(request):
         'form': form,
         'posts': posts,
         'comment_form': CommentForm()
+    })
+
+
+def create_event(request):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+
+    if request.method == 'POST':
+        form = EventoForm(request.POST, request.FILES)
+        if form.is_valid():
+            evento = form.save(commit=False)
+            evento.criador = user
+            evento.save()
+            messages.success(
+                request,
+                f'Evento "{evento.titulo}" criado com sucesso!',
+                extra_tags='toast'
+            )
+            return redirect('create_event')
+        messages.error(request, 'Verifique os campos destacados e tente novamente.', extra_tags='toast')
+    else:
+        form = EventoForm()
+
+    meus_eventos = user.eventos.all()
+    return render(request, 'usuarios/create_event.html', {
+        'user': user,
+        'form': form,
+        'meus_eventos': meus_eventos,
     })
 
 
@@ -646,3 +679,25 @@ def perfil(request):
         'user': user,
         'modalidades': modalidades_list,
     })
+
+
+@require_POST
+def toggle_favorite_event(request, evento_id):
+    """Toggle favorite for an event via AJAX POST. Returns JSON with new state."""
+    user = _get_logged_user(request)
+    if not user:
+        return JsonResponse({'detail': 'Autenticação requerida'}, status=401)
+
+    try:
+        evento = Evento.objects.get(pk=evento_id)
+    except Evento.DoesNotExist:
+        return JsonResponse({'detail': 'Evento não encontrado.'}, status=404)
+
+    if user in evento.favorited_by.all():
+        evento.favorited_by.remove(user)
+        favorited = False
+    else:
+        evento.favorited_by.add(user)
+        favorited = True
+
+    return JsonResponse({'favorited': favorited})

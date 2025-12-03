@@ -46,71 +46,114 @@
 
     <!-- Lista de eventos -->
     <div class="events-grid">
-      <!-- Card 1 -->
-      <div class="event-card">
-        <div class="event-img">
-          <img src="https://i.ibb.co/5Yc2fQ3/bikefest.png" alt="1º Bike Fest Recife">
-          <span class="material-symbols-outlined favorite">favorite</span>
+      {% if eventos %}
+        {% for evento in eventos %}
+        <div class="event-card">
+          <div class="event-img">
+            <img src="{% if evento.imagem_capa %}{{ evento.imagem_capa.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="{{ evento.titulo }}">
+            <span class="material-symbols-outlined favorite {% if user and user in evento.favorited_by.all %}favorited{% endif %}" data-event-id="{{ evento.id }}">favorite</span>
+          </div>
+          <h3>{{ evento.titulo }}</h3>
+          <p>{{ evento.descricao|truncatewords:24 }}</p>
+          <div class="event-info">
+            <span class="material-symbols-outlined">location_on</span>
+            <p>{{ evento.local }}</p>
+            <span class="material-symbols-outlined">calendar_month</span>
+            <p>{{ evento.data|date:'d/m/Y' }} · {{ evento.hora|time:'H\hi' }}</p>
+          </div>
+          <button class="btn">Ver detalhes</button>
         </div>
-        <h3>1º Bike Fest Recife</h3>
-        <p>Uma manhã para pedalar pelas ruas da cidade praticando esporte e lazer.</p>
-        <div class="event-info">
-          <span class="material-symbols-outlined">location_on</span>
-          <p>Boa Viagem - PE</p>
-          <span class="material-symbols-outlined">calendar_month</span>
-          <p>29/09/2025</p>
+        {% endfor %}
+      {% else %}
+        <div class="event-card event-card--empty">
+          <h3>Nenhum evento disponível.</h3>
+          <p>Assim que novos eventos forem publicados, eles aparecerão aqui.</p>
         </div>
-        <button class="btn">Participar</button>
-      </div>
-
-      <!-- Card 2 -->
-      <div class="event-card">
-        <div class="event-img">
-          <img src="https://i.ibb.co/TM2CY4J/sesc-corrida.png" alt="Circuito Sesc de Corridas">
-          <span class="material-symbols-outlined favorite">favorite</span>
-        </div>
-        <h3>Circuito Sesc de Corridas</h3>
-        <p>Venha participar desse incrível circuito de corridas promovido pelo SESC.</p>
-        <div class="event-info">
-          <span class="material-symbols-outlined">location_on</span>
-          <p>Recife - PE</p>
-          <span class="material-symbols-outlined">calendar_month</span>
-          <p>04/10/2025</p>
-        </div>
-        <button class="btn">Participar</button>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="event-card">
-        <div class="event-img">
-          <img src="https://i.ibb.co/1fnLFwS/bike-clube.png" alt="2º Pedal Bike Clube">
-          <span class="material-symbols-outlined favorite">favorite</span>
-        </div>
-        <h3>2º Pedal Bike Clube</h3>
-        <p>Venha participar desse incrível passeio de bike em Arcoverde - PE.</p>
-        <div class="event-info">
-          <span class="material-symbols-outlined">location_on</span>
-          <p>Arcoverde - PE</p>
-          <span class="material-symbols-outlined">calendar_month</span>
-          <p>08/11/2025</p>
-        </div>
-        <button class="btn">Participar</button>
-      </div>
+      {% endif %}
     </div>
   </main>
   
   <script>
-  function redirectByWidth() {
-    if (window.innerWidth <= 768) {
-      window.location.href = "{% url 'dashboard_mobile' %}";
+  // Favorites toggle (desktop)
+  (function(){
+    function getCookie(name){
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if(parts.length===2) return parts.pop().split(';').shift();
     }
-  }
+    const csrftoken = getCookie('csrftoken');
+    document.querySelectorAll('.favorite[data-event-id]').forEach(function(el){
+      el.addEventListener('click', function(e){
+          e.stopPropagation();
+          const id = el.getAttribute('data-event-id');
+          const base = "{% url 'toggle_favorite_event' 0 %}";
+          const url = base.replace('/0/','/' + id + '/');
+          console.log('[favorite] click', id, url);
+          // optimistic UI: toggle immediately
+          const prevState = el.classList.contains('favorited');
+          el.classList.toggle('favorited');
+          // send request
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+              'X-CSRFToken': csrftoken
+            },
+            credentials: 'same-origin'
+          }).then(response => {
+            console.log('[favorite] response status', response.status);
+            if (!response.ok) {
+              console.warn('Favorite request failed', response.status);
+              if (response.status === 401) {
+                alert('Faça login para favoritar eventos.');
+              }
+              // revert optimistic
+              if (prevState) el.classList.add('favorited'); else el.classList.remove('favorited');
+              return null;
+            }
+            return response.json();
+          }).then(data => {
+            if (!data) return;
+            console.log('[favorite] response json', data);
+            if (data.favorited) el.classList.add('favorited');
+            else el.classList.remove('favorited');
+          }).catch(err => {
+            console.error('Error toggling favorite', err);
+            if (prevState) el.classList.add('favorited'); else el.classList.remove('favorited');
+          });
+        });
+    });
+  })();
 
-  // Executa no carregamento da página
-  window.addEventListener("load", redirectByWidth);
+  </script>
 
-  // Executa sempre que a janela for redimensionada
-  window.addEventListener("resize", redirectByWidth);
+  <script>
+  (function() {
+    const mobilePath = "{% url 'dashboard_mobile' %}";
+    const media = window.matchMedia('(max-width: 768px)');
+
+    const ensureMobile = () => {
+      if (window.location.pathname !== mobilePath) {
+        window.location.replace(mobilePath);
+      }
+    };
+
+    if (media.matches) {
+      ensureMobile();
+    }
+
+    const handleChange = (event) => {
+      if (event.matches) {
+        ensureMobile();
+      }
+    };
+
+    if (typeof media.addEventListener === 'function') {
+      media.addEventListener('change', handleChange);
+    } else if (typeof media.addListener === 'function') {
+      media.addListener(handleChange);
+    }
+  })();
   </script>
 
 </body>

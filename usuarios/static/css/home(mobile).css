@@ -112,7 +112,21 @@ body {
   color: #f68b4a;
   background: #fff;
   border-radius: 50%;
-  padding: 4px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, transform 140ms ease;
+  font-variation-settings: "FILL" 0, "wght" 400;
+}
+
+.favorite.favorited {
+  background-color: #f68b4a;
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(246,139,74,0.18);
+  transform: translateY(-1px);
+  font-variation-settings: "FILL" 1, "wght" 600;
 }
 
 .event-card h3 {
@@ -128,13 +142,54 @@ body {
 }
 
 .event-info {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin: 0 15px 10px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  margin: 0 15px 12px;
   color: #888;
 }
+
+.event-info .material-symbols-outlined {
+  font-size: 20px;
+  color: #f68b4a;
+  display: flex;
+  align-items: center;
+}
+
+.event-info p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+}
+
+/* Table-like stacked rows for mobile event info */
+.event-info.table-rows {
+  display: block;
+}
+
+.event-info.table-rows .row {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.event-info.table-rows .row .icon .material-symbols-outlined {
+  font-size: 20px;
+  color: #f68b4a;
+  display: inline-flex;
+  align-items: center;
+}
+
+.event-info.table-rows .row .cell p {
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+}
+
 
 .btn {
   display: block;

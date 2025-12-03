@@ -47,35 +47,108 @@
     <button>Funcional</button>
   </div>
 
-  <!-- Cartão de evento -->
-  <div class="event-card">
-    <div class="event-img">
-      <img src="https://i.ibb.co/5Yc2fQ3/bikefest.png" alt="1º Bike Fest Recife">
-      <span class="material-symbols-outlined favorite">favorite</span>
+  {% if eventos %}
+    {% for evento in eventos %}
+    <div class="event-card">
+      <div class="event-img">
+        <img src="{% if evento.imagem_capa %}{{ evento.imagem_capa.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="{{ evento.titulo }}">
+        <span class="material-symbols-outlined favorite {% if user and user in evento.favorited_by.all %}favorited{% endif %}" data-event-id="{{ evento.id }}">favorite</span>
+      </div>
+      <h3>{{ evento.titulo }}</h3>
+      <p>{{ evento.descricao|truncatewords:30 }}</p>
+      <div class="event-info table-rows">
+        <div class="row">
+          <div class="cell icon"><span class="material-symbols-outlined">location_on</span></div>
+          <div class="cell"><p>{{ evento.local }}</p></div>
+        </div>
+        <div class="row">
+          <div class="cell icon"><span class="material-symbols-outlined">calendar_month</span></div>
+          <div class="cell"><p>{{ evento.data|date:'d/m/Y' }} · {{ evento.hora|time:'H\\hi' }}</p></div>
+        </div>
+      </div>
+      <button class="btn">Ver detalhes</button>
     </div>
-    <h3>1º Bike Fest Recife</h3>
-    <p>Uma manhã para pedalar pelas ruas da cidade praticando esporte e lazer.</p>
-    <div class="event-info">
-      <span class="material-symbols-outlined">location_on</span>
-      <p>Boa Viagem - PE</p>
-      <span class="material-symbols-outlined">calendar_month</span>
-      <p>29/09/2025</p>
+    {% endfor %}
+  {% else %}
+    <div class="event-card empty-card">
+      <h3>Nenhum evento disponível</h3>
+      <p>Volte em breve para conferir novos encontros publicados pela comunidade.</p>
     </div>
-    <button class="btn">Participar</button>
-  </div>
+  {% endif %}
 
   <script>
-  function redirectByWidth() {
-    if (window.innerWidth > 768) {
-      window.location.href = "{% url 'dashboard' %}";
+  (function() {
+    const desktopPath = "{% url 'dashboard' %}";
+    const media = window.matchMedia('(max-width: 768px)');
+
+    const ensureDesktop = () => {
+      if (window.location.pathname !== desktopPath) {
+        window.location.replace(desktopPath);
+      }
+    };
+
+    if (!media.matches) {
+      ensureDesktop();
     }
-  }
 
-  // Roda no carregamento
-  window.addEventListener("load", redirectByWidth);
+    const handleChange = (event) => {
+      if (!event.matches) {
+        ensureDesktop();
+      }
+    };
 
-  // Roda sempre que a tela é redimensionada
-  window.addEventListener("resize", redirectByWidth);
+    if (typeof media.addEventListener === 'function') {
+      media.addEventListener('change', handleChange);
+    } else if (typeof media.addListener === 'function') {
+      media.addListener(handleChange);
+    }
+  })();
+  </script>
+
+  <script>
+  // Favorites toggle (mobile)
+  (function(){
+    function getCookie(name){
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if(parts.length===2) return parts.pop().split(';').shift();
+    }
+    const csrftoken = getCookie('csrftoken');
+    document.querySelectorAll('.favorite[data-event-id]').forEach(function(el){
+      el.addEventListener('click', function(e){
+        e.stopPropagation();
+        const id = el.getAttribute('data-event-id');
+        const base = "{% url 'toggle_favorite_event' 0 %}";
+        const url = base.replace('/0/','/' + id + '/');
+        console.log('[favorite-mobile] click', id, url);
+        const prevState = el.classList.contains('favorited');
+        el.classList.toggle('favorited');
+        fetch(url, {
+          method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrftoken
+          },
+          credentials: 'same-origin'
+        }).then(response => {
+          console.log('[favorite-mobile] response', response.status);
+          if (!response.ok) {
+            if (response.status === 401) alert('Faça login para favoritar eventos.');
+            if (prevState) el.classList.add('favorited'); else el.classList.remove('favorited');
+            return null;
+          }
+          return response.json();
+        }).then(data => {
+          if (!data) return;
+          console.log('[favorite-mobile] json', data);
+          if (data.favorited) el.classList.add('favorited'); else el.classList.remove('favorited');
+        }).catch(err => {
+          console.error('Error toggling favorite (mobile)', err);
+          if (prevState) el.classList.add('favorited'); else el.classList.remove('favorited');
+        });
+      });
+    });
+  })();
   </script>
 
   <!-- Importa o Navbar Mobile -->

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Criar Evento</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2eee8;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #383838;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-top: 18px;
+      margin-bottom: 6px;
+      color: #2f2f2f;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      background: white;
+      border-radius: 10px;
+      border: none;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: none;
+      height: 100px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 14px;
+      border-radius: 30px;
+      border: none;
+      background: #d1d9e0;
+      font-size: 16px;
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    /* DESKTOP VERSION */
+    @media (min-width: 900px) {
+      .container {
+        max-width: 900px;
+      }
+
+      form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        background: #fff;
+        padding: 30px;
+        border-radius: 14px;
+      }
+
+      h1 {
+        grid-column: span 2;
+      }
+
+      textarea {
+        height: 140px;
+      }
+
+      .full {
+        grid-column: span 2;
+      }
+
+      button {
+        grid-column: span 2;
+        width: 200px;
+        justify-self: center;
+        background: #6c7e92;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form>
+      <h1>Criar Evento Novo</h1>
+
+      <div class="full">
+        <label>Título do Evento</label>
+        <input type="text" placeholder="Corrida matinal no Marco Zero" />
+      </div>
+
+      <div class="full">
+        <label>Descrição</label>
+        <textarea placeholder="Descreva seu evento..."></textarea>
+      </div>
+
+      <div>
+        <label>Modalidade Esportiva</label>
+        <input type="text" placeholder="Corrida" />
+      </div>
+
+      <div>
+        <label>Nível de Dificuldade</label>
+        <input type="text" placeholder="Médio" />
+      </div>
+
+      <div>
+        <label>Data</label>
+        <input type="text" placeholder="dd/mm/aaaa" />
+      </div>
+
+      <div>
+        <label>Hora</label>
+        <input type="text" placeholder="--:--" />
+      </div>
+
+      <div>
+        <label>Local</label>
+        <select>
+          <option>Selecione o local</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Distância (opcional)</label>
+        <input type="text" placeholder="5K, 10 milhas, etc." />
+      </div>
+
+      <div>
+        <label>Máximo de Participantes (opcional)</label>
+        <input type="text" placeholder="Ex: 20" />
+      </div>
+
+      <button type="submit">Criar Evento</button>
+    </form>
+  </div>
+</body>
+</html>
