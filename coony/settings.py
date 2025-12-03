@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'django_user_agents',
     'usuarios',
 ]
@@ -85,6 +86,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'coony.wsgi.application'
+ASGI_APPLICATION = 'coony.asgi.application'
 
 
 # Database
@@ -144,6 +146,12 @@ STATICFILES_DIRS = [
 # Media files (user uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 # Allow iframe display
 X_FRAME_OPTIONS = 'SAMEORIGIN'

@@ -1,6 +1,8 @@
 from django.core.exceptions import MultipleObjectsReturned
 import json
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.db import IntegrityError
 from django.db.models import Q
 from django.shortcuts import render, redirect
@@ -8,13 +10,13 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
 from django.views.decorators.http import require_POST, require_GET
-from django.templatetags.static import static
 from django.utils import timezone
 from django.utils.timesince import timesince
 
 from .forms import RegistrationForm, LoginForm, PostForm, CommentForm, EventoForm
 from .models import Usuario, Post, Comment, Conversation, Message, PostLikeEvent, Evento
 from .utils import normalize_username
+from .chat_serializers import serialize_user, serialize_message, serialize_conversation
 
 
 def _get_logged_user(request):
@@ -35,68 +37,18 @@ def _json_auth_required(request):
     return user, None
 
 
-def _avatar_url(user):
-    if user and user.foto:
-        try:
-            return user.foto.url
-        except ValueError:
-            pass
-    return static('img/default-avatar.svg')
-
-
-def _user_payload(user):
-    if not user:
-        return None
-    return {
-        'id': user.id,
-        'name': user.nome,
-        'handle': f"@{user.username}" if user.username else '',
-        'avatar_url': _avatar_url(user),
-    }
-
-
-def _message_payload(message, current_user):
-    is_self = message.autor_id == current_user.id
-    is_deleted_for_all = message.deleted_for_everyone
-    if is_deleted_for_all:
-        deleted_by_name = message.deleted_by.nome if message.deleted_by else 'Usuário'
-        display_text = f'{deleted_by_name} apagou esta mensagem.'
-    else:
-        display_text = message.texto
-
-    return {
-        'id': message.id,
-        'conversation_id': message.conversation_id,
-        'text': '' if is_deleted_for_all else display_text,
-        'display_text': display_text,
-        'created_at': message.created_at.isoformat(),
-        'author': _user_payload(message.autor),
-        'is_self': is_self,
-        'is_deleted_for_all': is_deleted_for_all,
-        'deleted_label': display_text if is_deleted_for_all else None,
-        'can_delete_for_self': True,
-        'can_delete_for_all': is_self and not is_deleted_for_all,
-    }
-
-
-def _conversation_payload(conversation, current_user):
-    other = conversation.other_participant(current_user) or current_user
-    last_message = (conversation.messages
-                    .exclude(deleted_for=current_user)
-                    .order_by('-created_at')
-                    .first())
-    if last_message and last_message.deleted_for_everyone:
-        preview_text = _message_payload(last_message, current_user)['display_text']
-    elif last_message:
-        preview_text = last_message.texto
-    else:
-        preview_text = ''
-    return {
-        'id': conversation.id,
-        'partner': _user_payload(other),
-        'last_message': preview_text,
-        'last_message_at': last_message.created_at.isoformat() if last_message else None,
-    }
+def _broadcast_message_event(message):
+    channel_layer = get_channel_layer()
+    if not channel_layer:
+        return
+    async_to_sync(channel_layer.group_send)(
+        f'chat_{message.conversation_id}',
+        {
+            'type': 'chat.message_event',
+            'message_id': message.id,
+            'conversation_id': message.conversation_id,
+        }
+    )
 
 
 def index(request):
@@ -400,7 +352,7 @@ def chat_conversations_api(request):
     conversations = (Conversation.objects
                      .filter(participants=user)
                      .prefetch_related('participants', 'messages__autor', 'messages__deleted_by'))
-    data = [_conversation_payload(conv, user) for conv in conversations]
+    data = [serialize_conversation(conv, user) for conv in conversations]
     return JsonResponse({'conversations': data})
 
 
@@ -414,17 +366,24 @@ def chat_search_users_api(request):
     if not term:
         return JsonResponse({'results': []})
 
-    normalized = normalize_username(term.lstrip('@')) if term.startswith('@') else normalize_username(term)
-    filters = Q(nome__icontains=term)
-    if normalized:
-        filters |= Q(username__icontains=normalized)
+    search_name = term.lstrip('@') if term.startswith('@') else term
+    normalized_handle = normalize_username(term)
+
+    filters = Q()
+    if search_name:
+        filters |= Q(nome__icontains=search_name)
+    if normalized_handle:
+        filters |= Q(username__icontains=normalized_handle)
+
+    if not filters:
+        return JsonResponse({'results': []})
 
     matches = (Usuario.objects
                .exclude(pk=user.pk)
                .filter(filters)
                .order_by('nome')[:8])
 
-    results = [_user_payload(match) for match in matches]
+    results = [serialize_user(match) for match in matches]
     return JsonResponse({'results': results})
 
 
@@ -453,7 +412,7 @@ def chat_start_conversation_api(request):
         return JsonResponse({'detail': 'Você não pode iniciar uma conversa consigo mesmo.'}, status=400)
 
     conversation = Conversation.get_or_create_private(user, partner)
-    data = _conversation_payload(conversation, user)
+    data = serialize_conversation(conversation, user)
     return JsonResponse({'conversation': data}, status=201)
 
 
@@ -471,7 +430,7 @@ def chat_messages_api(request, conversation_id):
     queryset = (conversation.messages
                 .select_related('autor', 'deleted_by')
                 .exclude(deleted_for=user))
-    messages = [_message_payload(message, user) for message in queryset]
+    messages = [serialize_message(message, user) for message in queryset]
     return JsonResponse({'messages': messages})
 
 
@@ -497,8 +456,9 @@ def chat_send_message_api(request, conversation_id):
 
     message = Message.objects.create(conversation=conversation, autor=user, texto=text)
     conversation.touch()
+    _broadcast_message_event(message)
 
-    return JsonResponse({'message': _message_payload(message, user)}, status=201)
+    return JsonResponse({'message': serialize_message(message, user)}, status=201)
 
 
 @require_POST
@@ -535,10 +495,11 @@ def chat_delete_message_api(request, message_id):
         message.deleted_by = user
         message.save(update_fields=['deleted_for_everyone', 'deleted_for_everyone_at', 'deleted_by'])
         message.conversation.touch()
+        _broadcast_message_event(message)
         return JsonResponse({
             'scope': 'all',
-            'message': _message_payload(message, user),
-            'conversation': _conversation_payload(message.conversation, user)
+            'message': serialize_message(message, user),
+            'conversation': serialize_conversation(message.conversation, user)
         })
 
     # Delete for self (default)
@@ -547,7 +508,7 @@ def chat_delete_message_api(request, message_id):
     return JsonResponse({
         'scope': 'self',
         'message_id': message.id,
-        'conversation': _conversation_payload(conversation, user)
+        'conversation': serialize_conversation(conversation, user)
     })
 
 

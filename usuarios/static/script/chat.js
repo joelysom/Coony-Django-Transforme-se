@@ -49,6 +49,23 @@ document.addEventListener('DOMContentLoaded', () => {
     searchTimeout: null,
     searchResults: [],
     mobileView: null,
+    lastSearchTerm: '',
+    hasLoadedConversations: false,
+    liveInterval: null,
+    isRefreshing: false,
+    messageInterval: null,
+    socket: null,
+    socketConversationId: null,
+    socketAutoReconnect: false,
+    socketReconnectTimer: null,
+    socketReconnectAttempts: 0,
+    socketMaxRetries: 5,
+  };
+
+  const realtimeLog = (...args) => {
+    if (window.COONY_DEBUG_REALTIME) {
+      console.debug('[chat realtime]', ...args);
+    }
   };
 
   const resetDesktopLayout = () => {
@@ -110,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const config = {
       method: options.method || 'GET',
       credentials: 'same-origin',
+      cache: 'no-store',
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
         ...(options.body ? { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken } : {}),
@@ -118,12 +136,15 @@ document.addEventListener('DOMContentLoaded', () => {
       body: options.body,
     };
 
+    realtimeLog('apiFetch request', config.method, url);
     const response = await fetch(url, config);
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       const detail = data?.detail || 'Não foi possível completar a ação.';
+      realtimeLog('apiFetch error', response.status, url, detail);
       throw new Error(detail);
     }
+    realtimeLog('apiFetch ok', url, Object.keys(data));
     return data;
   };
 
@@ -175,6 +196,13 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(() => {
       target.scrollTop = target.scrollHeight;
     });
+  };
+
+  const isNearBottom = (element) => {
+    if (!element) return true;
+    const threshold = 60;
+    const distance = element.scrollHeight - element.scrollTop - element.clientHeight;
+    return distance <= threshold;
   };
 
   const renderEmptyMessagesState = (text) => {
@@ -268,11 +296,16 @@ document.addEventListener('DOMContentLoaded', () => {
     messagesContainer.appendChild(wrapper);
   };
 
-  const renderMessages = (conversationId) => {
+  const renderMessages = (conversationId, { stickToBottom = true } = {}) => {
     if (!messagesContainer) return;
     const conversation = state.conversations.find((conv) => conv.id === conversationId);
     const partner = conversation?.partner;
     const messages = state.messagesCache[conversationId] || [];
+
+    let previousOffsetFromBottom = 0;
+    if (!stickToBottom) {
+      previousOffsetFromBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop;
+    }
 
     messagesContainer.innerHTML = '';
     if (!messages.length) {
@@ -281,13 +314,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     messages.forEach((message) => renderMessage(message, partner));
-    scrollMessagesToBottom();
+    if (stickToBottom) {
+      scrollMessagesToBottom();
+    } else if (messagesContainer) {
+      const nextTop = messagesContainer.scrollHeight - previousOffsetFromBottom;
+      messagesContainer.scrollTop = nextTop > 0 ? nextTop : 0;
+    }
   };
 
   const conversationMatchesTerm = (conversation, term) => {
     const partner = conversation.partner;
     const target = `${partner?.name || ''} ${partner?.handle || ''}`.toLowerCase();
     return target.includes(term.toLowerCase());
+  };
+
+  const applyConversationFilter = () => {
+    if (!state.lastSearchTerm) {
+      state.filteredConversations = null;
+      return;
+    }
+    state.filteredConversations = state.conversations.filter((conversation) =>
+      conversationMatchesTerm(conversation, state.lastSearchTerm)
+    );
   };
 
   const renderConversations = () => {
@@ -363,6 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const ensureMessages = async (conversationId, { force = false } = {}) => {
     if (!force && state.messagesCache[conversationId]) {
+      realtimeLog('ensureMessages using cache', conversationId, state.messagesCache[conversationId].length);
       return state.messagesCache[conversationId];
     }
 
@@ -373,10 +422,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const data = await apiFetch(url);
     state.messagesCache[conversationId] = data.messages || [];
+    realtimeLog('ensureMessages fetched', conversationId, state.messagesCache[conversationId].length);
     return state.messagesCache[conversationId];
   };
 
   const selectConversation = async (conversationId) => {
+    stopMessagePolling();
+    disconnectConversationSocket();
     state.activeConversationId = conversationId;
     highlightConversation(conversationId);
     const conversation = state.conversations.find((conv) => conv.id === conversationId);
@@ -389,27 +441,286 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isMobile()) {
         setMobileView('chat');
       }
+      connectConversationSocket(conversationId);
+      startMessagePolling();
     } catch (error) {
       notify(error.message, 'error');
       renderEmptyMessagesState('Não foi possível carregar as mensagens.');
+      disconnectConversationSocket();
     }
   };
 
-  const loadConversations = async () => {
+  async function loadConversations({ silent = false } = {}) {
     if (!endpoints.conversations) return;
     try {
+      realtimeLog('loadConversations tick');
       const data = await apiFetch(endpoints.conversations);
+      const previousActive = state.activeConversationId;
       state.conversations = data.conversations || [];
+      realtimeLog('conversations count', state.conversations.length);
+      applyConversationFilter();
       renderConversations();
-      if (state.conversations.length && !state.activeConversationId && !isMobile()) {
-        selectConversation(state.conversations[0].id);
-      } else if (!state.conversations.length && isMobile()) {
+
+      if (!state.hasLoadedConversations) {
+        state.hasLoadedConversations = true;
+        if (state.conversations.length && !previousActive && !isMobile()) {
+          selectConversation(state.conversations[0].id);
+        }
+        startLiveUpdates();
+      } else if (previousActive && !state.conversations.some((conv) => conv.id === previousActive)) {
+        state.activeConversationId = null;
+        renderEmptyMessagesState('Esta conversa não está mais disponível.');
+        stopMessagePolling();
+        disconnectConversationSocket();
+      }
+
+      if (state.activeConversationId) {
+        const updated = state.conversations.find((conv) => conv.id === state.activeConversationId);
+        if (updated) {
+          updateConversationHeader(updated.partner);
+        }
+      }
+
+      if (!state.conversations.length && isMobile()) {
         setMobileView('list');
       }
     } catch (error) {
-      notify(error.message, 'error');
+      if (!silent) {
+        notify(error.message, 'error');
+      }
+      realtimeLog('loadConversations error', error?.message);
+    }
+  }
+
+  async function refreshActiveConversationMessages() {
+    const conversationId = state.activeConversationId;
+    if (!conversationId) return;
+    const conversation = state.conversations.find((conv) => conv.id === conversationId);
+    if (!conversation) return;
+
+    const wasAtBottom = isNearBottom(messagesContainer);
+
+    try {
+      realtimeLog('refreshActiveConversationMessages tick', conversationId);
+      await ensureMessages(conversationId, { force: true });
+      renderMessages(conversationId, { stickToBottom: wasAtBottom });
+      realtimeLog('refreshActiveConversationMessages rendered', conversationId);
+    } catch (error) {
+      // Falha silenciosa em atualizações em tempo real.
+      realtimeLog('refreshActiveConversationMessages error', error?.message);
+    }
+  }
+
+  const clearSocketReconnect = () => {
+    if (state.socketReconnectTimer) {
+      clearTimeout(state.socketReconnectTimer);
+      state.socketReconnectTimer = null;
     }
   };
+
+  const disconnectConversationSocket = () => {
+    state.socketAutoReconnect = false;
+    clearSocketReconnect();
+    if (state.socket) {
+      try {
+        state.socket.close();
+      } catch (_) {
+        /* noop */
+      }
+    }
+    state.socket = null;
+    state.socketConversationId = null;
+  };
+
+  const scheduleSocketReconnect = (conversationId) => {
+    clearSocketReconnect();
+    if (!state.socketAutoReconnect) {
+      return;
+    }
+    state.socketReconnectAttempts += 1;
+    if (state.socketReconnectAttempts > state.socketMaxRetries) {
+      state.socketAutoReconnect = false;
+      notify('Conexão em tempo real indisponível. Mantendo atualização a cada 2s.', 'info');
+      startMessagePolling();
+      return;
+    }
+
+    state.socketReconnectTimer = setTimeout(() => {
+      if (document.hidden) {
+        return;
+      }
+      if (state.activeConversationId === conversationId) {
+        connectConversationSocket(conversationId);
+      }
+    }, 5000);
+  };
+
+  const upsertMessageInCache = (message) => {
+    if (!message || !message.id) {
+      return;
+    }
+    const conversationId = message.conversation_id;
+    if (!conversationId) {
+      return;
+    }
+
+    if (!state.messagesCache[conversationId]) {
+      state.messagesCache[conversationId] = [];
+    }
+    const cache = state.messagesCache[conversationId];
+    const existingIndex = cache.findIndex((item) => item.id === message.id);
+    if (existingIndex >= 0) {
+      cache[existingIndex] = message;
+    } else {
+      cache.push(message);
+      cache.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    }
+
+    if (state.activeConversationId === conversationId) {
+      const stickToBottom = isNearBottom(messagesContainer);
+      renderMessages(conversationId, { stickToBottom });
+    }
+  };
+
+  const handleRealtimePayload = (payload) => {
+    if (!payload) return;
+    if (payload.conversation) {
+      upsertConversation(payload.conversation);
+      if (payload.conversation.id === state.activeConversationId) {
+        updateConversationHeader(payload.conversation.partner);
+      }
+    }
+    if (payload.message) {
+      upsertMessageInCache(payload.message);
+    }
+  };
+
+  const handleSocketMessage = (rawData) => {
+    if (!rawData) return;
+    let payload;
+    try {
+      payload = JSON.parse(rawData);
+    } catch (_) {
+      return;
+    }
+
+    if (payload.event === 'message') {
+      handleRealtimePayload(payload);
+    }
+  };
+
+  const connectConversationSocket = (conversationId) => {
+    if (!conversationId) {
+      disconnectConversationSocket();
+      return;
+    }
+
+    disconnectConversationSocket();
+    state.socketAutoReconnect = true;
+    state.socketReconnectAttempts = 0;
+
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const url = `${protocol}://${window.location.host}/ws/chat/${conversationId}/`;
+    let socket;
+    try {
+      socket = new WebSocket(url);
+    } catch (e) {
+      realtimeLog('socket construct failed', e);
+      state.socketAutoReconnect = false;
+      startMessagePolling();
+      return;
+    }
+    state.socket = socket;
+    state.socketConversationId = conversationId;
+
+    socket.addEventListener('open', () => {
+      clearSocketReconnect();
+      state.socketReconnectAttempts = 0;
+      realtimeLog('socket connected', conversationId);
+    });
+
+    socket.addEventListener('message', (event) => handleSocketMessage(event.data));
+
+    socket.addEventListener('close', (event) => {
+      realtimeLog('socket closed', conversationId, event.code, event.reason);
+      startMessagePolling();
+      if (state.socket === socket) {
+        state.socket = null;
+        state.socketConversationId = null;
+      }
+      // If abnormal close (e.g., 1006), stop reconnecting this session
+      if (event && event.code === 1006) {
+        state.socketAutoReconnect = false;
+      }
+      if (state.socketAutoReconnect && !document.hidden) {
+        startMessagePolling();
+        scheduleSocketReconnect(conversationId);
+      }
+    });
+
+    socket.addEventListener('error', (event) => {
+      realtimeLog('socket error', conversationId, event);
+      // Disable auto-reconnect on persistent errors to avoid UI flicker
+      state.socketAutoReconnect = false;
+      try {
+        socket.close();
+      } catch (_) {
+        /* noop */
+      }
+    });
+  };
+
+    const stopMessagePolling = () => {
+      if (state.messageInterval) {
+        clearInterval(state.messageInterval);
+        state.messageInterval = null;
+      }
+    };
+
+    const startMessagePolling = () => {
+      stopMessagePolling();
+      if (!state.activeConversationId) {
+        return;
+      }
+
+      const tick = async () => {
+        if (document.hidden || !state.activeConversationId) {
+          return;
+        }
+        realtimeLog('message poll tick', state.activeConversationId);
+        await refreshActiveConversationMessages();
+      };
+
+      tick();
+      state.messageInterval = setInterval(tick, 2000);
+    };
+
+  function stopLiveUpdates() {
+    if (state.liveInterval) {
+      clearInterval(state.liveInterval);
+      state.liveInterval = null;
+    }
+  }
+
+  function startLiveUpdates() {
+    if (state.liveInterval) {
+      return;
+    }
+    const tick = async () => {
+      if (state.isRefreshing || document.hidden) {
+        return;
+      }
+      realtimeLog('live updates tick');
+      state.isRefreshing = true;
+      try {
+        await loadConversations({ silent: true });
+        await refreshActiveConversationMessages();
+      } finally {
+        state.isRefreshing = false;
+      }
+    };
+    state.liveInterval = setInterval(tick, 3000);
+  }
 
   const handleSendMessage = async () => {
     const text = msgInput.value.trim();
@@ -537,8 +848,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const performRemoteSearch = async (term) => {
-    if (!endpoints.search || term.length < 2) {
-      renderSearchResults([], '');
+    const normalizedLength = term.startsWith('@') ? term.slice(1).length : term.length;
+    if (!endpoints.search || normalizedLength < 1) {
       return;
     }
 
@@ -554,13 +865,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const handleSearchInput = (term) => {
     const trimmed = term.trim();
+    state.lastSearchTerm = trimmed;
+    applyConversationFilter();
+    renderConversations();
+
     if (!trimmed) {
-      state.filteredConversations = null;
-      renderConversations();
       renderSearchResults([], '');
-    } else {
-      state.filteredConversations = state.conversations.filter((conversation) => conversationMatchesTerm(conversation, trimmed));
-      renderConversations();
+    } else if (searchResultsEl) {
+      searchResultsEl.hidden = false;
+      searchResultsEl.innerHTML = trimmed === '@'
+        ? '<p class="search-hint">Digite o usuário após o @.</p>'
+        : '<p class="search-loading">Buscando usuários...</p>';
     }
 
     clearTimeout(state.searchTimeout);
@@ -753,4 +1068,24 @@ document.addEventListener('DOMContentLoaded', () => {
     mobileQuery.addListener(handleViewportChange);
   }
   loadConversations();
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopLiveUpdates();
+      stopMessagePolling();
+      disconnectConversationSocket();
+      return;
+    }
+    loadConversations({ silent: true });
+    startLiveUpdates();
+    startMessagePolling();
+    if (state.activeConversationId) {
+      connectConversationSocket(state.activeConversationId);
+    }
+  });
+  window.addEventListener('beforeunload', () => {
+    stopLiveUpdates();
+    stopMessagePolling();
+    disconnectConversationSocket();
+  });
 });

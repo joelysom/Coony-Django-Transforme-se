@@ -3,3 +3,5 @@ Django==5.2.8
 django-user-agents==0.4.0
 # Parses DATABASE_URL strings provided by PythonAnywhere
 dj-database-url==2.3.0
+channels==4.1.0
+daphne==4.1.2
