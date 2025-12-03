@@ -218,6 +218,37 @@ def social(request):
     })
 
 
+def eventos_list(request):
+    """Render events listing page."""
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+    
+    eventos = Evento.objects.all().order_by('-data', '-hora', '-criado_em')
+    return render(request, 'usuarios/eventos.html', {
+        'user': user,
+        'eventos': eventos,
+    })
+
+
+def evento_detail(request, evento_id):
+    """Render event detail page."""
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+    
+    try:
+        evento = Evento.objects.select_related('criador').get(pk=evento_id)
+    except Evento.DoesNotExist:
+        messages.error(request, 'Evento não encontrado.', extra_tags='toast')
+        return redirect('eventos_list')
+    
+    return render(request, 'usuarios/evento_detail.html', {
+        'user': user,
+        'evento': evento,
+    })
+
+
 def create_event(request):
     user = _get_logged_user(request)
     if not user:

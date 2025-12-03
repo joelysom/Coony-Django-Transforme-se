@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eventos — Coony</title>
+  
+  <link rel="stylesheet" href="{% static 'pages/eventos/css/eventos.css' %}" /> 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+      #eventos-mapa iframe {
+        border:0; 
+        border-radius: var(--radius); 
+        box-shadow: var(--shadow-soft);
+      }
+      .filtro-section {
+          display: flex; 
+          flex-wrap: wrap; 
+          gap: var(--spacing-medium);
+          margin-bottom: 2rem;
+      }
+      .filtro-section > * {
+          flex: 1 1 200px; 
+          min-width: 120px;
+      }
+      .icon-orange {
+          color: var(--color-primary-orange); 
+          font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+          vertical-align: middle; 
+          margin-right: 5px;
+          line-height: 1; 
+      }
+      .card-content p {
+          display: flex; 
+          align-items: center; 
+      }
+  </style>
+</head>
+<body>
+    {% include 'usuarios/components/toast.html' %}
+    {% include 'usuarios/components/messages.html' %}
+    {% include 'usuarios/components/sidebar.html' %}
+
+    <div class="app-container"> 
+        <main class="listagem-container"> 
+            <header class="eventos-header">
+                <h1><span class="material-symbols-outlined icon-orange">calendar_month</span> Descubra Eventos</h1>
+                <p>
+                    Encontre e participe de atividades esportivas em Recife e região
+                </p>
+                <a href="{% url 'create_event' %}" class="button"><span class="material-symbols-outlined">add</span> Criar Evento</a>
+            </header>
+
+            <section class="filtro-section">
+                <input
+                    type="text"
+                    id="busca"
+                    class="input"
+                    placeholder="Buscar eventos, locais..."
+                    oninput="filtrarEventos()"
+                />
+
+                <select id="filtro-esporte" class="input" onchange="filtrarEventos()">
+                    <option value="todos">Modalidade Esportiva</option>
+                    <option value="caminhada">Caminhada</option>
+                    <option value="ciclismo">Ciclismo</option>
+                    <option value="corrida">Corrida</option>
+                    <option value="natacao">Natação</option>
+                    <option value="trilha">Trilha</option>
+                    <option value="yoga">Yoga</option>
+                    <option value="funcional">Funcional</option>
+                </select>
+
+                <select id="filtro-dificuldade" class="input" onchange="filtrarEventos()">
+                    <option value="todos">Nível de Dificuldade</option>
+                    <option value="iniciante">Iniciante (Baixa Intensidade)</option>
+                    <option value="intermediario">Moderado (Média Intensidade)</option>
+                    <option value="avancado">Desafiador (Alta Intensidade)</option>
+                </select>
+
+                <div style="display: flex; gap: 0.5rem; flex: 1 1 100%;">
+                    <button class="button secondary-btn" onclick="mudarVisualizacao('lista')" id="btn-lista" style="flex: 1;"><span class="material-symbols-outlined">list</span> Lista</button>
+                    <button class="button secondary-btn" onclick="mudarVisualizacao('grade')" id="btn-grade" style="flex: 1;"><span class="material-symbols-outlined">grid_view</span> Grade</button>
+                </div>
+            </section>
+
+            <section id="eventos-lista-grade" class="eventos-lista"> 
+                {% if eventos %}
+                  {% for evento in eventos %}
+                  <div class="evento-card" data-modalidade="{{ evento.modalidade|lower }}" data-nivel="{{ evento.nivel_dificuldade|lower }}">
+                      <img src="{% if evento.imagem_capa %}{{ evento.imagem_capa.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="{{ evento.titulo }}" />
+                      <div class="card-content"> 
+                          <h3 class="badge">{{ evento.titulo }}</h3>
+                          <p class="location-info"><span class="material-symbols-outlined icon-orange">location_on</span> {{ evento.local }}</p>
+                          <p class="date-info"><span class="material-symbols-outlined icon-orange">calendar_month</span> {{ evento.data|date:'d/m/Y' }} às {{ evento.hora|time:'H:i' }}</p>
+                          <p class="modalidade" style="display: none;">{{ evento.modalidade|lower }}</p>
+                          <p class="nivel" style="display: none;">{{ evento.nivel_dificuldade|lower }}</p>
+                      </div>
+                      <a href="{% url 'evento_detail' evento.id %}" class="button">Ver Detalhes</a>
+                  </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="evento-card">
+                      <div class="card-content">
+                          <h3>Nenhum evento disponível</h3>
+                          <p>Volte em breve para conferir novos encontros publicados pela comunidade.</p>
+                      </div>
+                  </div>
+                {% endif %}
+            </section>
+            
+            <section id="eventos-mapa" style="display: none; margin-top: 2rem;">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15894.2746107255!2d-34.8782646!3d-8.0631491!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x7ab18a4c3f4e3b1%3A0x9f7e1f6e6f6e6f6e!2sMarco%20Zero%2C%20Recife%20-%20PE!5e0!3m2!1spt-BR!2sbr!4v1700000000000"
+                    width="100%"
+                    height="400"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
+            </section>
+        </main>
+    </div>
+  
+    <script src="{% static 'pages/eventos/js/eventos.js' %}" defer></script> 
+</body>
+</html>

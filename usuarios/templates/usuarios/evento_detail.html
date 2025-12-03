@@ -1,0 +1,278 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ evento.titulo }} — Coony</title>
+    
+    <link rel="stylesheet" href="{% static 'pages/eventos/css/detalhes.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Roboto:wght@400;500&family=Inter:wght@700&display=swap');
+    </style>
+</head>
+<body>
+    {% include 'usuarios/components/toast.html' %}
+    {% include 'usuarios/components/messages.html' %}
+    {% include 'usuarios/components/sidebar.html' %}
+
+    <div class="app-container">
+        
+        <header class="header">
+            <a href="{% url 'eventos_list' %}" class="icon-btn back-btn" aria-label="Voltar">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </a>
+            <h1 class="header-title">Detalhes do Evento</h1>
+            <button class="icon-btn home-btn" aria-label="Home" onclick="window.location.href='{% url 'dashboard' %}'">
+                <span class="material-symbols-outlined">home</span>
+            </button>
+        </header>
+
+        <main class="detail-content">
+            <!-- Imagem do Evento -->
+            <div class="event-image-container">
+                <img id="event-image" src="{% if evento.imagem_capa %}{{ evento.imagem_capa.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="{{ evento.titulo }}" class="event-image">
+            </div>
+
+            <!-- Título e Badge -->
+            <div class="event-header">
+                <h2 id="event-title" class="event-title">{{ evento.titulo }}</h2>
+                <span id="event-badge" class="badge badge-corrida">{{ evento.modalidade }}</span>
+            </div>
+
+            <!-- Informações Principais -->
+            <div class="event-info-section">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="material-symbols-outlined icon-orange">calendar_month</span>
+                        <div class="info-text">
+                            <strong>Data e Hora</strong>
+                            <p id="event-datetime">{{ evento.data|date:'d/m/Y' }} às {{ evento.hora|time:'H:i' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="material-symbols-outlined icon-orange">location_on</span>
+                        <div class="info-text">
+                            <strong>Local</strong>
+                            <p id="event-location">{{ evento.local }}</p>
+                        </div>
+                    </div>
+
+                    {% if evento.nivel_dificuldade %}
+                    <div class="info-item">
+                        <span class="material-symbols-outlined icon-orange">speed</span>
+                        <div class="info-text">
+                            <strong>Nível de Dificuldade</strong>
+                            <p id="event-difficulty">{{ evento.nivel_dificuldade }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if evento.distancia %}
+                    <div class="info-item">
+                        <span class="material-symbols-outlined icon-orange">straighten</span>
+                        <div class="info-text">
+                            <strong>Distância</strong>
+                            <p id="event-distance">{{ evento.distancia }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if evento.max_participantes %}
+                    <div class="info-item">
+                        <span class="material-symbols-outlined icon-orange">group</span>
+                        <div class="info-text">
+                            <strong>Participantes</strong>
+                            <p id="event-participants">Máximo: {{ evento.max_participantes }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Descrição -->
+            <div class="event-description-section">
+                <h3 class="section-title">
+                    <span class="material-symbols-outlined icon-orange">description</span>
+                    Sobre o Evento
+                </h3>
+                <p id="event-description" class="event-description">
+                    {{ evento.descricao }}
+                </p>
+            </div>
+
+            <!-- Organizador -->
+            <div class="organizer-section">
+                <h3 class="section-title">
+                    <span class="material-symbols-outlined icon-orange">person</span>
+                    Organizador
+                </h3>
+                <div class="organizer-info">
+                    <div class="organizer-avatar">
+                        {% if evento.criador.foto %}
+                        <img src="{{ evento.criador.foto.url }}" alt="{{ evento.criador.nome }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                        {% else %}
+                        <span class="material-symbols-outlined">account_circle</span>
+                        {% endif %}
+                    </div>
+                    <div class="organizer-details">
+                        <strong id="organizer-name">{{ evento.criador.nome }}</strong>
+                        <p id="organizer-contact">@{{ evento.criador.username }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mapa -->
+            <div class="map-section">
+                <h3 class="section-title">
+                    <span class="material-symbols-outlined icon-orange">map</span>
+                    Localização
+                </h3>
+                <div class="map-container">
+                    <iframe
+                        id="event-map"
+                        src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q={{ evento.local|urlencode }}"
+                        width="100%"
+                        height="250"
+                        style="border:0; border-radius: var(--radius);"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
+                </div>
+            </div>
+
+            <!-- Imagens Adicionais -->
+            {% if evento.imagem_detalhe_1 or evento.imagem_detalhe_2 or evento.imagem_detalhe_3 %}
+            <div class="event-description-section">
+                <h3 class="section-title">
+                    <span class="material-symbols-outlined icon-orange">photo_library</span>
+                    Galeria de Imagens
+                </h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    {% if evento.imagem_detalhe_1 %}
+                    <img src="{{ evento.imagem_detalhe_1.url }}" alt="Detalhe 1" style="width:100%; border-radius:8px;">
+                    {% endif %}
+                    {% if evento.imagem_detalhe_2 %}
+                    <img src="{{ evento.imagem_detalhe_2.url }}" alt="Detalhe 2" style="width:100%; border-radius:8px;">
+                    {% endif %}
+                    {% if evento.imagem_detalhe_3 %}
+                    <img src="{{ evento.imagem_detalhe_3.url }}" alt="Detalhe 3" style="width:100%; border-radius:8px;">
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </main>
+
+        <!-- Botões de Ação -->
+        <footer class="footer-btns">
+            <button class="btn secondary-btn" id="btn-compartilhar" onclick="compartilharEvento()">
+                <span class="material-symbols-outlined">share</span>
+                Compartilhar
+            </button>
+            <button class="btn primary-btn favorite-toggle {% if user in evento.favorited_by.all %}favorited{% endif %}" 
+                    data-event-id="{{ evento.id }}"
+                    onclick="toggleFavorite({{ evento.id }})">
+                <span class="material-symbols-outlined">{% if user in evento.favorited_by.all %}favorite{% else %}favorite_border{% endif %}</span>
+                {% if user in evento.favorited_by.all %}Favoritado{% else %}Favoritar{% endif %}
+            </button>
+        </footer>
+    </div>
+
+    <script>
+    function getCookie(name){
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if(parts.length===2) return parts.pop().split(';').shift();
+    }
+
+    function toggleFavorite(eventoId) {
+        const csrftoken = getCookie('csrftoken');
+        const btn = document.querySelector('.favorite-toggle');
+        const icon = btn.querySelector('.material-symbols-outlined');
+        const prevState = btn.classList.contains('favorited');
+        
+        // Optimistic UI
+        btn.classList.toggle('favorited');
+        if (prevState) {
+            icon.textContent = 'favorite_border';
+            btn.childNodes[2].textContent = 'Favoritar';
+        } else {
+            icon.textContent = 'favorite';
+            btn.childNodes[2].textContent = 'Favoritado';
+        }
+        
+        const url = "{% url 'toggle_favorite_event' 0 %}".replace('/0/', `/${eventoId}/`);
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': csrftoken
+            },
+            credentials: 'same-origin'
+        }).then(response => {
+            if (!response.ok) {
+                // Revert on error
+                if (prevState) {
+                    btn.classList.add('favorited');
+                    icon.textContent = 'favorite';
+                    btn.childNodes[2].textContent = 'Favoritado';
+                } else {
+                    btn.classList.remove('favorited');
+                    icon.textContent = 'favorite_border';
+                    btn.childNodes[2].textContent = 'Favoritar';
+                }
+                if (response.status === 401) {
+                    alert('Faça login para favoritar eventos.');
+                }
+            }
+            return response.json();
+        }).then(data => {
+            if (data && data.favorited !== undefined) {
+                if (data.favorited) {
+                    btn.classList.add('favorited');
+                    icon.textContent = 'favorite';
+                    btn.childNodes[2].textContent = 'Favoritado';
+                } else {
+                    btn.classList.remove('favorited');
+                    icon.textContent = 'favorite_border';
+                    btn.childNodes[2].textContent = 'Favoritar';
+                }
+            }
+        }).catch(err => {
+            console.error('Error toggling favorite', err);
+            // Revert
+            if (prevState) {
+                btn.classList.add('favorited');
+                icon.textContent = 'favorite';
+                btn.childNodes[2].textContent = 'Favoritado';
+            } else {
+                btn.classList.remove('favorited');
+                icon.textContent = 'favorite_border';
+                btn.childNodes[2].textContent = 'Favoritar';
+            }
+        });
+    }
+
+    function compartilharEvento() {
+        if (navigator.share) {
+            navigator.share({
+                title: '{{ evento.titulo }}',
+                text: 'Confira este evento no Coony!',
+                url: window.location.href
+            }).catch(err => console.log('Erro ao compartilhar', err));
+        } else {
+            // Fallback: copiar URL
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('Link copiado para área de transferência!');
+            });
+        }
+    }
+    </script>
+
+    <script src="{% static 'pages/eventos/js/detalhes.js' %}"></script>
+</body>
+</html>

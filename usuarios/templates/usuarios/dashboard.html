@@ -61,7 +61,7 @@
             <span class="material-symbols-outlined">calendar_month</span>
             <p>{{ evento.data|date:'d/m/Y' }} · {{ evento.hora|time:'H\hi' }}</p>
           </div>
-          <button class="btn">Ver detalhes</button>
+          <a href="{% url 'evento_detail' evento.id %}" class="btn" style="text-decoration: none; display: inline-block;">Ver detalhes</a>
         </div>
         {% endfor %}
       {% else %}

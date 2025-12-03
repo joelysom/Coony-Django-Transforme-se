@@ -1,0 +1,474 @@
+/* eventos.css: Versão corrigida e completa, contendo estilos base (cores, body, app-container) e layouts de eventos. */
+
+:root {
+    /* Cores ajustadas (Base Global) */
+    --color-primary-orange: #EC8441;
+    --color-text-dark: #333333; 
+    --color-input-bg: #FFFFFF; 
+    --color-input-border: #E6E6E6; 
+    --color-background-screen: #F3F0EB; 
+    --color-frame-dark: #363131; 
+    
+    /* Dimensões (Base Global) */
+    --input-radius: 14px; 
+    --button-height: 44px;
+    --side-margin: 24px; 
+    --spacing-medium: 16px; 
+    --shadow-soft: 0 4px 10px rgba(0,0,0,0.08); 
+    --radius: 12px; 
+    --border: #E6E6E6; 
+    --muted-foreground: #6c757d; /* Cor de texto secundário */
+}
+
+/* --- ESTILOS GLOBAIS BÁSICOS NECESSÁRIOS PARA O LAYOUT (Base do CriarEventos.css) --- */
+* {
+    box-sizing: border-box;
+    font-family: 'Roboto', 'Inter', 'Montserrat', sans-serif;
+}
+
+body {
+    background-color: var(--color-frame-dark); 
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 420px; 
+    background-color: var(--color-background-screen); 
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 0; 
+    min-height: 100vh;
+    border-radius: var(--input-radius); 
+    box-shadow: 0 0 20px rgba(0,0,0,0.1); 
+}
+
+.listagem-container { 
+    /* Esta classe envolve todo o conteúdo de eventos.html, e precisa ser flexível */
+    padding: var(--side-margin);
+    width: 100%;
+    margin: auto; 
+    flex-grow: 1; 
+}
+
+
+/* --- ESTILOS DE BOTÕES E INPUTS USADOS EM EVENTOS.HTML --- */
+
+.btn, .button {
+    height: var(--button-height); 
+    border: none;
+    border-radius: 22px; 
+    font-size: 16px; 
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    box-shadow: var(--shadow-soft); 
+    cursor: pointer;
+    text-align: center; 
+    line-height: var(--button-height); 
+    text-decoration: none; 
+    display: inline-block; 
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.eventos-header .button {
+    /* Botão "Criar Evento" no header que precisa de largura total */
+    width: 100%;
+    /* NOVO: Aumenta a altura para formato 'mais comprido' */
+    height: 52px; 
+    line-height: 52px;
+    /* NOVO: Aumenta o tamanho da fonte */
+    font-size: 18px; 
+    /* Garante que o texto se alinhe corretamente sem o ícone */
+    display: block; 
+}
+
+.primary-btn, .button {
+    background-color: var(--color-primary-orange); 
+    color: #FFFFFF; 
+}
+
+.primary-btn:hover, .button:hover {
+    background-color: #d67538;
+}
+
+.primary-btn:active, .button:active {
+    transform: translateY(1px);
+}
+
+.secondary-btn {
+    background-color: #FFFFFF; 
+    color: var(--color-primary-orange); 
+    border: 2px solid var(--color-primary-orange); 
+    box-shadow: none; 
+}
+
+.secondary-btn:hover {
+    background-color: #fff5f0;
+}
+
+.secondary-btn:active {
+    transform: translateY(1px);
+}
+
+/* Ajuste para alinhar ícones e texto dentro dos botões de Lista/Grade (Correção de ícones) */
+.filtro-section .button {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    line-height: normal; 
+}
+
+.input {
+    /* Estilos para inputs de filtro (busca, select) */
+    height: var(--button-height);
+    padding: 12px 14px;
+    border: 1px solid var(--color-input-border);
+    border-radius: var(--input-radius);
+    background-color: var(--color-input-bg);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    outline: none;
+    font-family: inherit;
+    color: var(--color-text-dark);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:hover {
+    border-color: var(--color-primary-orange);
+}
+
+.input:focus {
+    border-color: var(--color-primary-orange);
+    box-shadow: 0 3px 12px rgba(236, 132, 65, 0.2);
+}
+
+
+/* --- ESTILOS ESPECÍFICOS DA TELA DE EVENTOS (Header, Filtros, Cards) --- */
+
+.eventos-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-top: 10px;
+}
+
+.eventos-header h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    color: var(--color-text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.eventos-header p {
+    color: var(--muted-foreground);
+    margin-bottom: 1rem;
+    font-size: 14px;
+}
+
+.filtro-section {
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: var(--spacing-medium);
+    margin-bottom: 2rem;
+}
+
+.filtro-section > * {
+    flex: 1 1 200px; 
+    min-width: 120px;
+}
+
+#filtro-esporte, #filtro-dificuldade {
+    /* Ícone de dropdown (seta) para selects */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20d%3D%22M4.516%207.548c0.436-0.446%201.043-0.481%201.576%200l3.908%203.748%203.894-3.748c0.533-0.481%201.141-0.446%201.574%200%200.436%200.445%200.408%201.197%200%201.615l-4.695%204.502c-0.284%200.287-0.697%200.467-1.148%200.467s-0.864-0.18-1.149-0.467l-4.705-4.502c-0.407-0.418-0.408-1.169%200-1.615z%22%20fill%3D%22%23333333%22%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px; 
+}
+
+
+/* --- Estilo dos Cartões de Evento (Event Card) --- */
+.evento-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--spacing-medium);
+    box-shadow: var(--shadow-soft);
+    background-color: var(--color-input-bg);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.evento-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+}
+
+.evento-card img {
+    object-fit: cover; 
+    border-radius: var(--radius);
+    height: auto; 
+    width: 100%; 
+    transition: opacity 0.2s;
+}
+
+.evento-card:hover img {
+    opacity: 0.95;
+}
+
+.evento-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.evento-card p {
+    font-size: 14px;
+    color: var(--color-text-dark);
+    margin: 0.25rem 0;
+}
+
+/* CORREÇÃO APLICADA: Botão "Ver Detalhes" agora ocupa 100% da largura em QUALQUER layout de card. */
+.evento-card a.button {
+    width: 100%; 
+    display: block; /* Garante que o link de âncora se comporte como um bloco para respeitar o 100% */
+}
+
+/* --- LAYOUT: Visualização de GRADE (2xN) --- */
+.eventos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-medium);
+    margin-bottom: 2rem;
+}
+
+.eventos-grid .evento-card img {
+    height: 120px; 
+    margin-bottom: var(--spacing-medium);
+}
+
+/* ------------------------------------------------------------------ */
+/* --- LAYOUT: Visualização de LISTA (1 coluna) - GRANDE IMAGEM --- */
+/* ------------------------------------------------------------------ */
+.eventos-lista {
+    display: grid;
+    grid-template-columns: 1fr; 
+    gap: var(--spacing-medium);
+    margin-bottom: 2rem;
+}
+
+/* 1. O card no modo lista volta a ser um container de blocos empilhados (Imagem > Texto > Botão) */
+.eventos-lista .evento-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; 
+    padding: var(--spacing-medium);
+}
+
+/* 2. IMAGEM MAIOR e de largura total no modo LISTA */
+.eventos-lista .evento-card img {
+    width: 100%; 
+    height: 200px;
+    object-fit: cover; 
+    border-radius: var(--radius);
+    margin: 0 0 var(--spacing-medium) 0; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+}
+
+/* 3. Container de texto */
+.eventos-lista .evento-card .card-content {
+    display: block; 
+    flex-grow: 1; 
+    margin-bottom: var(--spacing-medium); 
+}
+
+/* 4. Botão "Ver Detalhes" */
+.eventos-lista .evento-card a.button {
+    flex: none; 
+    align-self: stretch; 
+    margin: 0;
+    padding: 0 16px; 
+    line-height: var(--button-height);
+}
+
+/* Opcional: Ajuste para telas muito estreitas */
+@media (max-width: 320px) {
+    .eventos-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================================================================== */
+/* --- RESPONSIVIDADE DESKTOP --- */
+/* ================================================================== */
+
+/* Tablets e telas médias (768px+) */
+@media (min-width: 768px) {
+    body {
+        background-color: var(--color-frame-dark);
+        padding: 20px 0;
+    }
+
+    .app-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        box-shadow: 0 0 30px rgba(0,0,0,0.2);
+    }
+
+    .listagem-container {
+        padding: 40px 48px;
+    }
+
+    .eventos-header h1 {
+        font-size: 32px;
+    }
+
+    .eventos-header p {
+        font-size: 16px;
+    }
+
+    .eventos-header .button {
+        max-width: 300px;
+        margin: 0 auto;
+        height: 56px;
+        line-height: 56px;
+        font-size: 18px;
+    }
+
+    /* Filtros em linha no desktop */
+    .filtro-section {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 2.5rem;
+    }
+
+    .filtro-section > div {
+        grid-column: 1 / -1;
+        display: flex;
+        gap: 12px;
+    }
+
+    .filtro-section > div button {
+        flex: 0 1 150px;
+    }
+
+    /* Grid de 3 colunas no desktop */
+    .eventos-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+
+    .eventos-grid .evento-card img {
+        height: 180px;
+    }
+
+    /* Lista com cards em grid de 3 colunas - estilo tabela */
+    .eventos-lista {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .eventos-lista .evento-card {
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+    }
+
+    .eventos-lista .evento-card img {
+        width: 100%;
+        height: 160px;
+        margin: 0 0 12px 0;
+    }
+
+    .eventos-lista .evento-card .card-content {
+        flex: 1;
+        margin-bottom: 12px;
+    }
+
+    .eventos-lista .evento-card h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .eventos-lista .evento-card p {
+        font-size: 13px;
+        margin: 4px 0;
+    }
+
+    .eventos-lista .evento-card a.button {
+        width: 100%;
+        padding: 0 12px;
+        font-size: 14px;
+    }
+
+    .evento-card h3 {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .evento-card p {
+        font-size: 15px;
+        margin: 4px 0;
+    }
+}
+
+/* Desktop grande (1024px+) */
+@media (min-width: 1024px) {
+    .app-container {
+        max-width: 1400px;
+    }
+
+    .listagem-container {
+        padding: 50px 60px;
+    }
+
+    .eventos-header h1 {
+        font-size: 36px;
+    }
+
+    /* Grid de 4 colunas em telas grandes */
+    .eventos-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 28px;
+    }
+
+    .eventos-grid .evento-card img {
+        height: 200px;
+    }
+
+    /* Lista também com 3 colunas em desktop grande */
+    .eventos-lista {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+
+    .eventos-lista .evento-card img {
+        height: 180px;
+    }
+
+    .eventos-lista .evento-card h3 {
+        font-size: 17px;
+    }
+
+    .eventos-lista .evento-card p {
+        font-size: 14px;
+    }
+}
+
+/* Desktop extra grande (1440px+) */
+@media (min-width: 1440px) {
+    .app-container {
+        max-width: 1600px;
+    }
+
+    .eventos-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
