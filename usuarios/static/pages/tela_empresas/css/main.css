@@ -659,9 +659,13 @@ a.btn-secondary {
 :is(body.page-empresa-shell, body.page-empresa-cadastro) {
   background: var(--bg-light);
   min-height: 100vh;
-  padding: 0;
+  padding: 0 !important;
+  margin: 0 !important;
   overflow-x: hidden;
   box-sizing: border-box;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 :is(body.page-empresa-shell, body.page-empresa-cadastro) .nav-shell[hidden] {
@@ -677,19 +681,27 @@ a.btn-secondary {
 }
 
 :is(body.page-empresa-shell, body.page-empresa-cadastro)[data-current-nav="desktop"],
-:is(body.page-empresa-shell, body.page-empresa-cadastro)[data-render-mode="desktop"] {
-  padding-left: calc(280px + 16px);
-  padding-right: 24px;
+:is(body.page-empresa-shell, body.page-empresa-cadastro):not([data-current-nav])[data-render-mode="desktop"] {
+  padding-left: calc(280px + 16px) !important;
+  padding-right: 24px !important;
+  padding-bottom: 0 !important;
 }
 
 :is(body.page-empresa-shell, body.page-empresa-cadastro)[data-current-nav="desktop"] .page,
-:is(body.page-empresa-shell, body.page-empresa-cadastro)[data-render-mode="desktop"] .page {
+:is(body.page-empresa-shell, body.page-empresa-cadastro):not([data-current-nav])[data-render-mode="desktop"] .page {
   max-width: min(1240px, calc(100vw - (280px + 40px)));
   margin-left: 0;
 }
 
+:is(body.page-empresa-shell, body.page-empresa-cadastro)[data-current-nav="mobile"],
+:is(body.page-empresa-shell, body.page-empresa-cadastro):not([data-current-nav])[data-render-mode="mobile"] {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: clamp(80px, 10vw, 110px) !important;
+}
+
 :is(body.page-empresa-shell, body.page-empresa-cadastro)[data-current-nav="mobile"] .page,
-:is(body.page-empresa-shell, body.page-empresa-cadastro)[data-render-mode="mobile"] .page {
+:is(body.page-empresa-shell, body.page-empresa-cadastro):not([data-current-nav])[data-render-mode="mobile"] .page {
   margin-left: auto;
   margin-right: auto;
   padding-bottom: 120px;
