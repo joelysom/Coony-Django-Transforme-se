@@ -21,9 +21,12 @@
   <!-- Topo -->
   <header class="header">
     <div class="header-icons">
-      <span class="material-symbols-outlined">add</span>
-      <span class="material-symbols-outlined">chat_bubble</span>
-      <span class="material-symbols-outlined">notifications</span>
+      <a href="{% url 'chat' %}" class="icon-link" title="Chat">
+        <span class="material-symbols-outlined">chat_bubble</span>
+      </a>
+      <a href="{% url 'notifications' %}" class="icon-link" title="Notificações">
+        <span class="material-symbols-outlined">notifications</span>
+      </a>
     </div>
   </header>
 

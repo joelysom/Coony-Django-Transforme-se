@@ -15,14 +15,49 @@ body {
 .header {
   display: flex;
   justify-content: flex-end;
-  padding: 15px;
+  align-items: center;
+  padding: 15px 20px;
   background-color: #f5efe7;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-icons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 .header-icons span {
-  margin-left: 15px;
+  margin-left: 0;
   font-size: 26px;
   color: #a06132;
+}
+
+.icon-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff;
+  color: #a06132;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.icon-link:hover {
+  background: #f68b4a;
+  color: #fff;
+  border-color: #f68b4a;
+}
+
+.icon-link span {
+  font-size: 22px;
 }
 
 /* WELCOME */
