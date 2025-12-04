@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meus Eventos - Coony</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <link rel="stylesheet" href="{% static 'css/my-events.css' %}">
+</head>
+<body class="page-my-events" data-static-root="{{ STATIC_URL }}">
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
+  <main class="my-events-layout">
+    <section class="my-events-hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Sua agenda</p>
+        <h1>Organize, monitore e refine seus eventos</h1>
+        <p>Visualize rapidamente o que está por vir, revise encontros passados e mantenha tudo alinhado com a comunidade.</p>
+        {% if next_event %}
+        <div class="next-event" aria-live="polite">
+          <p class="next-event__label">Próximo evento confirmado</p>
+          <div class="next-event__content">
+            <div>
+              <strong>{{ next_event.titulo }}</strong>
+                <p>{{ next_event.data|date:"d" }} de {{ next_event.data|date:"F" }} · {{ next_event.hora|time:"H\hi" }} · {{ next_event.local }}</p>
+            </div>
+            <a href="{% url 'evento_detail' next_event.id %}" class="tertiary-link">Ver detalhes</a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      <div class="my-events-stats" aria-label="Resumo dos eventos">
+        <article class="stat-card">
+          <p class="stat-card__label">Total</p>
+          <p class="stat-card__value">{{ stats.total }}</p>
+          <p class="stat-card__caption">Eventos cadastrados</p>
+        </article>
+        <article class="stat-card stat-card--highlight">
+          <p class="stat-card__label">Próximos</p>
+          <p class="stat-card__value">{{ stats.upcoming }}</p>
+          <p class="stat-card__caption">Futuros 30 dias</p>
+        </article>
+        <article class="stat-card">
+          <p class="stat-card__label">Encerrados</p>
+          <p class="stat-card__value">{{ stats.past }}</p>
+          <p class="stat-card__caption">Histórico</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="my-events-toolbar" aria-label="Filtros e ações">
+      <form method="get" class="filter-form">
+        <label class="input-field" aria-label="Buscar eventos">
+          <span class="material-symbols-outlined" aria-hidden="true">search</span>
+          <input type="search" name="q" placeholder="Buscar por título ou local" value="{{ search }}">
+        </label>
+        <label class="input-field select" aria-label="Filtrar por status">
+          <span class="material-symbols-outlined" aria-hidden="true">flag</span>
+          <select name="status">
+            <option value="future" {% if status == 'future' %}selected{% endif %}>Próximos eventos</option>
+            <option value="all" {% if status == 'all' %}selected{% endif %}>Todos</option>
+            <option value="past" {% if status == 'past' %}selected{% endif %}>Eventos passados</option>
+          </select>
+        </label>
+        <button type="submit" class="primary-btn">Aplicar filtros</button>
+        {% if search or status != 'future' %}
+        <a href="{% url 'my_events' %}" class="reset-link">Limpar</a>
+        {% endif %}
+      </form>
+      <a href="{% url 'create_event' %}" class="secondary-btn">Criar novo evento</a>
+    </section>
+
+    <section class="my-events-collection" aria-live="polite">
+      {% if eventos %}
+      <ul class="event-card-list">
+        {% for evento in eventos %}
+        <li class="event-card">
+          <div class="event-card__media">
+            {% if evento.imagem_capa %}
+              <img src="{{ evento.imagem_capa.url }}" alt="Imagem de capa do evento {{ evento.titulo }}">
+            {% else %}
+              <div class="event-card__placeholder">Sem imagem</div>
+            {% endif %}
+          </div>
+          <div class="event-card__content">
+            <div class="event-card__tags">
+              <span class="tag">{{ evento.modalidade }}</span>
+              <span class="tag tag--muted">{{ evento.nivel_dificuldade|default:'Livre' }}</span>
+            </div>
+            <h3>{{ evento.titulo }}</h3>
+            <p class="event-card__excerpt">{{ evento.descricao|truncatechars:150 }}</p>
+            <dl class="event-card__meta">
+              <div>
+                <dt>Data</dt>
+                <dd>{{ evento.data|date:"d/m/Y" }} · {{ evento.hora|time:"H\hi" }}</dd>
+              </div>
+              <div>
+                <dt>Local</dt>
+                <dd>{{ evento.local }}</dd>
+              </div>
+              {% if evento.distancia %}
+              <div>
+                <dt>Distância</dt>
+                <dd>{{ evento.distancia }}</dd>
+              </div>
+              {% endif %}
+              {% if evento.max_participantes %}
+              <div>
+                <dt>Vagas</dt>
+                <dd>{{ evento.max_participantes }}</dd>
+              </div>
+              {% endif %}
+            </dl>
+          </div>
+          <footer class="event-card__actions">
+            <a href="{% url 'evento_detail' evento.id %}" class="primary-btn ghost">Ver detalhes</a>
+          </footer>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <div class="empty-state">
+        <h3>Nenhum evento encontrado</h3>
+        <p>Utilize filtros diferentes ou cadastre um novo encontro para a comunidade.</p>
+        <div class="empty-state__actions">
+          <a href="{% url 'create_event' %}" class="primary-btn">Criar evento</a>
+          <a href="{% url 'eventos_list' %}" class="secondary-btn ghost">Explorar comunidade</a>
+        </div>
+      </div>
+      {% endif %}
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      const navMobile = document.getElementById('nav-mobile');
+      const navDesktop = document.getElementById('nav-desktop');
+      const navQuery = window.matchMedia('(max-width: 768px)');
+
+      const applyNavMode = (isMobile) => {
+        if (!navMobile || !navDesktop) {
+          return;
+        }
+        navMobile.hidden = !isMobile;
+        navDesktop.hidden = isMobile;
+        document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+      };
+
+      const handleChange = (event) => applyNavMode(event.matches);
+
+      applyNavMode(navQuery.matches);
+      if (typeof navQuery.addEventListener === 'function') {
+        navQuery.addEventListener('change', handleChange);
+      } else if (typeof navQuery.addListener === 'function') {
+        navQuery.addListener(handleChange);
+      }
+    })();
+  </script>
+</body>
+</html>

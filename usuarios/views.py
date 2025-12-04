@@ -1,3 +1,4 @@
+from collections import Counter
 from django.core.exceptions import MultipleObjectsReturned
 import json
 
@@ -270,11 +271,54 @@ def create_event(request):
     else:
         form = EventoForm()
 
-    meus_eventos = user.eventos.all()
     return render(request, 'usuarios/create_event.html', {
         'user': user,
         'form': form,
-        'meus_eventos': meus_eventos,
+    })
+
+
+def my_events(request):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+
+    search = request.GET.get('q', '').strip()
+    status = request.GET.get('status', 'future')
+
+    now = timezone.localtime()
+    future_filter = Q(data__gt=now.date()) | (Q(data=now.date()) & Q(hora__gte=now.time()))
+    past_filter = Q(data__lt=now.date()) | (Q(data=now.date()) & Q(hora__lt=now.time()))
+
+    eventos_qs = user.eventos.all()
+    stats = {
+        'total': eventos_qs.count(),
+        'upcoming': eventos_qs.filter(future_filter).count(),
+        'past': eventos_qs.filter(past_filter).count(),
+    }
+
+    if status == 'future':
+        eventos_qs = eventos_qs.filter(future_filter)
+    elif status == 'past':
+        eventos_qs = eventos_qs.filter(past_filter)
+    else:
+        status = 'all'
+
+    if search:
+        eventos_qs = eventos_qs.filter(
+            Q(titulo__icontains=search) |
+            Q(local__icontains=search)
+        )
+
+    eventos = eventos_qs.order_by('data', 'hora')
+    next_event = user.eventos.filter(future_filter).order_by('data', 'hora').first()
+
+    return render(request, 'usuarios/my_events.html', {
+        'user': user,
+        'eventos': eventos,
+        'search': search,
+        'status': status,
+        'stats': stats,
+        'next_event': next_event,
     })
 
 
@@ -283,8 +327,25 @@ def notifications(request):
     if not user:
         return redirect('index')
 
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'clear':
+            request.session['notifications_cleared_at'] = timezone.now().timestamp()
+            messages.info(request, 'Seu feed foi limpo. Novas interações aparecerão automaticamente.', extra_tags='toast')
+            return redirect('notifications')
+
     notifications = []
     now = timezone.now()
+    type_filter = (request.GET.get('type') or 'all').lower()
+    search_query = request.GET.get('q', '').strip()
+
+    cleared_at_ts = request.session.get('notifications_cleared_at')
+    cleared_at = None
+    if cleared_at_ts:
+        try:
+            cleared_at = timezone.datetime.fromtimestamp(float(cleared_at_ts), tz=timezone.utc)
+        except (TypeError, ValueError, OverflowError):
+            cleared_at = None
 
     conversation_ids = list(user.chat_conversations.values_list('id', flat=True))
     if conversation_ids:
@@ -352,16 +413,54 @@ def notifications(request):
         })
 
     notifications.sort(key=lambda item: item['timestamp'] or now, reverse=True)
-    notifications = notifications[:40]
+    notifications = notifications[:60]
 
-    for item in notifications:
+    if cleared_at:
+        notifications = [item for item in notifications if (item.get('timestamp') or now) > cleared_at]
+
+    type_counts = Counter(item['type'] for item in notifications)
+    stats = {
+        'total': len(notifications),
+        'message': type_counts.get('message', 0),
+        'comment': type_counts.get('comment', 0),
+        'like': type_counts.get('like', 0),
+    }
+
+    if type_filter not in {'message', 'comment', 'like', 'all'}:
+        type_filter = 'all'
+
+    filtered_notifications = notifications
+    if type_filter != 'all':
+        filtered_notifications = [item for item in filtered_notifications if item['type'] == type_filter]
+
+    if search_query:
+        lowered = search_query.lower()
+
+        def matches(item):
+            for field in ('title', 'description', 'post_excerpt'):
+                value = item.get(field)
+                if value and lowered in value.lower():
+                    return True
+            return False
+
+        filtered_notifications = [item for item in filtered_notifications if matches(item)]
+
+    filtered_notifications = filtered_notifications[:40]
+
+    for item in filtered_notifications:
         ts = item.get('timestamp') or now
         delta = timesince(ts, now)
         item['relative_time'] = f'{delta} atrás' if delta else 'agora mesmo'
 
     return render(request, 'usuarios/notifications.html', {
         'user': user,
-        'notifications': notifications
+        'notifications': filtered_notifications,
+        'stats': stats,
+        'filter_type': type_filter,
+        'search_query': search_query,
+        'has_filters': bool(search_query) or type_filter != 'all',
+        'last_synced': timezone.localtime(now),
+        'cleared_at': timezone.localtime(cleared_at) if cleared_at else None,
     })
 
 

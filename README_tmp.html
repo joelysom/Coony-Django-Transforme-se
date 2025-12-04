@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>README.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="coony-%E2%80%93-vis%C3%A3o-geral-do-projeto">Coony – Visão Geral do Projeto</h1>
+<p>Documentação técnica do aplicativo social-esportivo construído sobre Django. Este resumo cobre o stack, modelos de dados, rotas backend, superfícies de interface, assets estáticos e instruções de execução.</p>
+<h2 id="stack-e-depend%C3%AAncias-principais">Stack e Dependências Principais</h2>
+<ul>
+<li><strong>Backend:</strong> Django 5.2.8, Python 3.x</li>
+<li><strong>Banco de dados:</strong> SQLite por padrão (<code>dj-database-url</code> permite <code>DATABASE_URL</code> em produção)</li>
+<li><strong>Detecção de dispositivo:</strong> <code>django-user-agents</code> decide entre views desktop/mobile</li>
+<li><strong>Frontend:</strong> Google Material Symbols, Poppins/Montserrat/Roboto, CropperJS (perfil), emoji-picker web component, scripts próprios em <code>usuarios/static/script</code></li>
+<li><strong>Outros utilitários:</strong> Toast system custom (HTML/CSS/JS), <code>db_viewer.py</code> (Tkinter) para inspecionar <code>db.sqlite3</code></li>
+</ul>
+<h2 id="estrutura-do-projeto">Estrutura do Projeto</h2>
+<table>
+<thead>
+<tr>
+<th>Caminho</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>coony/</code></td>
+<td>Configurações principais (<code>settings.py</code>, <code>urls.py</code>, <code>wsgi.py</code>, <code>asgi.py</code>)</td>
+</tr>
+<tr>
+<td><code>usuarios/</code></td>
+<td>App Django com models, forms, views, urls, templates, static e migrações</td>
+</tr>
+<tr>
+<td><code>usuarios/templates/usuarios/</code></td>
+<td>Páginas desktop/mobile, dashboard, social, perfil, chat, notificações, componentes (sidebar, navbar, toast)</td>
+</tr>
+<tr>
+<td><code>usuarios/static/</code></td>
+<td>CSS de cada página, scripts (<code>script/chat.js</code>, <code>script/app.js</code>), assets (fonts, icons, imgs)</td>
+</tr>
+<tr>
+<td><code>media/</code></td>
+<td>Uploads (fotos de usuários em <code>usuarios/fotos/</code>, posts, capas de eventos)</td>
+</tr>
+<tr>
+<td><code>db_viewer.py</code></td>
+<td>Ferramenta desktop para explorar o SQLite local com login ADMIN/ADMIN</td>
+</tr>
+<tr>
+<td><code>requirements.txt</code></td>
+<td>Dependências de produção/desenvolvimento</td>
+</tr>
+<tr>
+<td><code>TOAST_IMPLEMENTATION.md</code> / <code>TOAST_SUMMARY.txt</code></td>
+<td>Documentação do sistema de notificações</td>
+</tr>
+</tbody>
+</table>
+<h2 id="configura%C3%A7%C3%A3o--ambiente">Configuração &amp; Ambiente</h2>
+<ul>
+<li>Variáveis suportadas (via <code>.env.*</code>): <code>DJANGO_SECRET_KEY</code>, <code>DJANGO_DEBUG</code>, <code>DJANGO_ALLOWED_HOSTS</code>, <code>DATABASE_URL</code>.</li>
+<li><code>STATICFILES_DIRS</code> aponta para <code>usuarios/static</code>; <code>STATIC_ROOT</code> resolve em <code>staticfiles/</code> para <code>collectstatic</code>.</li>
+<li>Uploads são servidos de <code>media/</code> quando <code>DEBUG=True</code>; <code>MEDIA_URL=/media/</code>.</li>
+<li><code>django_user_agents.middleware.UserAgentMiddleware</code> habilita <code>request.user_agent</code> nos templates/views para alternar UI.</li>
+</ul>
+<h2 id="modelos-de-dados-usuariosmodelspy">Modelos de Dados (<code>usuarios/models.py</code>)</h2>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Campos-chave / Função</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Usuario</code></td>
+<td>Perfil custom (nome, telefone, email único, senha hash, localização, modalidades, bio, foto, slug <code>username</code>). Métodos para hash/checagem e geração de handle único.</td>
+</tr>
+<tr>
+<td><code>Post</code></td>
+<td>Conteúdo social com texto, imagem opcional, localização e relação <code>likes</code> (ManyToMany com <code>Usuario</code>).</td>
+</tr>
+<tr>
+<td><code>PostLikeEvent</code></td>
+<td>Histórico de curtidas para construir notificações; garante unicidade por post/usuário.</td>
+</tr>
+<tr>
+<td><code>Comment</code></td>
+<td>Comentários ligados a <code>Post</code> com ordering cronológico.</td>
+</tr>
+<tr>
+<td><code>Conversation</code></td>
+<td>Conversas privadas (WhatsApp-like) entre dois usuários; gera <code>conversation_key</code> e mantém <code>updated_at</code>.</td>
+</tr>
+<tr>
+<td><code>Message</code></td>
+<td>Mensagens com flags de leitura, exclusões seletivas/global, autor, timestamps.</td>
+</tr>
+<tr>
+<td><code>Evento</code></td>
+<td>Eventos criados pelo usuário com mídia (capa + até 3 imagens), modalidade, data/hora/local, limite de participantes e <code>favorited_by</code> (ManyToMany para favoritos persistentes).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="forms-principais-usuariosformspy">Forms Principais (<code>usuarios/forms.py</code>)</h2>
+<ul>
+<li><code>RegistrationForm</code> / <code>LoginForm</code> para onboarding.</li>
+<li><code>PostForm</code> (texto, imagem, localização) e <code>CommentForm</code> para o feed social.</li>
+<li><code>EventoForm</code> com validação de imagem obrigatória e widgets específicos (date/time inputs, placeholders, accept image/*).</li>
+</ul>
+<h2 id="autentica%C3%A7%C3%A3o-e-helpers">Autenticação e Helpers</h2>
+<ul>
+<li>Sessões utilizam a chave <code>session['usuario_id']</code> em vez de <code>request.user</code>.</li>
+<li><code>_get_logged_user</code> e <code>_json_auth_required</code> encapsulam a recuperação/validação do usuário em views normais e APIs JSON.</li>
+<li>Senhas são armazenadas usando <code>django.contrib.auth.hashers</code> (mesmo sem <code>AbstractUser</code>).</li>
+</ul>
+<h2 id="rotas--views">Rotas &amp; Views</h2>
+<h3 id="p%C3%BAblico--onboarding">Público / Onboarding</h3>
+<table>
+<thead>
+<tr>
+<th>Rota</th>
+<th>Método</th>
+<th>View</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/</code></td>
+<td>GET</td>
+<td><code>index</code></td>
+<td>Landing desktop com formulários de login/registro + toasts</td>
+</tr>
+<tr>
+<td><code>/mobile/</code></td>
+<td>GET</td>
+<td><code>mobile</code></td>
+<td>Variante mobile da tela inicial</td>
+</tr>
+<tr>
+<td><code>/register/</code></td>
+<td>POST</td>
+<td><code>register_view</code></td>
+<td>Cria <code>Usuario</code>, faz login e redireciona ao dashboard</td>
+</tr>
+<tr>
+<td><code>/login/</code></td>
+<td>POST</td>
+<td><code>login_view</code></td>
+<td>Aceita e-mail, nome ou <code>@username</code>; utiliza <code>normalize_username</code></td>
+</tr>
+<tr>
+<td><code>/logout/</code></td>
+<td>GET</td>
+<td><code>logout_view</code></td>
+<td>Limpa sessão e mostra toast de despedida</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dashboard--eventos">Dashboard &amp; Eventos</h3>
+<table>
+<thead>
+<tr>
+<th>Rota</th>
+<th>Método</th>
+<th>View</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/dashboard/</code></td>
+<td>GET</td>
+<td><code>dashboard</code></td>
+<td>Lista eventos do usuário (desktop); redireciona mobile</td>
+</tr>
+<tr>
+<td><code>/dashboard/mobile/</code></td>
+<td>GET</td>
+<td><code>dashboard_mobile</code></td>
+<td>Layout responsivo com cards empilhados</td>
+</tr>
+<tr>
+<td><code>/eventos/criar/</code></td>
+<td>GET/POST</td>
+<td><code>create_event</code></td>
+<td>Formulário + listagem &quot;Meus eventos&quot; com galeria; alterna sidebar/navbar por largura</td>
+</tr>
+<tr>
+<td><code>/eventos/toggle_favorite/&lt;id&gt;/</code></td>
+<td>POST</td>
+<td><code>toggle_favorite_event</code></td>
+<td>Endpoint AJAX usado por ambos dashboards para favoritar</td>
+</tr>
+</tbody>
+</table>
+<h3 id="social--engajamento">Social &amp; Engajamento</h3>
+<table>
+<thead>
+<tr>
+<th>Rota</th>
+<th>Método</th>
+<th>View</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/social/</code></td>
+<td>GET/POST</td>
+<td><code>social</code></td>
+<td>Feed com criação de posts, upload de imagem, contagem de likes/comentários, remoção do próprio post</td>
+</tr>
+<tr>
+<td><code>/social/like/&lt;id&gt;/</code></td>
+<td>POST</td>
+<td><code>like_post</code></td>
+<td>Alterna curtida e gera <code>PostLikeEvent</code></td>
+</tr>
+<tr>
+<td><code>/social/comment/&lt;id&gt;/</code></td>
+<td>POST</td>
+<td><code>comment_post</code></td>
+<td>Adiciona comentário via <code>CommentForm</code></td>
+</tr>
+<tr>
+<td><code>/social/delete/&lt;id&gt;/</code></td>
+<td>POST</td>
+<td><code>delete_post</code></td>
+<td>Autores removem seus posts; coberto por testes</td>
+</tr>
+<tr>
+<td><code>/notifications/</code></td>
+<td>GET</td>
+<td><code>notifications</code></td>
+<td>Consolida mensagens recentes, likes e comentários com CTA (chat/social)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="perfil--utilidades">Perfil &amp; Utilidades</h3>
+<table>
+<thead>
+<tr>
+<th>Rota</th>
+<th>Método</th>
+<th>View</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/perfil/</code></td>
+<td>GET/POST</td>
+<td><code>perfil</code></td>
+<td>Atualiza dados, @handle, email, localização, modalidades dinamicamente, bio e foto com CropperJS/cortes</td>
+</tr>
+<tr>
+<td><code>/chat/</code></td>
+<td>GET</td>
+<td><code>chat</code></td>
+<td>SPA-like para mensagens privadas; injeta dados atuais e URLs das APIs</td>
+</tr>
+</tbody>
+</table>
+<h3 id="apis-de-chat-json">APIs de Chat (JSON)</h3>
+<ul>
+<li><code>GET /chat/api/conversations/</code> → lista conversas (inclui preview, último timestamp).</li>
+<li><code>GET /chat/api/search/?q=</code> → busca usuários por nome/@, exclui o atual.</li>
+<li><code>POST /chat/api/conversations/start/</code> → inicia conversa privada via payload JSON.</li>
+<li><code>GET /chat/api/conversations/&lt;id&gt;/messages/</code> → mensagens filtradas para o usuário atual.</li>
+<li><code>POST /chat/api/conversations/&lt;id&gt;/messages/send/</code> → envia texto.</li>
+<li><code>POST /chat/api/messages/&lt;id&gt;/delete/</code> → remove para si ou todos com regras de permissão.</li>
+</ul>
+<h2 id="p%C3%A1ginas-e-componentes-de-interface">Páginas e Componentes de Interface</h2>
+<ul>
+<li><strong><code>usuarios/index.html</code> / <code>mobile.html</code>:</strong> telas de login/registro com includes <code>toast.html</code> + <code>messages.html</code>.</li>
+<li><strong>Dashboard desktop (<code>dashboard.html</code>):</strong> cards com imagem, descrição truncada, informações (local/data) e botão. Inclui busca fictícia, filtros estáticos e toggles de favoritos por fetch + <code>csrftoken</code>.</li>
+<li><strong>Dashboard mobile:</strong> mesma fonte de dados com layout comprimido, header com ícones, e fallback quando não há eventos.</li>
+<li><strong><code>create_event.html</code>:</strong> layout com hero, formulário responsivo, instruções de mídia e listagem rica dos eventos do criador (covers + gallery thumbnails).</li>
+<li><strong><code>social.html</code>:</strong> feed completo (tabs, share box, preview de imagem, modal de localização, contadores, botões de curtir/comentar/compartilhar) com JS para navegação mobile/desktop.</li>
+<li><strong><code>perfil.html</code>:</strong> formulário multi-seção com tags de modalidades, sincronização de inputs ocultos, upload/crop/remoção de foto e navegação responsiva.</li>
+<li><strong><code>notifications.html</code>:</strong> cards com timeline relativa usando <code>timesince</code>. (Estrutura definida na view.)</li>
+<li><strong><code>chat.html</code>:</strong> layout de duas colunas (lista de contatos + corpo do chat), integra <code>emoji-picker</code>, ações (call/voltar), e carrega <code>static/script/chat.js</code> para consumir as APIs.</li>
+<li><strong>Componentes compartilhados:</strong> <code>sidebar.html</code>, <code>navbar_mobile.html</code>, <code>navbar.html</code>, <code>toast.html</code>, <code>messages.html</code>, <code>components/messages.html</code> para bridging com Django messages.</li>
+</ul>
+<h2 id="assets-est%C3%A1ticos--js">Assets Estáticos &amp; JS</h2>
+<ul>
+<li>CSS específico por página em <code>usuarios/static/css/</code> (<code>home.css</code>, <code>home(mobile).css</code>, <code>create-event.css</code>, <code>perfil.css</code>, <code>chat.css</code>, etc.).</li>
+<li>Scripts:
+<ul>
+<li><code>static/script/app.js</code> e <code>static/script/chat.js</code> para comportamento de navegação, chat e interações.</li>
+<li>Inline scripts nos templates para toggles (favoritos, navbars, pre-visualização de imagens) e modais.</li>
+</ul>
+</li>
+<li>Fonts/icones: Google Fonts, Material Symbols (com <code>font-variation-settings</code> para hearts preenchidos), Boxicons, Remix Icons, CropperJS, emoji-picker.</li>
+<li>Toast demo disponível em <code>usuarios/static/toast-demo.html</code>.</li>
+</ul>
+<h2 id="sistema-de-toasts">Sistema de Toasts</h2>
+<ul>
+<li>Localizado em <code>usuarios/templates/usuarios/components/toast.html</code> e descrito em <code>TOAST_DOCUMENTATION.md</code>.</li>
+<li>Tipos suportados: success/error/warning/info com animações CSS, barra de progresso e API JS global <code>Toast.*</code>.</li>
+<li>Django <code>messages</code> adiciona <code>extra_tags='toast'</code> para exibir automaticamente na próxima resposta.</li>
+</ul>
+<h2 id="m%C3%ADdia-e-uploads">Mídia e Uploads</h2>
+<ul>
+<li>Uploads de usuários: <code>usuarios/fotos/</code>.</li>
+<li>Postagens: <code>media/posts/</code>.</li>
+<li>Eventos: <code>media/eventos/capa/</code> e <code>media/eventos/detalhes/</code>.</li>
+<li>Funções de profile permitem remover/resetar foto e usar fallback <code>static/img/default-avatar.svg</code>.</li>
+</ul>
+<h2 id="ferramentas-e-utilidades">Ferramentas e Utilidades</h2>
+<ul>
+<li><code>db_viewer.py</code>: interface Tkinter com login ADMIN/ADMIN para listar tabelas, filtrar, exportar CSV, CRUD básico e visualizar imagens (via Pillow). Útil para inspeção sem acessar admin Django.</li>
+<li><code>db_viewer_README.md</code>: instruções rápidas para o viewer.</li>
+</ul>
+<h2 id="testes-automatizados-usuariostestspy">Testes Automatizados (<code>usuarios/tests.py</code>)</h2>
+<ul>
+<li><code>DeletePostViewTests</code> garante que apenas o autor remove postagens.</li>
+<li><code>UsernameGenerationTests</code> valida criação automática de usernames únicos.</li>
+<li><code>LoginWithUsernameTests</code> cobre login via <code>@handle</code> com/sem arroba.</li>
+</ul>
+<h2 id="executando-localmente">Executando Localmente</h2>
+<pre class="hljs"><code><div>python <span class="hljs-literal">-m</span> venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install <span class="hljs-literal">-r</span> requirements.txt
+
+<span class="hljs-comment"># Configure variáveis opcionais</span>
+<span class="hljs-variable">$env:DJANGO_DEBUG</span> = <span class="hljs-string">'True'</span>
+<span class="hljs-variable">$env:DJANGO_ALLOWED_HOSTS</span> = <span class="hljs-string">'localhost,127.0.0.1'</span>
+
+python manage.py makemigrations usuarios
+python manage.py migrate
+python manage.py runserver
+</div></code></pre>
+<ul>
+<li>Acesse <code>http://localhost:8000/</code>. Para usar recursos que dependem de upload (eventos, perfil), garanta permissões de escrita na pasta <code>media/</code>.</li>
+<li><code>python manage.py createsuperuser</code> é opcional se desejar usar <code>/admin/</code> (apenas <code>Usuario</code> está registrado por padrão).</li>
+</ul>
+<h2 id="considera%C3%A7%C3%B5es-de-deploy">Considerações de Deploy</h2>
+<ul>
+<li>Defina <code>DJANGO_SECRET_KEY</code> forte e <code>DJANGO_DEBUG=False</code>.</li>
+<li>Popule <code>DJANGO_ALLOWED_HOSTS</code> com domínio(s) reais; <code>CSRF_TRUSTED_ORIGINS</code> é derivado automaticamente.</li>
+<li>Configure <code>DATABASE_URL</code> (PostgreSQL recomendado em produção).</li>
+<li>Execute <code>python manage.py collectstatic</code> para enviar CSS/JS/imagens para <code>STATIC_ROOT</code>.</li>
+<li>Use storage dedicado para <code>MEDIA_ROOT</code> (S3, Azure Blob, etc.) ou monte volume específico.</li>
+</ul>
+<h2 id="pr%C3%B3ximos-passos-poss%C3%ADveis">Próximos Passos Possíveis</h2>
+<ol>
+<li>Expor APIs REST para eventos/posts (Django REST Framework).</li>
+<li>Migrar <code>Usuario</code> para um <code>AbstractUser</code> custom se for necessário integrar com Django auth padrão.</li>
+<li>Consolidar scripts inline em bundles versionados (<code>static/script/</code>).</li>
+<li>Adicionar testes para chat APIs e favoritos.</li>
+<li>Criar componentes reusáveis para cards de eventos e feed, facilitando evolução futura.</li>
+</ol>
+
+</body>
+</html>

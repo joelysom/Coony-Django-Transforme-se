@@ -27,90 +27,112 @@
 }
 
 body {
-    background-color: var(--color-frame-dark); 
+    background-color: var(--color-background-screen);
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
     min-height: 100vh;
 }
 
 .app-container {
     width: 100%;
-    max-width: 420px; 
-    background-color: var(--color-background-screen); 
+    max-width: 100%;
+    background-color: var(--color-background-screen);
     display: flex;
     flex-direction: column;
-    position: relative;
-    overflow: hidden;
     min-height: 100vh;
-    border-radius: var(--input-radius); 
-    box-shadow: 0 0 20px rgba(0,0,0,0.1); 
+    border-radius: 0;
+    box-shadow: none;
+    position: relative;
 }
 
-/* --- Header --- */
-.header {
+.detail-toolbar {
     display: flex;
     justify-content: space-between;
-    align-items: center; 
-    padding: 24px var(--side-margin) 16px var(--side-margin); 
-    position: relative;
-    z-index: 10;
-    background-color: var(--color-background-screen);
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 32px var(--side-margin) 12px;
 }
 
-.icon-btn {
-    background: none;
-    border: none;
-    font-size: 24px; 
-    cursor: pointer;
-    padding: 0;
-    margin: 0;
-    color: var(--color-text-dark); 
-    line-height: 1; 
-    text-decoration: none; 
-    display: inline-block;
-    transition: transform 0.2s, opacity 0.2s;
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--muted-foreground);
+    flex-wrap: wrap;
 }
 
-.icon-btn:hover {
-    transform: scale(1.1);
-    opacity: 0.8;
+.breadcrumb-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--color-primary-orange);
+    font-weight: 600;
 }
 
-.icon-btn:active {
-    transform: scale(0.95);
+.breadcrumb-divider {
+    color: var(--muted-foreground);
 }
 
-.icon-btn .material-symbols-outlined {
-    font-size: 24px; 
-    font-variation-settings: 
-        'FILL' 0,
-        'wght' 400,
-        'GRAD' 0,
-        'opsz' 24;
-    vertical-align: middle; 
-}
-
-.back-btn .material-symbols-outlined,
-.home-btn .material-symbols-outlined {
-    color: var(--color-primary-orange); 
-}
-
-.header-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 24px; 
-    font-weight: 700;
+.breadcrumb-current {
+    font-weight: 600;
     color: var(--color-text-dark);
-    margin: 0;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.ghost-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--color-text-dark);
+    border-radius: 22px;
+    height: var(--button-height);
+    padding: 0 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.ghost-btn:hover {
+    border-color: var(--color-primary-orange);
+    color: var(--color-primary-orange);
+}
+
+.toolbar-actions .btn,
+.toolbar-actions .ghost-btn {
+    flex: 0 0 auto;
+}
+
+.favorite-toggle .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+}
+
+.favorite-toggle.favorited {
+    background-color: #d9593d;
+}
+
+.favorite-toggle.favorited .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 24;
 }
 
 /* --- Conteúdo Principal --- */
 .detail-content {
-    padding: 0 var(--side-margin); 
+    padding: 0 var(--side-margin) 48px; 
     flex-grow: 1;
-    overflow-y: auto;
-    padding-bottom: 100px; /* Espaço para os botões fixos */
+    overflow: visible;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
 }
 
 /* --- Imagem do Evento --- */
@@ -132,15 +154,36 @@ body {
 
 /* --- Título e Badge --- */
 .event-header {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    background-color: var(--color-input-bg);
+    border-radius: var(--radius);
+    padding: var(--spacing-medium);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.event-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .event-title {
     font-family: 'Montserrat', sans-serif;
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 700;
     color: var(--color-text-dark);
-    margin: 0 0 0.5rem 0;
+    margin: 0;
+}
+
+.event-subtitle {
+    font-size: 15px;
+    color: var(--muted-foreground);
+    margin: 0;
+    line-height: 1.6;
 }
 
 .badge {
@@ -176,6 +219,35 @@ body {
 
 .badge-caminhada {
     background-color: #FFA500;
+}
+
+.event-highlights {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.highlight-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background-color: #fffdfb;
+}
+
+.highlight-item strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text-dark);
+}
+
+.highlight-item p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--muted-foreground);
 }
 
 /* --- Seção de Informações --- */
@@ -342,22 +414,7 @@ body {
     margin-top: 12px;
 }
 
-/* --- Botões de Rodapé --- */
-.footer-btns {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 420px;
-    background-color: var(--color-background-screen);
-    padding: 16px var(--side-margin);
-    display: flex;
-    gap: 12px;
-    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.08);
-    z-index: 100;
-}
-
+/* --- Botões reutilizáveis --- */
 .btn {
     height: var(--button-height); 
     border: none;
@@ -373,7 +430,7 @@ body {
     justify-content: center;
     gap: 6px;
     transition: background-color 0.2s, transform 0.1s;
-    flex: 1;
+    flex: 0 0 auto;
 }
 
 .btn .material-symbols-outlined {
@@ -409,13 +466,19 @@ body {
 }
 
 /* --- Responsividade --- */
-@media (max-width: 420px) {
-    .app-container {
-        border-radius: 0;
+@media (max-width: 600px) {
+    .detail-toolbar {
+        padding: 24px var(--side-margin) 8px;
     }
-    
-    .footer-btns {
-        border-radius: 0;
+
+    .toolbar-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .toolbar-actions .btn,
+    .toolbar-actions .ghost-btn {
+        flex: 1 1 100%;
     }
 }
 
@@ -425,28 +488,12 @@ body {
 
 /* Tablets e telas médias (768px+) */
 @media (min-width: 768px) {
-    body {
-        background-color: var(--color-frame-dark);
-        padding: 20px 0;
-    }
-
-    .app-container {
-        max-width: 900px;
-        margin: 0 auto;
-        box-shadow: 0 0 30px rgba(0,0,0,0.2);
-    }
-
-    .header {
-        padding: 32px 48px 24px 48px;
-    }
-
-    .header-title {
-        font-size: 28px;
+    .detail-toolbar {
+        padding: 40px 48px 16px;
     }
 
     .detail-content {
-        padding: 0 48px;
-        padding-bottom: 120px;
+        padding: 0 48px 70px;
     }
 
     /* Imagem maior no desktop */
@@ -496,11 +543,6 @@ body {
         height: 350px;
     }
 
-    .footer-btns {
-        padding: 20px 48px;
-        max-width: 900px;
-    }
-
     .btn {
         height: 52px;
         font-size: 17px;
@@ -509,21 +551,8 @@ body {
 
 /* Desktop grande (1024px+) */
 @media (min-width: 1024px) {
-    .app-container {
-        max-width: 1200px;
-    }
-
-    .header {
-        padding: 40px 60px 28px 60px;
-    }
-
-    .header-title {
-        font-size: 32px;
-    }
-
     .detail-content {
-        padding: 0 60px;
-        padding-bottom: 140px;
+        padding: 0 60px 90px;
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 32px;
@@ -582,24 +611,14 @@ body {
         min-height: 300px;
     }
 
-    .footer-btns {
-        padding: 24px 60px;
-        max-width: 1200px;
-    }
-
     .btn {
         height: 56px;
         font-size: 18px;
-        max-width: 250px;
     }
 }
 
 /* Desktop extra grande (1440px+) */
 @media (min-width: 1440px) {
-    .app-container {
-        max-width: 1400px;
-    }
-
     .detail-content {
         column-gap: 50px;
     }

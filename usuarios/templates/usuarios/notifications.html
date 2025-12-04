@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
-<body>
+<body class="page-notifications" data-static-root="{{ STATIC_URL }}">
   {% include 'usuarios/components/toast.html' %}
   {% include 'usuarios/components/messages.html' %}
 
@@ -20,41 +20,146 @@
     {% include 'usuarios/components/sidebar.html' %}
   </div>
 
-  <main class="content">
+  <main class="notifications-layout">
     <section class="notifications-hero">
-      <div>
+      <div class="hero-copy">
         <p class="eyebrow">Painel em tempo real</p>
-        <h2>Notificações</h2>
-        <p class="subtitle">Acompanhe novos comentários, curtidas e respostas do chat em um só lugar.</p>
+        <h1>Central de notificações</h1>
+        <p class="subtitle">Monitore respostas do chat, comentários e curtidas com filtros inteligentes e ações rápidas.</p>
+        <div class="hero-meta">
+          <span class="meta-item">
+            <span class="material-symbols-outlined" aria-hidden="true">refresh</span>
+            Atualizado {{ last_synced|date:"d/m/Y H\\hi" }}
+          </span>
+          {% if cleared_at %}
+          <span class="meta-item meta-muted">
+            <span class="material-symbols-outlined" aria-hidden="true">layers_clear</span>
+            Limpo {{ cleared_at|timesince }} atrás
+          </span>
+          {% endif %}
+        </div>
       </div>
-      <span class="material-symbols-outlined hero-icon">notifications_active</span>
+      <ul class="hero-stats" aria-label="Resumo de notificações">
+        <li class="stat-card">
+          <div class="stat-icon" aria-hidden="true">
+            <span class="material-symbols-outlined">stacked_bar_chart</span>
+          </div>
+          <div class="stat-details">
+            <p class="stat-label">Total</p>
+            <p class="stat-value">{{ stats.total }}</p>
+            <span>Última sincronização</span>
+          </div>
+        </li>
+        <li class="stat-card">
+          <div class="stat-icon" aria-hidden="true">
+            <span class="material-symbols-outlined">forum</span>
+          </div>
+          <div class="stat-details">
+            <p class="stat-label">Chat</p>
+            <p class="stat-value">{{ stats.message }}</p>
+            <span>Mensagens diretas</span>
+          </div>
+        </li>
+        <li class="stat-card">
+          <div class="stat-icon" aria-hidden="true">
+            <span class="material-symbols-outlined">reviews</span>
+          </div>
+          <div class="stat-details">
+            <p class="stat-label">Comentários</p>
+            <p class="stat-value">{{ stats.comment }}</p>
+            <span>Novos feedbacks</span>
+          </div>
+        </li>
+        <li class="stat-card">
+          <div class="stat-icon" aria-hidden="true">
+            <span class="material-symbols-outlined">favorite</span>
+          </div>
+          <div class="stat-details">
+            <p class="stat-label">Curtidas</p>
+            <p class="stat-value">{{ stats.like }}</p>
+            <span>Interações sociais</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="notifications-toolbar" aria-label="Filtros do painel">
+      <header class="toolbar-heading">
+        <div>
+          <p class="eyebrow">Curadoria instantânea</p>
+          <h2>Refine o feed em segundos</h2>
+          <p class="toolbar-hint">Busque, combine filtros e mantenha apenas os alertas realmente importantes.</p>
+        </div>
+        <p class="toolbar-note desktop">Exibindo {{ notifications|length }} notificações</p>
+      </header>
+      <form method="get" class="filter-form">
+        <label class="input-field" aria-label="Buscar notificações">
+          <span class="material-symbols-outlined" aria-hidden="true">search</span>
+          <input type="search" name="q" placeholder="Buscar por título ou descrição" value="{{ search_query }}">
+        </label>
+        <label class="input-field select" aria-label="Filtrar por tipo">
+          <span class="material-symbols-outlined" aria-hidden="true">filter_alt</span>
+          <select name="type">
+            <option value="all" {% if filter_type == 'all' %}selected{% endif %}>Todos</option>
+            <option value="message" {% if filter_type == 'message' %}selected{% endif %}>Chat</option>
+            <option value="comment" {% if filter_type == 'comment' %}selected{% endif %}>Comentários</option>
+            <option value="like" {% if filter_type == 'like' %}selected{% endif %}>Curtidas</option>
+          </select>
+        </label>
+        <button type="submit" class="primary-btn">
+          <span class="material-symbols-outlined" aria-hidden="true">bolt</span>
+          Aplicar filtros
+        </button>
+        {% if has_filters %}
+        <a href="{% url 'notifications' %}" class="reset-link">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          Limpar filtros
+        </a>
+        {% endif %}
+      </form>
+      <div class="toolbar-actions">
+        <form method="post" class="clear-form">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="clear">
+          <button type="submit" class="secondary-btn" {% if not notifications %}disabled aria-disabled="true"{% endif %}>
+            <span class="material-symbols-outlined" aria-hidden="true">layers_clear</span>
+            Limpar feed
+          </button>
+        </form>
+        <p class="toolbar-note mobile">Exibindo {{ notifications|length }} notificações</p>
+      </div>
     </section>
 
     <section class="notifications-feed">
       {% if notifications %}
         {% for notification in notifications %}
-          <article class="notification-card notification-{{ notification.type }}">
+          <article class="notification-card notification-{{ notification.type }}" data-type="{{ notification.type }}">
             <div class="notification-icon">
-              <span class="material-symbols-outlined">{{ notification.icon }}</span>
+              <span class="material-symbols-outlined" aria-hidden="true">{{ notification.icon }}</span>
             </div>
             <div class="notification-body">
               <div class="notification-header">
-                <h3>{{ notification.title }}</h3>
-                <span class="notification-time">{{ notification.relative_time }}</span>
+                <div>
+                  <div class="notification-meta">
+                    <span class="notification-badge">{{ notification.type|title }}</span>
+                    <span class="notification-time">{{ notification.relative_time }}</span>
+                  </div>
+                  <h3>{{ notification.title }}</h3>
+                </div>
               </div>
               {% if notification.description %}
                 <p class="notification-text">{{ notification.description }}</p>
               {% endif %}
               {% if notification.post_excerpt %}
                 <div class="notification-target">
-                  <span>Post:</span>
+                  <span>Post monitorado</span>
                   <p>{{ notification.post_excerpt }}</p>
                 </div>
               {% endif %}
               <div class="notification-actions">
                 <a href="{{ notification.cta_url }}" class="notification-link">
                   {{ notification.cta_label }}
-                  <span class="material-symbols-outlined">arrow_outward</span>
+                  <span class="material-symbols-outlined" aria-hidden="true">arrow_outward</span>
                 </a>
               </div>
             </div>
@@ -62,11 +167,42 @@
         {% endfor %}
       {% else %}
         <div class="notification-empty">
-          <span class="material-symbols-outlined">notifications_off</span>
-          <p>Sem novidades por enquanto. Assim que alguém interagir com você, tudo aparece aqui.</p>
+          <span class="material-symbols-outlined" aria-hidden="true">notifications_off</span>
+          <h3>Sem novidades por aqui</h3>
+          <p>Assim que alguém interagir com você, os alertas reaparecem automaticamente.</p>
+          <div class="empty-actions">
+            <a href="{% url 'social' %}" class="secondary-btn ghost">Ir para a comunidade</a>
+            <a href="{% url 'chat' %}" class="secondary-btn ghost">Abrir chat</a>
+          </div>
         </div>
       {% endif %}
     </section>
   </main>
+
+  <script>
+    (function() {
+      const navMobile = document.getElementById('nav-mobile');
+      const navDesktop = document.getElementById('nav-desktop');
+      const navQuery = window.matchMedia('(max-width: 768px)');
+
+      const applyNavMode = (isMobile) => {
+        if (!navMobile || !navDesktop) {
+          return;
+        }
+        navMobile.hidden = !isMobile;
+        navDesktop.hidden = isMobile;
+        document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+      };
+
+      const handleChange = (event) => applyNavMode(event.matches);
+
+      applyNavMode(navQuery.matches);
+      if (typeof navQuery.addEventListener === 'function') {
+        navQuery.addEventListener('change', handleChange);
+      } else if (typeof navQuery.addListener === 'function') {
+        navQuery.addListener(handleChange);
+      }
+    })();
+  </script>
 </body>
 </html>

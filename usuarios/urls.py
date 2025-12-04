@@ -13,6 +13,7 @@ urlpatterns = [
     path('eventos/', views.eventos_list, name='eventos_list'),
     path('eventos/<int:evento_id>/', views.evento_detail, name='evento_detail'),
     path('eventos/criar/', views.create_event, name='create_event'),
+    path('eventos/meus/', views.my_events, name='my_events'),
     path('eventos/toggle_favorite/<int:evento_id>/', views.toggle_favorite_event, name='toggle_favorite_event'),
     path('social/like/<int:post_id>/', views.like_post, name='like_post'),
     path('social/comment/<int:post_id>/', views.comment_post, name='comment_post'),

@@ -18,16 +18,34 @@
     {% include 'usuarios/components/sidebar.html' %}
 
     <div class="app-container">
-        
-        <header class="header">
-            <a href="{% url 'eventos_list' %}" class="icon-btn back-btn" aria-label="Voltar">
-                <span class="material-symbols-outlined">arrow_back</span>
-            </a>
-            <h1 class="header-title">Detalhes do Evento</h1>
-            <button class="icon-btn home-btn" aria-label="Home" onclick="window.location.href='{% url 'dashboard' %}'">
-                <span class="material-symbols-outlined">home</span>
-            </button>
-        </header>
+
+        <div class="detail-toolbar">
+            <div class="breadcrumb">
+                <a href="{% url 'eventos_list' %}" class="breadcrumb-link">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Todos os eventos
+                </a>
+                <span class="breadcrumb-divider">/</span>
+                <span class="breadcrumb-current">{{ evento.titulo }}</span>
+            </div>
+            <div class="toolbar-actions">
+                <button class="ghost-btn" type="button" onclick="window.location.href='{% url 'dashboard' %}'">
+                    <span class="material-symbols-outlined">home</span>
+                    Painel
+                </button>
+                <button class="btn secondary-btn" type="button" onclick="compartilharEvento()">
+                    <span class="material-symbols-outlined">share</span>
+                    Compartilhar
+                </button>
+                <button class="btn primary-btn favorite-toggle {% if user in evento.favorited_by.all %}favorited{% endif %}"
+                        type="button"
+                        data-event-id="{{ evento.id }}"
+                        onclick="toggleFavorite({{ evento.id }})">
+                    <span class="material-symbols-outlined favorite-icon">{% if user in evento.favorited_by.all %}favorite{% else %}favorite_border{% endif %}</span>
+                    <span class="favorite-label">{% if user in evento.favorited_by.all %}Favoritado{% else %}Favoritar{% endif %}</span>
+                </button>
+            </div>
+        </div>
 
         <main class="detail-content">
             <!-- Imagem do Evento -->
@@ -37,8 +55,54 @@
 
             <!-- Título e Badge -->
             <div class="event-header">
-                <h2 id="event-title" class="event-title">{{ evento.titulo }}</h2>
-                <span id="event-badge" class="badge badge-corrida">{{ evento.modalidade }}</span>
+                <div class="event-heading">
+                    <span id="event-badge" class="badge badge-corrida">{{ evento.modalidade }}</span>
+                    <h1 id="event-title" class="event-title">{{ evento.titulo }}</h1>
+                    <p class="event-subtitle">{{ evento.descricao|truncatewords:32 }}</p>
+                </div>
+                <div class="event-highlights">
+                    <div class="highlight-item">
+                        <span class="material-symbols-outlined icon-orange">calendar_month</span>
+                        <div>
+                            <strong>Data e horário</strong>
+                            <p id="event-datetime-highlight">{{ evento.data|date:'d/m/Y' }} às {{ evento.hora|time:'H:i' }}</p>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="material-symbols-outlined icon-orange">location_on</span>
+                        <div>
+                            <strong>Local</strong>
+                            <p>{{ evento.local }}</p>
+                        </div>
+                    </div>
+                    {% if evento.max_participantes %}
+                    <div class="highlight-item">
+                        <span class="material-symbols-outlined icon-orange">group</span>
+                        <div>
+                            <strong>Participantes</strong>
+                            <p>Máximo: {{ evento.max_participantes }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if evento.distancia %}
+                    <div class="highlight-item">
+                        <span class="material-symbols-outlined icon-orange">straighten</span>
+                        <div>
+                            <strong>Distância</strong>
+                            <p>{{ evento.distancia }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if evento.nivel_dificuldade %}
+                    <div class="highlight-item">
+                        <span class="material-symbols-outlined icon-orange">speed</span>
+                        <div>
+                            <strong>Nível</strong>
+                            <p>{{ evento.nivel_dificuldade }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
 
             <!-- Informações Principais -->
@@ -166,19 +230,6 @@
             {% endif %}
         </main>
 
-        <!-- Botões de Ação -->
-        <footer class="footer-btns">
-            <button class="btn secondary-btn" id="btn-compartilhar" onclick="compartilharEvento()">
-                <span class="material-symbols-outlined">share</span>
-                Compartilhar
-            </button>
-            <button class="btn primary-btn favorite-toggle {% if user in evento.favorited_by.all %}favorited{% endif %}" 
-                    data-event-id="{{ evento.id }}"
-                    onclick="toggleFavorite({{ evento.id }})">
-                <span class="material-symbols-outlined">{% if user in evento.favorited_by.all %}favorite{% else %}favorite_border{% endif %}</span>
-                {% if user in evento.favorited_by.all %}Favoritado{% else %}Favoritar{% endif %}
-            </button>
-        </footer>
     </div>
 
     <script>
@@ -192,16 +243,17 @@
         const csrftoken = getCookie('csrftoken');
         const btn = document.querySelector('.favorite-toggle');
         const icon = btn.querySelector('.material-symbols-outlined');
+        const label = btn.querySelector('.favorite-label');
         const prevState = btn.classList.contains('favorited');
         
         // Optimistic UI
         btn.classList.toggle('favorited');
         if (prevState) {
             icon.textContent = 'favorite_border';
-            btn.childNodes[2].textContent = 'Favoritar';
+            if (label) label.textContent = 'Favoritar';
         } else {
             icon.textContent = 'favorite';
-            btn.childNodes[2].textContent = 'Favoritado';
+            if (label) label.textContent = 'Favoritado';
         }
         
         const url = "{% url 'toggle_favorite_event' 0 %}".replace('/0/', `/${eventoId}/`);
@@ -219,11 +271,11 @@
                 if (prevState) {
                     btn.classList.add('favorited');
                     icon.textContent = 'favorite';
-                    btn.childNodes[2].textContent = 'Favoritado';
+                    if (label) label.textContent = 'Favoritado';
                 } else {
                     btn.classList.remove('favorited');
                     icon.textContent = 'favorite_border';
-                    btn.childNodes[2].textContent = 'Favoritar';
+                    if (label) label.textContent = 'Favoritar';
                 }
                 if (response.status === 401) {
                     alert('Faça login para favoritar eventos.');
@@ -235,11 +287,11 @@
                 if (data.favorited) {
                     btn.classList.add('favorited');
                     icon.textContent = 'favorite';
-                    btn.childNodes[2].textContent = 'Favoritado';
+                    if (label) label.textContent = 'Favoritado';
                 } else {
                     btn.classList.remove('favorited');
                     icon.textContent = 'favorite_border';
-                    btn.childNodes[2].textContent = 'Favoritar';
+                    if (label) label.textContent = 'Favoritar';
                 }
             }
         }).catch(err => {
@@ -248,11 +300,11 @@
             if (prevState) {
                 btn.classList.add('favorited');
                 icon.textContent = 'favorite';
-                btn.childNodes[2].textContent = 'Favoritado';
+                if (label) label.textContent = 'Favoritado';
             } else {
                 btn.classList.remove('favorited');
                 icon.textContent = 'favorite_border';
-                btn.childNodes[2].textContent = 'Favoritar';
+                if (label) label.textContent = 'Favoritar';
             }
         });
     }
