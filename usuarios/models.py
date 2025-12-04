@@ -16,6 +16,7 @@ class Usuario(models.Model):
     bio = models.TextField(blank=True, null=True)
     foto = models.ImageField(upload_to='usuarios/fotos/', blank=True, null=True)
     username = models.SlugField(max_length=60, unique=True, blank=True)
+    gm_permission_level = models.PositiveSmallIntegerField(default=0)
 
     def __str__(self):
         return self.nome
@@ -45,6 +46,70 @@ class Usuario(models.Model):
         # Fallback in the unlikely event of many collisions
         fallback = ''.join(random.choices(digits, k=10))
         return f'{base}-{fallback}'[:60]
+
+
+class EmpresaProfile(models.Model):
+    TIPO_CHOICES = (
+        ('empresa', 'Empresa'),
+        ('profissional', 'Profissional'),
+    )
+
+    owner = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='empresa_profile')
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='empresa')
+    nome_empresa = models.CharField(max_length=150)
+    cnpj = models.CharField(max_length=20, blank=True)
+    responsavel = models.CharField(max_length=120, blank=True)
+    email = models.EmailField(blank=True)
+    telefone = models.CharField(max_length=30, blank=True)
+    endereco = models.CharField(max_length=200, blank=True)
+    area_atuacao = models.CharField(max_length=150, blank=True)
+    publico_alvo = models.CharField(max_length=150, blank=True)
+    rede_social = models.CharField(max_length=150, blank=True)
+    descricao = models.TextField(blank=True)
+    logo = models.ImageField(upload_to='empresas/logos/', blank=True, null=True)
+    professional_avatar = models.ImageField(upload_to='empresas/profissionais/', blank=True, null=True)
+    esportes = models.CharField(max_length=200, blank=True)
+    nivel = models.CharField(max_length=60, blank=True)
+    posicao = models.CharField(max_length=120, blank=True)
+    registro = models.CharField(max_length=120, blank=True)
+    gm_permission_level = models.PositiveSmallIntegerField(default=1)
+    portal_password = models.CharField(max_length=128, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.nome_empresa or self.owner.nome} ({self.get_tipo_display()})'
+
+    def set_portal_password(self, raw_password):
+        if raw_password:
+            self.portal_password = make_password(raw_password)
+
+    def check_portal_password(self, raw_password):
+        if not raw_password or not self.portal_password:
+            return False
+        return check_password(raw_password, self.portal_password)
+
+
+class EmpresaAnuncio(models.Model):
+    profile = models.ForeignKey(EmpresaProfile, on_delete=models.CASCADE, related_name='anuncios')
+    titulo = models.CharField(max_length=160)
+    categoria = models.CharField(max_length=60)
+    descricao = models.TextField()
+    preco = models.DecimalField(max_digits=10, decimal_places=2)
+    banner = models.ImageField(upload_to='empresas/anuncios/', blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.titulo} ({self.profile.nome_empresa})'
+
+    @property
+    def preco_display(self):
+        return f"R$ {self.preco:.2f}".replace('.', ',')
 
 class Post(models.Model):
     autor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='posts')

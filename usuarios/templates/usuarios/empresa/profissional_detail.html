@@ -1,0 +1,130 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ profissional.nome }} - Perfil Profissional</title>
+  <link rel="stylesheet" href="{% static 'pages/tela_empresas/css/main.css' %}" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="page-empresa-shell" data-render-mode="{% if request.user_agent.is_mobile %}mobile{% else %}desktop{% endif %}">
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
+  <div class="page">
+    <header class="site-header header-vizu">
+      <div class="header-vizu-inner">
+        <a href="{% url 'empresa_buscar_profissionais' %}" class="btn-voltar">
+            <span class="material-icons icon-voltar">arrow_back</span>
+        </a>
+        <h1 class="h1-header-vizu">{{ profissional.nome }}</h1>
+        <a href="#" class="icon-btn icon-btn-dot">⋮</a>
+      </div>
+    </header>
+
+    <main class="container container-vizu">
+      <section class="card-visualizacao" role="region" aria-label="Dados Cadastrados">
+        <div class="profile-info">
+            <img src="{{ profissional.avatar }}" alt="Foto de Perfil" class="profile-photo" />
+            <div>
+              <h3 class="h3-profile">{{ profissional.nome }}</h3>
+              <p class="p-profile-detail">{{ profissional.area }} • {{ profissional.experiencia }}</p>
+            </div>
+        </div>
+
+        <button class="data-header-btn">Dados Pessoais</button>
+
+        <ul class="data-list">
+            <li class="data-item">
+                <span class="data-label">CPF:</span>
+                <span class="data-value">{{ profissional.cpf }}</span>
+            </li>
+            <li class="data-item">
+                <span class="data-label">Email:</span>
+                <span class="data-value">{{ profissional.email }}</span>
+            </li>
+            <li class="data-item">
+                <span class="data-label">Telefone/Celular:</span>
+                <span class="data-value">{{ profissional.telefone }}</span>
+            </li>
+            <li class="data-item">
+                <span class="data-label">Cidade/UF:</span>
+                <span class="data-value">{{ profissional.localizacao }}</span>
+            </li>
+        </ul>
+
+        <button class="data-header-btn mb-15">Dados Profissionais</button>
+
+        <ul class="data-list">
+            <li class="data-item">
+                <span class="data-label">Esportes Principais:</span>
+                <span class="data-value">{{ profissional.esportes|join:', ' }}</span>
+            </li>
+            <li class="data-item">
+                <span class="data-label">Área de Atuação:</span>
+                <span class="data-value">{{ profissional.area }}</span>
+            </li>
+            <li class="data-item">
+                <span class="data-label">Posição/Especialidade:</span>
+                <span class="data-value">{{ profissional.posicao|default:profissional.area }}</span>
+            </li>
+            <li class="data-item">
+                <span class="data-label">Rede Social:</span>
+                <span class="data-value">{{ profissional.rede_social }}</span>
+            </li>
+            <li class="data-item">
+                <span class="data-label">Nível de Atuação:</span>
+                <span class="data-value">{{ profissional.nivel|title }}</span>
+            </li>
+            <li class="data-item">
+                <span class="data-label">Registro Profissional:</span>
+                <span class="data-value">{{ profissional.registro }}</span>
+            </li>
+        </ul>
+
+        <p style="margin-top:16px;">{{ profissional.descricao }}</p>
+
+        <div class="actions mt-30">
+            <a href="mailto:{{ profissional.email }}" class="btn btn-primary" type="button">Entrar em contato</a>
+        </div>
+      </section>
+    </main>
+
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navMediaQuery = window.matchMedia('(max-width: 768px)');
+      const navMobile = document.getElementById('nav-mobile');
+      const navDesktop = document.getElementById('nav-desktop');
+
+      function applyNavMode(isMobile) {
+        if (!navMobile || !navDesktop) {
+          return;
+        }
+        navMobile.hidden = !isMobile;
+        navDesktop.hidden = isMobile;
+        document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+      }
+
+      function handleNavChange(event) {
+        applyNavMode(event.matches);
+      }
+
+      applyNavMode(navMediaQuery.matches);
+      if (typeof navMediaQuery.addEventListener === 'function') {
+        navMediaQuery.addEventListener('change', handleNavChange);
+      } else if (typeof navMediaQuery.addListener === 'function') {
+        navMediaQuery.addListener(handleNavChange);
+      }
+    });
+  </script>
+</body>
+</html>

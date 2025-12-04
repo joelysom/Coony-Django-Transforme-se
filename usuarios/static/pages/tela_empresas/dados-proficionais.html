@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tela Empresas/Profissionais</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <div class="page">
+
+    <main class="container">
+      <section class="card" role="region" aria-label="Dados Específicos para Profissionais">
+        <div class="card-header">
+         <a href="cadastro-pf-pj.html" class="icon-btn" aria-label="Voltar">
+            <span class="material-icons icon-voltar">arrow_back</span>
+         </a>
+          <h2>Dados Específicos para Profissionais</h2>
+        </div>
+        
+        <form class="form" autocomplete="off">
+          <label class="field input-box">
+            <span class="label-text">Informe esportes principais (opcional):</span>
+            <input class="input" type="text" name="esportes" placeholder="Ex: Futebol, Vôlei" />
+          </label>
+
+          <label class="field input-box">
+            <span class="label-text">Informe a área de atuação:</span>
+            <input class="input" type="text" name="area_atuacao" placeholder="Ex: Treinamento físico" />
+          </label>
+
+          <label class="field input-box">
+            <span class="label-text">Informe sua posição/Especialidade:</span>
+            <input class="input" type="text" name="posicao" placeholder="Ex: Preparador físico" />
+          </label>
+
+          <label class="field input-box">
+            <span class="label-text">Informe rede social (opcional):</span>
+            <input class="input" type="text" name="rede_social" placeholder="@seudonoInstagram" />
+          </label>
+
+          <label class="field input-box">
+            <span class="label-text">Informe seu nível de atuação:</span>
+            <select class="input" name="nivel">
+              <option value="">Selecione</option>
+              <option value="amador">Amador</option>
+              <option value="regional">Profissional (Regional)</option>
+              <option value="nacional">Profissional (Nacional)</option>
+            </select>
+          </label>
+
+          <label class="field input-box">
+            <span class="label-text">Informe seu Registro profissional (Ex: CREF/Confederação):</span>
+            <input class="input" type="text" name="registro" placeholder="Número do registro" />
+          </label>
+
+          <label class="field">
+            <span class="label-text">Foto de perfil:</span>
+            <div class="file-row">
+      
+              <input class="file-input" type="file" id="avatar" name="avatar" accept="image/*" data-trigger="#btn-upload" />
+              <button type="button" id="btn-upload" class="upload-btn">Upload de Arquivos</button>
+              <img src="placeholder-avatar.png" alt="Pré-visualização" class="preview-avatar" />
+            </div>
+          </label>
+
+          <div class="actions">
+          
+            <button class="btn btn-primary" type="submit">Finalizar →</button>
+          </div>
+        </form>
+
+        <footer class="card-footer small text-center mt-16">
+          <a href="#">Sobre</a>
+          <a href="#">Ajuda</a>
+          <a href="#">Política</a>
+          <a href="#">Privacidade</a>
+        </footer>
+      </section>
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <h3>Coony</h3>
+          <p>© 2025</p>
+        </div>
+        <div class="footer-actions">
+          <div class="footer-lang">
+            <label for="lang">Idioma</label>
+            <select id="lang">
+              <option>PT-BR</option>
+              <option>EN</option>
+            </select>
+          </div>
+          <div class="footer-links">
+            <a href="#">Contato</a>
+            <a href="#">Termos</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+ 
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const fileInput = document.querySelector('.file-input');
+      const trigger = document.querySelector('#btn-upload');
+      const preview = document.querySelector('.preview-avatar');
+
+      if (trigger && fileInput) {
+        trigger.addEventListener('click', ()=> fileInput.click());
+      }
+
+      if (fileInput && preview) {
+        fileInput.addEventListener('change', () => {
+          const file = fileInput.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function(e){ preview.src = e.target.result; };
+          reader.readAsDataURL(file);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

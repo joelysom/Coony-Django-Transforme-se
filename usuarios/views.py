@@ -1,6 +1,8 @@
 from collections import Counter
-from django.core.exceptions import MultipleObjectsReturned
+from copy import deepcopy
+from decimal import Decimal, InvalidOperation
 import json
+from django.core.exceptions import MultipleObjectsReturned
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
@@ -15,7 +17,17 @@ from django.utils import timezone
 from django.utils.timesince import timesince
 
 from .forms import RegistrationForm, LoginForm, PostForm, CommentForm, EventoForm
-from .models import Usuario, Post, Comment, Conversation, Message, PostLikeEvent, Evento
+from .models import (
+    Usuario,
+    Post,
+    Comment,
+    Conversation,
+    Message,
+    PostLikeEvent,
+    Evento,
+    EmpresaProfile,
+    EmpresaAnuncio,
+)
 from .utils import normalize_username
 from .chat_serializers import serialize_user, serialize_message, serialize_conversation
 
@@ -50,6 +62,126 @@ def _broadcast_message_event(message):
             'conversation_id': message.conversation_id,
         }
     )
+
+
+DEFAULT_EMPRESA_PROFILE = {
+    'tipo': 'empresa',
+    'nome_empresa': 'Esporte Total Academia',
+    'cnpj': '00.000.000/0001-00',
+    'responsavel': 'Equipe Coony',
+    'email': 'contato@esportetotal.com.br',
+    'telefone': '(11) 3333-4444',
+    'endereco': 'Av. Principal, 123 - Centro, São Paulo - SP',
+    'area_atuacao': 'Musculação, Natação e Aulas Funcionais',
+    'publico_alvo': 'Jovens e adultos focados em performance',
+    'rede_social': '@esportetotal_academia',
+}
+
+DEFAULT_EMPRESA_ADS = [
+    {
+        'id': 'AD001',
+        'titulo': 'Treinador de Futebol - Categoria Sub-17',
+        'descricao': 'Programa completo para categorias de base, com foco em fundamentos táticos.',
+        'categoria': 'Serviço',
+        'preco_display': 'R$ 2.500,00',
+        'visualizar_url': '#',
+        'editar_url': '#',
+    },
+    {
+        'id': 'AD002',
+        'titulo': 'Professor de Natação - Turno da Manhã',
+        'descricao': 'Turmas reduzidas com foco em rendimento e correção de técnica.',
+        'categoria': 'Serviço',
+        'preco_display': 'R$ 120,00/h',
+        'visualizar_url': '#',
+        'editar_url': '#',
+    },
+    {
+        'id': 'AD003',
+        'titulo': 'Instrutor de Musculação - Período Noturno',
+        'descricao': 'Atendimento personalizado para equipes competitivas.',
+        'categoria': 'Serviço',
+        'preco_display': 'R$ 90,00/h',
+        'visualizar_url': '#',
+        'editar_url': '#',
+    },
+]
+
+PROFESSIONALS_SAMPLE = [
+    {
+        'id': 1,
+        'nome': 'João Silva',
+        'area': 'Preparador Físico (Futebol)',
+        'posicao': 'Preparador Físico',
+        'localizacao': 'São Paulo - SP',
+        'nivel': 'nacional',
+        'esportes': ['Futebol', 'Vôlei', 'Tênis'],
+        'telefone': '(11) 98765-4321',
+        'email': 'joao.silva@email.com',
+        'registro': 'CREF: 000000-G/SP',
+        'experiencia': '5 anos de experiência',
+        'descricao': 'Preparador físico certificado com foco em performance de atletas de base e alto rendimento.',
+        'avatar': 'https://via.placeholder.com/100/ED864B/FFFFFF?text=J',
+        'cpf': '123.456.789-00',
+        'rede_social': '@joao.prep_fisico',
+        'cidade': 'São Paulo',
+        'estado': 'SP',
+    },
+    {
+        'id': 2,
+        'nome': 'Maria Faria',
+        'area': 'Fisioterapeuta Esportiva',
+        'posicao': 'Fisioterapeuta',
+        'localizacao': 'Rio de Janeiro - RJ',
+        'nivel': 'regional',
+        'esportes': ['Natação', 'Corrida'],
+        'telefone': '(21) 99876-1122',
+        'email': 'maria.faria@email.com',
+        'registro': 'CREFITO: 12345-F/RJ',
+        'experiencia': '8 anos de experiência',
+        'descricao': 'Especialista em reabilitação esportiva e prevenção de lesões para nadadores e corredores.',
+        'avatar': 'https://via.placeholder.com/100/D3D3D3/000000?text=M',
+        'cpf': '321.654.987-00',
+        'rede_social': '@maria.fisio',
+        'cidade': 'Rio de Janeiro',
+        'estado': 'RJ',
+    },
+    {
+        'id': 3,
+        'nome': 'Alex Souza',
+        'area': 'Coach de Ciclismo (Nacional)',
+        'posicao': 'Coach de Ciclismo',
+        'localizacao': 'Recife - PE',
+        'nivel': 'nacional',
+        'esportes': ['Ciclismo'],
+        'telefone': '(81) 93321-5555',
+        'email': 'alex.souza@email.com',
+        'registro': 'CBC: 88991-PE',
+        'experiencia': '10 anos de experiência',
+        'descricao': 'Coach especializado em ciclismo de estrada e preparação para provas de resistência.',
+        'avatar': 'https://via.placeholder.com/100/797979/FFFFFF?text=A',
+        'cpf': '987.321.654-00',
+        'rede_social': '@alex.ciclismo',
+        'cidade': 'Recife',
+        'estado': 'PE',
+    },
+]
+
+
+def _get_empresa_profile_obj(user):
+    if not user:
+        return None
+    try:
+        return user.empresa_profile
+    except EmpresaProfile.DoesNotExist:
+        return None
+
+
+def _get_professional_by_id(prof_id):
+    for professional in PROFESSIONALS_SAMPLE:
+        if professional['id'] == prof_id:
+            return professional
+    return None
 
 
 def index(request):
@@ -794,3 +926,329 @@ def toggle_favorite_event(request, evento_id):
         favorited = True
 
     return JsonResponse({'favorited': favorited})
+
+
+def empresa_cadastro_tipo(request):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+    profile = _get_empresa_profile_obj(user)
+
+    if request.method == 'POST':
+        tipo = (request.POST.get('tipo-cadastro') or request.POST.get('tipo') or '').strip()
+        if tipo == 'Profissional':
+            return redirect('empresa_cadastro_profissional')
+        if tipo in {'Empresa', 'Mei', 'empresa', 'mei'}:
+            return redirect('empresa_cadastro_empresa')
+        messages.error(request, 'Selecione uma opção para continuar.', extra_tags='toast')
+
+    return render(request, 'usuarios/empresa/cadastro_tipo.html', {
+        'user': user,
+        'profile': profile,
+    })
+
+
+def empresa_cadastro_empresa(request):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+    profile = _get_empresa_profile_obj(user)
+    form_data = deepcopy(DEFAULT_EMPRESA_PROFILE)
+
+    if profile and profile.tipo == 'empresa':
+        form_data.update({
+            'nome_empresa': profile.nome_empresa or form_data['nome_empresa'],
+            'cnpj': profile.cnpj or '',
+            'responsavel': profile.responsavel or user.nome,
+            'email': profile.email or user.email,
+            'telefone': profile.telefone or user.telefone,
+            'endereco': profile.endereco or '',
+            'area_atuacao': profile.area_atuacao or form_data['area_atuacao'],
+            'publico_alvo': profile.publico_alvo or form_data['publico_alvo'],
+            'rede_social': profile.rede_social or form_data['rede_social'],
+        })
+    else:
+        form_data.update({
+            'responsavel': user.nome,
+            'email': user.email,
+            'telefone': user.telefone,
+        })
+
+    if request.method == 'POST':
+        data = {
+            'nome_empresa': request.POST.get('nome_empresa', '').strip(),
+            'cnpj': request.POST.get('cnpj', '').strip(),
+            'responsavel': request.POST.get('responsavel', '').strip(),
+            'email': request.POST.get('email', '').strip(),
+            'telefone': request.POST.get('telefone', '').strip(),
+            'endereco': request.POST.get('endereco', '').strip(),
+            'area_atuacao': request.POST.get('area_atuacao', '').strip() or DEFAULT_EMPRESA_PROFILE['area_atuacao'],
+            'publico_alvo': request.POST.get('publico_alvo', '').strip() or DEFAULT_EMPRESA_PROFILE['publico_alvo'],
+            'rede_social': request.POST.get('rede_social', '').strip() or DEFAULT_EMPRESA_PROFILE['rede_social'],
+        }
+        senha = (request.POST.get('senha') or '').strip()
+        confirma_senha = (request.POST.get('confirma_senha') or '').strip()
+        remove_logo = request.POST.get('remove_logo') == '1'
+        logo_file = request.FILES.get('logo')
+
+        required = ['nome_empresa', 'cnpj', 'responsavel', 'email', 'telefone', 'endereco']
+        missing = [field for field in required if not data.get(field)]
+        if missing:
+            messages.error(request, 'Preencha todos os campos obrigatórios.', extra_tags='toast')
+        elif (senha or confirma_senha) and senha != confirma_senha:
+            messages.error(request, 'As senhas informadas não coincidem.', extra_tags='toast')
+        elif senha and len(senha) < 6:
+            messages.error(request, 'Use ao menos 6 caracteres para a senha de acesso.', extra_tags='toast')
+        else:
+            profile = profile or EmpresaProfile(owner=user)
+            profile.tipo = 'empresa'
+            profile.nome_empresa = data['nome_empresa']
+            profile.cnpj = data['cnpj']
+            profile.responsavel = data['responsavel']
+            profile.email = data['email']
+            profile.telefone = data['telefone']
+            profile.endereco = data['endereco']
+            profile.area_atuacao = data['area_atuacao']
+            profile.publico_alvo = data['publico_alvo']
+            profile.rede_social = data['rede_social']
+            if profile.gm_permission_level < 1:
+                profile.gm_permission_level = 1
+            if remove_logo and profile.logo:
+                profile.logo.delete(save=False)
+                profile.logo = None
+            if logo_file:
+                profile.logo = logo_file
+            if senha:
+                profile.set_portal_password(senha)
+            profile.save()
+            if user.gm_permission_level < 1:
+                user.gm_permission_level = 1
+                user.save(update_fields=['gm_permission_level'])
+            messages.success(request, 'Informações da empresa atualizadas!', extra_tags='toast')
+            return redirect('empresa_painel')
+        form_data = data
+
+    return render(request, 'usuarios/empresa/cadastro_empresa.html', {
+        'user': user,
+        'form_data': form_data,
+        'logo_url': profile.logo.url if profile and profile.logo else '',
+    })
+
+
+def empresa_cadastro_profissional(request):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+    profile = _get_empresa_profile_obj(user)
+    empty_defaults = {
+        'esportes': '',
+        'area_atuacao': '',
+        'posicao': '',
+        'rede_social': '',
+        'nivel': '',
+        'registro': '',
+    }
+
+    form_data = deepcopy(empty_defaults)
+    if profile and profile.tipo == 'profissional':
+        form_data.update({
+            'esportes': profile.esportes or '',
+            'area_atuacao': profile.area_atuacao or '',
+            'posicao': profile.posicao or '',
+            'rede_social': profile.rede_social or '',
+            'nivel': profile.nivel or '',
+            'registro': profile.registro or '',
+        })
+
+    if request.method == 'POST':
+        data = {
+            'esportes': request.POST.get('esportes', '').strip(),
+            'area_atuacao': request.POST.get('area_atuacao', '').strip(),
+            'posicao': request.POST.get('posicao', '').strip(),
+            'rede_social': request.POST.get('rede_social', '').strip(),
+            'nivel': request.POST.get('nivel', '').strip(),
+            'registro': request.POST.get('registro', '').strip(),
+        }
+        avatar_file = request.FILES.get('avatar')
+
+        if data['area_atuacao'] and data['posicao']:
+            profile = profile or EmpresaProfile(owner=user)
+            profile.tipo = 'profissional'
+            profile.nome_empresa = user.nome
+            profile.responsavel = user.nome
+            profile.email = user.email
+            profile.telefone = user.telefone
+            profile.endereco = user.localizacao or ''
+            profile.esportes = data['esportes']
+            profile.area_atuacao = data['area_atuacao']
+            profile.posicao = data['posicao']
+            profile.rede_social = data['rede_social']
+            profile.nivel = data['nivel']
+            profile.registro = data['registro']
+            if avatar_file:
+                profile.professional_avatar = avatar_file
+            profile.save()
+            messages.success(request, 'Perfil profissional salvo com sucesso!', extra_tags='toast')
+            return redirect('empresa_painel')
+        messages.error(request, 'Preencha pelo menos área de atuação e especialidade.', extra_tags='toast')
+        form_data = data
+
+    return render(request, 'usuarios/empresa/cadastro_profissional.html', {
+        'user': user,
+        'form_data': form_data,
+        'avatar_url': profile.professional_avatar.url if profile and profile.professional_avatar else '',
+    })
+
+
+def empresa_painel(request):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+    profile = _get_empresa_profile_obj(user)
+    if profile:
+        anuncios_qs = profile.anuncios.all()
+        anuncios_preview = list(anuncios_qs[:3])
+        total_ads = anuncios_qs.count()
+    else:
+        anuncios_preview = [dict(item) for item in DEFAULT_EMPRESA_ADS]
+        total_ads = 0
+
+    stats = {
+        'total_anuncios': total_ads,
+        'favoritos': max(total_ads - 1, 0),
+        'visualizacoes': 120 + (total_ads * 8),
+    }
+
+    return render(request, 'usuarios/empresa/painel.html', {
+        'user': user,
+        'profile': profile,
+        'profile_fallback': DEFAULT_EMPRESA_PROFILE,
+        'anuncios': anuncios_preview,
+        'stats': stats,
+    })
+
+
+def empresa_anunciar(request):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+
+    profile = _get_empresa_profile_obj(user)
+    if not profile:
+        messages.warning(request, 'Complete o cadastro da empresa antes de anunciar.', extra_tags='toast')
+        return redirect('empresa_cadastro_tipo')
+
+    if request.method == 'POST':
+        titulo = request.POST.get('titulo', '').strip()
+        categoria = request.POST.get('categoria', '').strip()
+        descricao = request.POST.get('descricao', '').strip()
+        preco_input = (request.POST.get('preco') or '').replace(',', '.').strip()
+        banner_file = request.FILES.get('banner')
+
+        try:
+            preco_decimal = Decimal(preco_input)
+        except (InvalidOperation, TypeError):
+            preco_decimal = None
+
+        if not all([titulo, categoria, descricao]) or preco_decimal is None:
+            messages.error(request, 'Informe título, categoria, descrição e um preço válido.', extra_tags='toast')
+        else:
+            EmpresaAnuncio.objects.create(
+                profile=profile,
+                titulo=titulo,
+                categoria=categoria,
+                descricao=descricao,
+                preco=preco_decimal,
+                banner=banner_file,
+            )
+            messages.success(request, 'Anúncio publicado com sucesso!', extra_tags='toast')
+            return redirect('empresa_meus_anuncios')
+
+    return render(request, 'usuarios/empresa/anunciar.html', {
+        'user': user,
+        'profile': profile,
+    })
+
+
+def empresa_meus_anuncios(request):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+    profile = _get_empresa_profile_obj(user)
+    if not profile:
+        messages.warning(request, 'Complete o cadastro da empresa para visualizar anúncios.', extra_tags='toast')
+        return redirect('empresa_cadastro_tipo')
+
+    anuncios_qs = profile.anuncios.all()
+    has_personal_ads = anuncios_qs.exists()
+    anuncios = anuncios_qs if has_personal_ads else [dict(item) for item in DEFAULT_EMPRESA_ADS]
+
+    return render(request, 'usuarios/empresa/anuncios.html', {
+        'user': user,
+        'profile': profile,
+        'anuncios': anuncios,
+        'has_personal_ads': has_personal_ads,
+    })
+
+
+def empresa_buscar_profissionais(request):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+
+    query = (request.GET.get('q') or '').strip().lower()
+    esporte = (request.GET.get('esporte') or '').strip().lower()
+    cidade_param = (request.GET.get('cidade') or '').strip()
+    cidade = cidade_param.lower()
+    nivel = (request.GET.get('nivel') or '').strip().lower()
+
+    profissionais = []
+    for prof in PROFESSIONALS_SAMPLE:
+        if query and query not in (prof['nome'] + ' ' + prof['area']).lower():
+            continue
+        if esporte and esporte not in ' '.join(prof.get('esportes', [])).lower():
+            continue
+        full_city = f"{prof.get('cidade', '')} - {prof.get('estado', '')}".strip(' -')
+        if cidade and cidade not in full_city.lower():
+            continue
+        if nivel and nivel != prof.get('nivel', '').lower():
+            continue
+        profissionais.append(prof)
+
+    esportes = sorted({sport for prof in PROFESSIONALS_SAMPLE for sport in prof.get('esportes', [])})
+    cidades = sorted({
+        f"{prof.get('cidade', '')} - {prof.get('estado', '')}".strip(' -')
+        for prof in PROFESSIONALS_SAMPLE
+        if prof.get('cidade')
+    })
+    niveis = sorted({prof.get('nivel', '') for prof in PROFESSIONALS_SAMPLE if prof.get('nivel')})
+
+    return render(request, 'usuarios/empresa/pesquisa_profissionais.html', {
+        'user': user,
+        'profissionais': profissionais,
+        'filters': {
+            'q': request.GET.get('q', ''),
+            'esporte': request.GET.get('esporte', ''),
+            'cidade': cidade_param,
+            'nivel': request.GET.get('nivel', ''),
+        },
+        'esportes': esportes,
+        'cidades': cidades,
+        'niveis': niveis,
+    })
+
+
+def empresa_profissional_detail(request, prof_id):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+
+    profissional = _get_professional_by_id(prof_id)
+    if not profissional:
+        messages.error(request, 'Profissional não encontrado.', extra_tags='toast')
+        return redirect('empresa_buscar_profissionais')
+
+    return render(request, 'usuarios/empresa/profissional_detail.html', {
+        'user': user,
+        'profissional': profissional,
+    })

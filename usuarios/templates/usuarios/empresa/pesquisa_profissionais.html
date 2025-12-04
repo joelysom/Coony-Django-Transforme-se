@@ -1,0 +1,106 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Buscar Profissionais</title>
+  <link rel="stylesheet" href="{% static 'pages/tela_empresas/css/main.css' %}" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="page-empresa-shell" data-render-mode="{% if request.user_agent.is_mobile %}mobile{% else %}desktop{% endif %}">
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
+  <div class="page">
+    <header class="site-header">
+        <a href="{% url 'empresa_painel' %}" class="header-link" aria-label="Voltar">
+            <span class="material-icons icon-voltar">arrow_back</span>
+        </a>
+        <h1>Buscar Profissionais Esportivos</h1>
+        <a href="#" class="header-link" aria-label="Ajuda">?</a>
+    </header>
+
+    <main class="container">
+      <form method="get" class="card" style="margin-bottom:18px;">
+        <div class="search-bar">
+          <input class="input" type="search" name="q" value="{{ filters.q }}" placeholder="Busque por nome, esporte ou especialidade..." />
+          <button class="btn-search" aria-label="Pesquisar">🔍</button>
+        </div>
+
+        <div class="filters">
+          <select class="input" name="esporte">
+            <option value="" disabled {% if not filters.esporte %}selected{% endif %} hidden>Esporte</option>
+            {% for esporte in esportes %}
+            <option value="{{ esporte }}" {% if filters.esporte == esporte %}selected{% endif %}>{{ esporte }}</option>
+            {% endfor %}
+          </select>
+          <select class="input" name="cidade">
+            <option value="" disabled {% if not filters.cidade %}selected{% endif %} hidden>Localização</option>
+            {% for cidade in cidades %}
+            <option value="{{ cidade }}" {% if filters.cidade == cidade %}selected{% endif %}>{{ cidade }}</option>
+            {% endfor %}
+          </select>
+          <select class="input" name="nivel">
+            <option value="" disabled {% if not filters.nivel %}selected{% endif %} hidden>Nível</option>
+            {% for nivel in niveis %}
+            <option value="{{ nivel }}" {% if filters.nivel == nivel %}selected{% endif %}>{{ nivel|title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </form>
+
+      <section class="results card results-section" role="list">
+        {% for prof in profissionais %}
+        <a href="{% url 'empresa_profissional_detail' prof.id %}" class="professional-card" role="listitem">
+            <img src="{{ prof.avatar }}" alt="Foto de {{ prof.nome }}" class="prof-avatar-search" />
+            <div class="prof-details">
+                <p class="prof-name">{{ prof.nome }}</p>
+                <p class="prof-area">{{ prof.area }}</p>
+                <p class="prof-location">{{ prof.localizacao }}</p>
+            </div>
+            <span class="arrow-forward-orange">→</span>
+        </a>
+        {% empty %}
+        <p style="padding:20px;">Nenhum profissional encontrado para os filtros selecionados.</p>
+        {% endfor %}
+      </section>
+    </main>
+
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navMediaQuery = window.matchMedia('(max-width: 768px)');
+      const navMobile = document.getElementById('nav-mobile');
+      const navDesktop = document.getElementById('nav-desktop');
+
+      function applyNavMode(isMobile) {
+        if (!navMobile || !navDesktop) {
+          return;
+        }
+        navMobile.hidden = !isMobile;
+        navDesktop.hidden = isMobile;
+        document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+      }
+
+      function handleNavChange(event) {
+        applyNavMode(event.matches);
+      }
+
+      applyNavMode(navMediaQuery.matches);
+      if (typeof navMediaQuery.addEventListener === 'function') {
+        navMediaQuery.addEventListener('change', handleNavChange);
+      } else if (typeof navMediaQuery.addListener === 'function') {
+        navMediaQuery.addListener(handleNavChange);
+      }
+    });
+  </script>
+</body>
+</html>

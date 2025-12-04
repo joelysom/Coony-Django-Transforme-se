@@ -9,6 +9,18 @@
         object-fit: cover;
         border: 2px solid #f68b4a;
     }
+
+    .navbar .nav-item.nav-item-empresa {
+        background: #f68b4a;
+        border-radius: 12px;
+        padding: 4px 10px;
+    }
+
+    .navbar .nav-item.nav-item-empresa span,
+    .navbar .nav-item.nav-item-empresa p {
+        color: #fff;
+        font-weight: 600;
+    }
 </style>
 
 <nav class="navbar">
@@ -20,6 +32,12 @@
         <span class="material-symbols-outlined">calendar_month</span>
         <p>Eventos</p>
     </a>
+    {% if user and user.gm_permission_level|default_if_none:0 >= 2 %}
+    <a href="{% url 'empresa_cadastro_tipo' %}" class="nav-item nav-item-empresa">
+        <span class="material-symbols-outlined">business_center</span>
+        <p>Cadastrar Empresa</p>
+    </a>
+    {% endif %}
     <a href="{% url 'social' %}" class="nav-item">
         <span class="material-symbols-outlined">maps_ugc</span>
         <p>Comunidade</p>

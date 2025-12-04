@@ -86,6 +86,14 @@
     <span class="material-symbols-outlined">add_circle</span>
     <p>Criar</p>
   </a>
+  {% if user and user.gm_permission_level|default_if_none:0 >= 2 %}
+    {% with current_name=request.resolver_match.url_name|default:'' %}
+    <a href="{% url 'empresa_cadastro_tipo' %}" class="nav-item {% if current_name == 'empresa_painel' or current_name == 'empresa_meus_anuncios' or current_name == 'empresa_anunciar' or current_name == 'empresa_cadastro_tipo' or current_name == 'empresa_cadastro_empresa' or current_name == 'empresa_cadastro_profissional' or current_name == 'empresa_buscar_profissionais' or current_name == 'empresa_profissional_detail' %}active{% endif %}">
+      <span class="material-symbols-outlined">business_center</span>
+      <p>Cadastrar Empresa</p>
+    </a>
+    {% endwith %}
+  {% endif %}
   <a href="{% url 'social' %}" class="nav-item">
     <span class="material-symbols-outlined">maps_ugc</span>
     <p>Comunidade</p>

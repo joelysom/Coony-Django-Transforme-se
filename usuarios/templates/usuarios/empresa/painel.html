@@ -1,0 +1,158 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Meu Negócio - Coony</title>
+    <link rel="stylesheet" href="{% static 'pages/tela_empresas/css/main.css' %}" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="page-empresa-shell" data-render-mode="{% if request.user_agent.is_mobile %}mobile{% else %}desktop{% endif %}">
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+
+    <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+        {% include 'usuarios/components/navbar_mobile.html' %}
+    </div>
+    <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+        {% include 'usuarios/components/sidebar.html' %}
+    </div>
+
+  <div class="page">
+    <header class="site-header">
+        <a href="{% url 'dashboard' %}" class="header-link" aria-label="Voltar">
+            <span class="material-icons icon-voltar">arrow_back</span>
+        </a>
+        <h1>Dados do Meu Negócio</h1>
+        <a href="{% url 'empresa_buscar_profissionais' %}" class="header-link" aria-label="Procurar profissionais">🔍</a>
+    </header>
+
+    <main class="container">
+      <section class="card-visualizacao" role="region" aria-label="Dados da Empresa">
+        {% if not profile %}
+        <div class="alert" style="margin-bottom:18px;background:#291313;border:1px solid rgba(255,255,255,0.1);padding:16px;border-radius:14px;">
+            Complete o cadastro da sua empresa para liberar todas as funcionalidades.
+            <a href="{% url 'empresa_cadastro_tipo' %}" class="btn-primary" style="display:inline-flex;margin-left:12px;">Cadastrar agora</a>
+        </div>
+        {% endif %}
+
+        {% with current_profile=profile|default:profile_fallback %}
+        <div class="profile-info">
+            {% if profile and profile.logo %}
+            <img src="{{ profile.logo.url }}" alt="Logo" class="avatar" style="object-fit:cover;" />
+            {% else %}
+            <img src="https://via.placeholder.com/100/D3D3D3/000000?text={{ current_profile.nome_empresa|slice:':1'|default:'C' }}" alt="Logo" class="avatar" />
+            {% endif %}
+            <div>
+              <h2>{{ current_profile.nome_empresa }}</h2>
+              {% if current_profile.cnpj %}
+              <p>{{ current_profile.cnpj }}</p>
+              {% endif %}
+            </div>
+        </div>
+
+        <div class="actions actions-col-gap mt-30">
+            <a href="{% url 'empresa_anunciar' %}" class="btn-primary">Cadastrar anúncio</a>
+            <a href="{% url 'empresa_meus_anuncios' %}" class="btn-secondary">Ver meus anúncios</a>
+        </div>
+
+        <div class="data-list" style="margin-top:32px;">
+            <div class="data-item">
+                <span class="data-label">Responsável:</span>
+                <span class="data-value">{{ current_profile.responsavel|default:user.nome }}</span>
+            </div>
+            <div class="data-item">
+                <span class="data-label">E-mail:</span>
+                <span class="data-value">{{ current_profile.email|default:user.email }}</span>
+            </div>
+            <div class="data-item">
+                <span class="data-label">Telefone:</span>
+                <span class="data-value">{{ current_profile.telefone|default:"Atualize no cadastro" }}</span>
+            </div>
+            <div class="data-item">
+                <span class="data-label">Endereço:</span>
+                <span class="data-value">{{ current_profile.endereco|default:"Atualize no cadastro" }}</span>
+            </div>
+            <div class="data-item">
+                <span class="data-label">Área de atuação:</span>
+                <span class="data-value">{{ current_profile.area_atuacao|default:"Não informado" }}</span>
+            </div>
+            <div class="data-item">
+                <span class="data-label">Público-alvo:</span>
+                <span class="data-value">{{ current_profile.publico_alvo|default:"Não informado" }}</span>
+            </div>
+            <div class="data-item">
+                <span class="data-label">Rede Social:</span>
+                <span class="data-value">{{ current_profile.rede_social|default:"-" }}</span>
+            </div>
+        </div>
+        {% endwith %}
+
+        <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:32px 0;">
+            <div class="card" style="padding:14px;">
+                <p class="label-text">Anúncios ativos</p>
+                <h3>{{ stats.total_anuncios|default:0 }}</h3>
+            </div>
+            <div class="card" style="padding:14px;">
+                <p class="label-text">Favoritos</p>
+                <h3>{{ stats.favoritos|default:0 }}</h3>
+            </div>
+            <div class="card" style="padding:14px;">
+                <p class="label-text">Visualizações</p>
+                <h3>{{ stats.visualizacoes|default:0 }}</h3>
+            </div>
+        </div>
+
+        <button class="data-header-btn">Anúncios Recentes</button>
+
+        <ul class="data-list">
+            {% for anuncio in anuncios %}
+            <li class="data-item">
+                <span class="data-label">{{ anuncio.titulo }}</span>
+                <span class="data-value">{{ anuncio.descricao }}</span>
+            </li>
+            {% empty %}
+            <li class="data-item">
+                <span class="data-value">Nenhum anúncio encontrado.</span>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <div class="actions actions-col-gap mt-30">
+            <a href="{% url 'empresa_buscar_profissionais' %}" class="btn-secondary">Buscar profissionais</a>
+            <a href="{% url 'empresa_cadastro_empresa' %}" class="btn-secondary">Editar cadastro</a>
+        </div>
+      </section>
+    </main>
+
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navMediaQuery = window.matchMedia('(max-width: 768px)');
+            const navMobile = document.getElementById('nav-mobile');
+            const navDesktop = document.getElementById('nav-desktop');
+
+            function applyNavMode(isMobile) {
+                if (!navMobile || !navDesktop) {
+                    return;
+                }
+                navMobile.hidden = !isMobile;
+                navDesktop.hidden = isMobile;
+                document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+            }
+
+            function handleNavChange(event) {
+                applyNavMode(event.matches);
+            }
+
+            applyNavMode(navMediaQuery.matches);
+            if (typeof navMediaQuery.addEventListener === 'function') {
+                navMediaQuery.addEventListener('change', handleNavChange);
+            } else if (typeof navMediaQuery.addListener === 'function') {
+                navMediaQuery.addListener(handleNavChange);
+            }
+        });
+    </script>
+</body>
+</html>

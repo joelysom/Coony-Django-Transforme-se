@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Empresa - Coony</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="page">
+        <header class="site-header">
+            <a href="cadastro-pf-pj.html" class="header-link" aria-label="Voltar">
+                <span class="material-icons icon-voltar">arrow_back</span>
+            </a>
+            <h1>Cadastre Seu Negócio</h1>
+            <a href="#" class="header-link" aria-label="Ajuda">?</a>
+        </header>
+
+        <main class="container">
+            <section class="card" role="region" aria-label="Formulário de Cadastro">
+                
+                <div class="card-header mb-28">
+                    <h2>Informações Básicas</h2>
+                </div>
+                
+                <form class="form" autocomplete="off">
+                    
+                    <label class="field">
+                        <span class="label-text">Nome da Empresa:</span>
+                        <input class="input" type="text" name="nome_empresa" placeholder="Digite o nome da sua empresa" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">CNPJ:</span>
+                        <input class="input" type="text" name="cnpj" placeholder="Digite o seu CNPJ" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Responsável:</span>
+                        <input class="input" type="text" name="responsavel" placeholder="Digite o nome do responsável" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">E-mail:</span>
+                        <input class="input" type="email" name="email" placeholder="Digite o seu e-mail" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Telefone:</span>
+                        <input class="input" type="tel" name="telefone" placeholder="Digite o seu telefone" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Endereço:</span>
+                        <input class="input" type="text" name="endereco" placeholder="Digite o seu endereço" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Logo da Empresa:</span>
+                        <div class="file-row">
+                            <input class="file-input" type="file" id="avatar-file" name="logo" accept="image/*" />
+                            <button type="button" id="btn-upload-trigger" class="upload-btn">Upload de Logo</button>
+                            <img src="placeholder-logo.png" alt="Pré-visualização do Logo" class="preview-avatar" id="preview-img" />
+                        </div>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Senha:</span>
+                        <input class="input" type="password" name="senha" placeholder="Digite sua senha" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Confirme Sua Senha:</span>
+                        <input class="input" type="password" name="confirma_senha" placeholder="Confirme sua senha" required>
+                    </label>
+
+                    <div class="actions">
+                        <button class="btn btn-primary" type="submit">Cadastrar →</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+
+        <footer class="site-footer" role="contentinfo">
+           </footer>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const fileInput = document.getElementById('avatar-file'); 
+            const trigger = document.getElementById('btn-upload-trigger');
+            const preview = document.getElementById('preview-img'); 
+
+            if (trigger && fileInput) {
+                trigger.addEventListener('click', (e)=> {
+                    e.preventDefault(); 
+                    fileInput.click();
+                });
+            }
+
+            if (fileInput && preview) {
+                fileInput.addEventListener('change', () => {
+                    const file = fileInput.files[0];
+                    if (!file) {
+                        preview.src = "placeholder-logo.png"; 
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function(e){ preview.src = e.target.result; };
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

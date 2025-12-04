@@ -1,0 +1,137 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Anunciar Produto/Serviço</title>
+  <link rel="stylesheet" href="{% static 'pages/tela_empresas/css/main.css' %}" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="page-empresa-shell" data-render-mode="{% if request.user_agent.is_mobile %}mobile{% else %}desktop{% endif %}">
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
+  <div class="page">
+    <header class="site-header">
+        <a href="{% url 'empresa_painel' %}" class="header-link" aria-label="Voltar">
+            <span class="material-icons icon-voltar">arrow_back</span>
+        </a>
+        <h1>Anunciar Produto ou Serviço</h1>
+        <a href="{% url 'empresa_meus_anuncios' %}" class="header-link" aria-label="Meus Anúncios">📄</a>
+    </header>
+
+    <main class="container">
+      <section class="card" role="region" aria-label="Formulário de Anúncio">
+        <div class="card-header mb-28">
+          <h2>Detalhes do Anúncio</h2>
+        </div>
+
+        <form class="form" method="post" autocomplete="off" enctype="multipart/form-data">
+          {% csrf_token %}
+          <label class="field">
+            <span class="label-text">Título do Anúncio:</span>
+            <input class="input" type="text" name="titulo" placeholder="Ex: Pacote de 10 aulas de natação" required />
+          </label>
+
+          <label class="field">
+            <span class="label-text">Categoria:</span>
+            <select class="input" name="categoria" required>
+              <option value="" disabled selected hidden>Selecione a categoria</option>
+              <option value="Serviço">Serviço</option>
+              <option value="Produto">Produto</option>
+              <option value="Evento">Evento</option>
+            </select>
+          </label>
+          
+          <label class="field">
+            <span class="label-text">Descrição Completa:</span>
+            <textarea class="input" name="descricao" placeholder="Detalhes, benefícios e condições do seu anúncio." rows="4" style="min-height: 120px; resize: vertical;" required></textarea>
+          </label>
+
+          <label class="field">
+            <span class="label-text">Preço (R$):</span>
+            <input class="input" type="number" name="preco" placeholder="Ex: 299.90" step="0.01" required />
+          </label>
+
+          <label class="field">
+            <span class="label-text">Imagens/Banner do Anúncio:</span>
+            <div class="file-row">
+              <input class="file-input" type="file" id="upload-file-anuncio" name="banner" accept="image/*" multiple />
+              <button type="button" id="trigger-anuncio-upload" class="upload-btn">Upload de Imagens</button>
+              <img src="{% static 'img/default-avatar.svg' %}" alt="Pré-visualização do Anúncio" class="preview-banner" id="preview-img-anuncio" />
+            </div>
+          </label>
+
+          <div class="actions actions-col-gap mt-40">
+            <button class="btn btn-primary" type="submit">Publicar Anúncio →</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const fileInput = document.getElementById('upload-file-anuncio'); 
+      const trigger = document.getElementById('trigger-anuncio-upload');
+      const preview = document.getElementById('preview-img-anuncio'); 
+
+      if (trigger && fileInput) {
+        trigger.addEventListener('click', function(e){
+             e.preventDefault(); 
+             fileInput.click();
+        });
+      }
+
+      if (fileInput && preview) {
+        fileInput.addEventListener('change', () => {
+          const file = fileInput.files[0];
+          if (!file) {
+            preview.src = "{% static 'img/default-avatar.svg' %}"; 
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = function(e){ preview.src = e.target.result; };
+          reader.readAsDataURL(file);
+        });
+      }
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navMediaQuery = window.matchMedia('(max-width: 768px)');
+      const navMobile = document.getElementById('nav-mobile');
+      const navDesktop = document.getElementById('nav-desktop');
+
+      function applyNavMode(isMobile) {
+        if (!navMobile || !navDesktop) {
+          return;
+        }
+        navMobile.hidden = !isMobile;
+        navDesktop.hidden = isMobile;
+        document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+      }
+
+      function handleNavChange(event) {
+        applyNavMode(event.matches);
+      }
+
+      applyNavMode(navMediaQuery.matches);
+      if (typeof navMediaQuery.addEventListener === 'function') {
+        navMediaQuery.addEventListener('change', handleNavChange);
+      } else if (typeof navMediaQuery.addListener === 'function') {
+        navMediaQuery.addListener(handleNavChange);
+      }
+    });
+  </script>
+</body>
+</html>

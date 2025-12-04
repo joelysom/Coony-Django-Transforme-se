@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Buscar Profissionais</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <div class="page">
+    
+    <header class="site-header">
+        <a href="#" class="header-link" aria-label="Voltar">
+            <span class="material-icons icon-voltar">arrow_back</span>
+        </a>
+        <h1>Buscar Profissionais Esportivos</h1>
+        <a href="#" class="header-link" aria-label="Ajuda">?</a>
+    </header>
+
+    <main class="container">
+      
+      <div class="search-bar">
+        <input class="input" type="search" placeholder="Busque por nome, esporte ou especialidade..." />
+        <button class="btn-search" aria-label="Pesquisar">🔍</button>
+      </div>
+
+      <div class="filters">
+        <select class="input">
+          <option value="" disabled selected hidden>Esporte</option>
+          <option>Futebol</option>
+          <option>Natação</option>
+          <option>Fisioterapia</option>
+        </select>
+        
+        <select class="input">
+          <option value="" disabled selected hidden>Localização</option>
+          <option>São Paulo</option>
+          <option>Rio de Janeiro</option>
+          <option>Recife</option>
+        </select>
+
+        <select class="input">
+          <option value="" disabled selected hidden>Nível</option>
+          <option>Amador</option>
+          <option>Regional</option>
+          <option>Nacional</option>
+        </select>
+      </div>
+
+      <section class="results card results-section" role="list">
+        
+        <a href="vizualizao - profissional .html" class="professional-card" role="listitem">
+            <img src="https://via.placeholder.com/60/ED864B/FFFFFF?text=J" alt="Foto de João" class="prof-avatar-search" />
+            <div class="prof-details">
+                <p class="prof-name">João Silva</p>
+                <p class="prof-area">Preparador Físico (Futebol)</p>
+                <p class="prof-location">São Paulo - SP</p>
+            </div>
+            <span class="arrow-forward-orange">→</span>
+        </a>
+
+        <a href="vizualizao - profissional .html" class="professional-card" role="listitem">
+            <img src="https://via.placeholder.com/60/D3D3D3/000000?text=M" alt="Foto de Maria" class="prof-avatar-search" />
+            <div class="prof-details">
+                <p class="prof-name">Maria Faria</p>
+                <p class="prof-area">Fisioterapeuta Esportiva</p>
+                <p class="prof-location">Rio de Janeiro - RJ</p>
+            </div>
+            <span class="arrow-forward-orange">→</span>
+        </a>
+        
+        <a href="vizualizao - profissional .html" class="professional-card" role="listitem">
+            <img src="https://via.placeholder.com/60/797979/FFFFFF?text=A" alt="Foto de Alex" class="prof-avatar-search" />
+            <div class="prof-details">
+                <p class="prof-name">Alex Souza</p>
+                <p class="prof-area">Coach de Ciclismo (Nacional)</p>
+                <p class="prof-location">Recife - PE</p>
+            </div>
+            <span class="arrow-forward-orange">→</span>
+        </a>
+
+      </section>
+
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+      </footer>
+  </div>
+</body>
+</html>

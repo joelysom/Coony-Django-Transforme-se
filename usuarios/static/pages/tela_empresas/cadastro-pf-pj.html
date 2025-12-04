@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Pessoa Física ou Jurídica</title>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="page">
+        <header class="site-header">
+            <a href="#" class="header-link" aria-label="Voltar">
+                <span class="material-icons icon-voltar">arrow_back</span>
+            </a>
+            <h1>Cadastro de Empresas e Profissionais</h1>
+            <a href="#" class="header-link" aria-label="Ajuda">?</a>
+        </header>
+
+        <main class="container">
+            <section class="card">
+                <form class="form" action="#" method="post">
+
+                    <div class="field options">
+                        <span class="label-text">Tipo de Cadastro:</span>
+                        <select class="input" name="tipo-cadastro" id="tipo-cadastro">
+                            <option value="" disabled selected hidden>Selecione o tipo de cadastro</option>
+                            <option value="Profissional">Profissional</option>
+                            <option value="Empresa">Empresa</option>
+                            <option value="Mei">MEI</option>
+                        </select>
+                    </div>
+
+                    <label class="field">
+                        <span class="label-text">Informe seu CPF/CNPJ:</span>
+                        <input
+                            type="text"
+                            name="cpf-cnpj"
+                            class="input"
+                            placeholder="000.000.000-00 ou 00.000.000/0000-00"
+                        >
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Informe seu nome ou nome da sua empresa:</span>
+                        <input
+                            type="text"
+                            name="nome"
+                            class="input"
+                            placeholder="Nome Completo / Razão Social"
+                        >
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Email:</span>
+                        <input
+                            type="email"
+                            name="email"
+                            class="input"
+                            placeholder="seunome@email.com"
+                        >
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Informe seu telefone/celular:</span>
+                        <input
+                            type="tel"
+                            name="telefone"
+                            class="input"
+                            placeholder="(xx) xxxxx-xxxx"
+                        >
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Informe uma senha:</span>
+                        <input
+                            type="password"
+                            name="senha"
+                            class="input"
+                            placeholder="Mínimo 8 caracteres"
+                        >
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Informe novamente a senha:</span>
+                        <input
+                            type="password"
+                            name="confirma-senha"
+                            class="input"
+                            placeholder="Confirme a senha"
+                        >
+                    </label>
+
+                    <div class="field">
+                        <span class="label-text">Confirmações:</span>
+
+                        <div class="termos-list">
+                            <label class="termos-item">
+                                <input
+                                    type="checkbox"
+                                    name="termos-de-uso"
+                                    id="termos-de-uso"
+                                >
+                                <span class="box-check" id="box-uso"></span>
+                                Li e aceito os termos de uso
+                            </label>
+
+                            <label class="termos-item">
+                                <input
+                                    type="checkbox"
+                                    name="uso-de-dados"
+                                    id="uso-de-dados"
+                                >
+                                <span class="box-check" id="box-dados"></span>
+                                Li e autorizo uso de dados
+                            </label>
+                        </div>
+                    </div>
+
+                    
+                    <div class="actions">
+                        <button class="btn btn-primary" type="submit">
+                            Próximo →
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </main>
+
+        <footer class="site-footer" role="contentinfo">
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <h3>Coony</h3>
+                    <p>© 2025</p>
+                </div>
+                <div class="footer-actions">
+                    <div class="footer-links">
+                        <a href="#">Contato</a>
+                        <a href="#">Termos</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.form');
+        const select = document.getElementById('tipo-cadastro');
+
+        if (form && select) {
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const tipo = select.value;
+            let destino = '';
+
+            if (tipo === 'Profissional') {
+              destino = 'dados-proficionais.html';
+            } else if (tipo === 'Empresa' || tipo === 'Mei') {
+              destino = 'tela de empresas.html';
+            } else {
+              alert('Selecione o tipo de cadastro antes de continuar.');
+              return;
+            }
+
+            window.location.href = destino;
+          });
+        }
+      });
+    </script>
+
+</body>
+</html>

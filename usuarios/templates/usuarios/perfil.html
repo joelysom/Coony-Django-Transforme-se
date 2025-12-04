@@ -10,6 +10,35 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
   <link rel="stylesheet" href="{% static 'css/perfil.css' %}">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    .profile-pic {
+      position: relative;
+    }
+
+    .profile-crown {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      background: linear-gradient(135deg, #cfd2d8, #8f939a);
+      color: #fff;
+    }
+
+    .profile-crown.profile-crown--gold {
+      background: linear-gradient(135deg, #ffe483, #f4b400);
+      color: #6b4500;
+    }
+
+    .profile-crown .material-symbols-outlined {
+      font-size: 26px;
+    }
+  </style>
 </head>
 <body>
 
@@ -40,6 +69,13 @@
             data-fallback="{% static 'img/default-avatar.svg' %}"
             alt="Foto de {{ user.nome|default:'Usuário' }}"
           >
+          {% with level=user.gm_permission_level|default_if_none:0 %}
+            {% if level|add:0 >= 1 %}
+              <div class="profile-crown {% if level >= 2 %}profile-crown--gold{% endif %}" aria-label="Conta nível {{ level }}">
+                <span class="material-symbols-outlined">workspace_premium</span>
+              </div>
+            {% endif %}
+          {% endwith %}
           <button type="button" class="edit-icon" onclick="document.getElementById('fotoInput').click();" aria-label="Alterar foto">
             <i class="ri-pencil-fill"></i>
           </button>

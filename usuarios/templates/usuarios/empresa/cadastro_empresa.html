@@ -1,0 +1,389 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Empresa - Coony</title>
+    <link rel="stylesheet" href="{% static 'pages/tela_empresas/css/main.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+    <style>
+        .logo-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .logo-preview {
+            width: 88px;
+            height: 88px;
+            border-radius: 14px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #0c0f16;
+        }
+        .logo-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-outline {
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            background: transparent;
+            color: inherit;
+            padding: 10px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        .cropper-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(6, 8, 14, 0.88);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .cropper-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .cropper-dialog {
+            width: min(520px, 90vw);
+            background: #05070f;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 14px 60px rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .cropper-dialog-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .cropper-image-wrapper {
+            width: 100%;
+            max-height: 420px;
+            overflow: hidden;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .cropper-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .cropper-hint {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.65);
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="page-empresa-shell page-empresa-cadastro" data-render-mode="{% if request.user_agent.is_mobile %}mobile{% else %}desktop{% endif %}">
+    {% include 'usuarios/components/toast.html' %}
+    {% include 'usuarios/components/messages.html' %}
+
+    <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+        {% include 'usuarios/components/navbar_mobile.html' %}
+    </div>
+    <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+        {% include 'usuarios/components/sidebar.html' %}
+    </div>
+
+    <div class="page">
+        <header class="site-header">
+            <a href="{% url 'empresa_cadastro_tipo' %}" class="header-link" aria-label="Voltar">
+                <span class="material-icons icon-voltar">arrow_back</span>
+            </a>
+            <h1>Cadastre Seu Negócio</h1>
+            <a href="#" class="header-link" aria-label="Ajuda">?</a>
+        </header>
+
+        <main class="container">
+            <section class="card" role="region" aria-label="Formulário de Cadastro">
+                <div class="card-header mb-28">
+                    <h2>Informações Básicas</h2>
+                </div>
+
+                <form class="form" method="post" autocomplete="off" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="remove_logo" id="removeLogoInput" value="0">
+                    <label class="field">
+                        <span class="label-text">Nome da Empresa:</span>
+                        <input class="input" type="text" name="nome_empresa" value="{{ form_data.nome_empresa|default:'' }}" placeholder="Digite o nome da sua empresa" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">CNPJ:</span>
+                        <input class="input" type="text" name="cnpj" value="{{ form_data.cnpj|default:'' }}" placeholder="Digite o seu CNPJ" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Responsável:</span>
+                        <input class="input" type="text" name="responsavel" value="{{ form_data.responsavel|default:'' }}" placeholder="Digite o nome do responsável" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">E-mail:</span>
+                        <input class="input" type="email" name="email" value="{{ form_data.email|default:'' }}" placeholder="Digite o seu e-mail" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Telefone:</span>
+                        <input class="input" type="tel" name="telefone" value="{{ form_data.telefone|default:'' }}" placeholder="Digite o seu telefone" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Endereço:</span>
+                        <input class="input" type="text" name="endereco" value="{{ form_data.endereco|default:'' }}" placeholder="Digite o seu endereço" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Área de Atuação:</span>
+                        <input class="input" type="text" name="area_atuacao" value="{{ form_data.area_atuacao|default:'' }}" placeholder="Ex: Treinamentos esportivos, academia" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Público Alvo:</span>
+                        <input class="input" type="text" name="publico_alvo" value="{{ form_data.publico_alvo|default:'' }}" placeholder="Ex: Jovens, adultos, equipes">
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Rede Social / Website:</span>
+                        <input class="input" type="text" name="rede_social" value="{{ form_data.rede_social|default:'' }}" placeholder="@seudonoInstagram">
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Logo da Empresa:</span>
+                        <div class="logo-row">
+                                                        <img
+                                                            src="{% if logo_url %}{{ logo_url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}"
+                                                            data-fallback="{% if logo_url %}{{ logo_url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}"
+                              alt="Pré-visualização do Logo"
+                              class="logo-preview"
+                              id="logoPreview">
+                            <div class="logo-actions">
+                                <input class="file-input" type="file" id="logoInput" name="logo" accept="image/*" hidden>
+                                <button type="button" id="btn-upload-trigger" class="upload-btn">Selecionar Arquivo</button>
+                                <button type="button" id="btn-remove-logo" class="btn-outline">Remover logo</button>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Senha:</span>
+                        <input class="input" type="password" name="senha" placeholder="Digite sua senha" required>
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Confirme Sua Senha:</span>
+                        <input class="input" type="password" name="confirma_senha" placeholder="Confirme sua senha" required>
+                    </label>
+
+                    <div class="actions">
+                        <button class="btn btn-primary" type="submit">Cadastrar →</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+
+    </div>
+
+    <div id="logoCropModal" class="cropper-modal" aria-hidden="true">
+        <div class="cropper-dialog" role="dialog" aria-modal="true">
+            <header class="cropper-dialog-header">
+                <h2>Ajuste o logo</h2>
+                <button type="button" class="btn-outline" id="logoCropClose">Fechar</button>
+            </header>
+            <div class="cropper-image-wrapper">
+                <img id="logoCropperImage" alt="Pré-visualização do logo">
+            </div>
+            <div class="cropper-actions">
+                <button type="button" class="btn-outline" id="logoCropCancel">Cancelar</button>
+                <button type="button" class="upload-btn" id="logoCropApply">Aplicar corte</button>
+            </div>
+            <p class="cropper-hint">Arraste para posicionar. Use o scroll para aplicar zoom.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const fileInput = document.getElementById('logoInput');
+            const trigger = document.getElementById('btn-upload-trigger');
+            const preview = document.getElementById('logoPreview');
+            const removeButton = document.getElementById('btn-remove-logo');
+            const removeInput = document.getElementById('removeLogoInput');
+            const fallback = preview ? preview.dataset.fallback : '';
+
+            const cropModal = document.getElementById('logoCropModal');
+            const cropperImage = document.getElementById('logoCropperImage');
+            const cropApplyBtn = document.getElementById('logoCropApply');
+            const cropCancelBtn = document.getElementById('logoCropCancel');
+            const cropCloseBtn = document.getElementById('logoCropClose');
+            let cropperInstance = null;
+            let objectUrl = null;
+
+            const destroyCropper = () => {
+                if (cropperInstance) {
+                    cropperInstance.destroy();
+                    cropperInstance = null;
+                }
+                if (objectUrl) {
+                    URL.revokeObjectURL(objectUrl);
+                    objectUrl = null;
+                }
+            };
+
+            const closeCropModal = (resetInput = false) => {
+                if (cropModal) {
+                    cropModal.classList.remove('show');
+                    cropModal.setAttribute('aria-hidden', 'true');
+                }
+                document.body.style.overflow = '';
+                destroyCropper();
+                if (resetInput && fileInput) {
+                    fileInput.value = '';
+                }
+            };
+
+            const openCropModal = (file) => {
+                if (!cropModal || !cropperImage) {
+                    return;
+                }
+                destroyCropper();
+                objectUrl = URL.createObjectURL(file);
+                cropperImage.src = objectUrl;
+                cropperImage.onload = () => {
+                    cropperInstance = new Cropper(cropperImage, {
+                        aspectRatio: 1,
+                        viewMode: 2,
+                        dragMode: 'move',
+                        responsive: true,
+                        autoCropArea: 1,
+                        background: false,
+                    });
+                };
+                cropModal.classList.add('show');
+                cropModal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            };
+
+            if (trigger && fileInput) {
+                trigger.addEventListener('click', function(e){
+                    e.preventDefault();
+                    fileInput.click();
+                });
+            }
+
+            if (fileInput) {
+                fileInput.addEventListener('change', (event) => {
+                    const file = event.target.files && event.target.files[0];
+                    if (!file) {
+                        return;
+                    }
+                    removeInput.value = '0';
+                    openCropModal(file);
+                });
+            }
+
+            if (removeButton) {
+                removeButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    removeInput.value = '1';
+                    if (fileInput) {
+                        fileInput.value = '';
+                    }
+                    if (preview && fallback) {
+                        preview.src = fallback;
+                    }
+                    closeCropModal();
+                });
+            }
+
+            const applyCrop = () => {
+                if (!cropperInstance || !fileInput || !preview) {
+                    return;
+                }
+                const canvas = cropperInstance.getCroppedCanvas({
+                    width: 600,
+                    height: 600,
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
+                });
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        closeCropModal();
+                        return;
+                    }
+                    const originalName = (fileInput.files && fileInput.files[0] && fileInput.files[0].name) || 'logo.png';
+                    const croppedFile = new File([blob], originalName, { type: blob.type });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(croppedFile);
+                    fileInput.files = dataTransfer.files;
+
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        preview.src = evt.target.result;
+                    };
+                    reader.readAsDataURL(croppedFile);
+                    removeInput.value = '0';
+                    closeCropModal();
+                }, 'image/png');
+            };
+
+            cropApplyBtn?.addEventListener('click', applyCrop);
+            cropCancelBtn?.addEventListener('click', () => closeCropModal(true));
+            cropCloseBtn?.addEventListener('click', () => closeCropModal(true));
+            cropModal?.addEventListener('click', (event) => {
+                if (event.target === cropModal) {
+                    closeCropModal(true);
+                }
+            });
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && cropModal?.classList.contains('show')) {
+                    closeCropModal(true);
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navMediaQuery = window.matchMedia('(max-width: 768px)');
+            const navMobile = document.getElementById('nav-mobile');
+            const navDesktop = document.getElementById('nav-desktop');
+
+            function applyNavMode(isMobile) {
+                if (!navMobile || !navDesktop) {
+                    return;
+                }
+                navMobile.hidden = !isMobile;
+                navDesktop.hidden = isMobile;
+                document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+            }
+
+            function handleNavChange(event) {
+                applyNavMode(event.matches);
+            }
+
+            applyNavMode(navMediaQuery.matches);
+            if (typeof navMediaQuery.addEventListener === 'function') {
+                navMediaQuery.addEventListener('change', handleNavChange);
+            } else if (typeof navMediaQuery.addListener === 'function') {
+                navMediaQuery.addListener(handleNavChange);
+            }
+        });
+    </script>
+</body>
+</html>

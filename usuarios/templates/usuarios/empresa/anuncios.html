@@ -1,0 +1,102 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Meus Anúncios - Coony</title>
+  <link rel="stylesheet" href="{% static 'pages/tela_empresas/css/main.css' %}" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="page-empresa-shell" data-render-mode="{% if request.user_agent.is_mobile %}mobile{% else %}desktop{% endif %}">
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
+  <div class="page">
+    <header class="site-header">
+        <a href="{% url 'empresa_painel' %}" class="header-link" aria-label="Voltar">
+            <span class="material-icons icon-voltar">arrow_back</span>
+        </a>
+        <h1>Meus Anúncios</h1>
+        <a href="{% url 'empresa_anunciar' %}" class="header-link" aria-label="Novo Anúncio">+</a>
+    </header>
+
+    <main class="container">
+      <section class="card-visualizacao" aria-label="Anúncios já publicados">
+        {% if not has_personal_ads %}
+        <p class="text-caption">
+          Estes são exemplos iniciais. Publique seu primeiro anúncio para personalizar esta lista.
+        </p>
+        {% else %}
+        <p class="text-caption">
+          Aqui você visualiza os anúncios publicados pela sua empresa e pode editar quando necessário.
+        </p>
+        {% endif %}
+
+        <ul class="data-list">
+          {% for anuncio in anuncios %}
+          <li class="data-item">
+            <span class="data-label">Título do Anúncio:</span>
+            <span class="data-value">{{ anuncio.titulo }}</span>
+            <p class="text-caption" style="margin:6px 0 12px;">{{ anuncio.descricao }}</p>
+            {% if anuncio.preco_display %}
+            <p class="text-caption" style="margin:0 0 12px;font-weight:600;">{{ anuncio.preco_display }}</p>
+            {% endif %}
+            {% if anuncio.banner %}
+            <img src="{% if anuncio.banner.url %}{{ anuncio.banner.url }}{% else %}{{ anuncio.banner }}{% endif %}" alt="Imagem do anúncio" style="width:100%;max-width:240px;border-radius:16px;margin-bottom:12px;">
+            {% endif %}
+            <div class="actions actions-wrap-small">
+              <a href="#" class="btn-secondary">Ver anúncio</a>
+              <a href="#" class="btn-primary">Editar anúncio</a>
+            </div>
+          </li>
+          {% empty %}
+          <li class="data-item">
+            <span class="data-value">Nenhum anúncio cadastrado. Clique em "Cadastrar novo anúncio".</span>
+          </li>
+          {% endfor %}
+        </ul>
+
+        <div class="actions mt-24">
+          <a href="{% url 'empresa_anunciar' %}" class="btn-primary">Cadastrar novo anúncio</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navMediaQuery = window.matchMedia('(max-width: 768px)');
+      const navMobile = document.getElementById('nav-mobile');
+      const navDesktop = document.getElementById('nav-desktop');
+
+      function applyNavMode(isMobile) {
+        if (!navMobile || !navDesktop) {
+          return;
+        }
+        navMobile.hidden = !isMobile;
+        navDesktop.hidden = isMobile;
+        document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+      }
+
+      function handleNavChange(event) {
+        applyNavMode(event.matches);
+      }
+
+      applyNavMode(navMediaQuery.matches);
+      if (typeof navMediaQuery.addEventListener === 'function') {
+        navMediaQuery.addEventListener('change', handleNavChange);
+      } else if (typeof navMediaQuery.addListener === 'function') {
+        navMediaQuery.addListener(handleNavChange);
+      }
+    });
+  </script>
+</body>
+</html>

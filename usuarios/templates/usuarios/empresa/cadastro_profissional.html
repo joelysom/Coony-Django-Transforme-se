@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cadastro Profissional - Coony</title>
+  <link rel="stylesheet" href="{% static 'pages/tela_empresas/css/main.css' %}" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="page-empresa-shell" data-render-mode="{% if request.user_agent.is_mobile %}mobile{% else %}desktop{% endif %}">
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
+  <div class="page">
+    <header class="site-header">
+      <a href="{% url 'empresa_cadastro_tipo' %}" class="header-link" aria-label="Voltar">
+        <span class="material-icons icon-voltar">arrow_back</span>
+      </a>
+      <h1>Dados para Profissionais</h1>
+      <a href="#" class="header-link" aria-label="Ajuda">?</a>
+    </header>
+
+    <main class="container">
+      <section class="card" role="region" aria-label="Dados Específicos para Profissionais">
+        <div class="card-header">
+          <h2>Dados Específicos para Profissionais</h2>
+        </div>
+
+        <form class="form" method="post" autocomplete="off" enctype="multipart/form-data">
+          {% csrf_token %}
+          <label class="field input-box">
+            <span class="label-text">Informe esportes principais (opcional):</span>
+            <input class="input" type="text" name="esportes" value="{{ form_data.esportes|default:'' }}" placeholder="Ex: Futebol, Vôlei" />
+          </label>
+
+          <label class="field input-box">
+            <span class="label-text">Informe a área de atuação:</span>
+            <input class="input" type="text" name="area_atuacao" value="{{ form_data.area_atuacao|default:'' }}" placeholder="Ex: Treinamento físico" required />
+          </label>
+
+          <label class="field input-box">
+            <span class="label-text">Informe sua posição/Especialidade:</span>
+            <input class="input" type="text" name="posicao" value="{{ form_data.posicao|default:'' }}" placeholder="Ex: Preparador físico" required />
+          </label>
+
+          <label class="field input-box">
+            <span class="label-text">Informe rede social (opcional):</span>
+            <input class="input" type="text" name="rede_social" value="{{ form_data.rede_social|default:'' }}" placeholder="@seudonoInstagram" />
+          </label>
+
+          <label class="field input-box">
+            <span class="label-text">Informe seu nível de atuação:</span>
+            <select class="input" name="nivel">
+              <option value="" disabled {% if not form_data.nivel %}selected{% endif %} hidden>Selecione</option>
+              <option value="amador" {% if form_data.nivel == 'amador' %}selected{% endif %}>Amador</option>
+              <option value="regional" {% if form_data.nivel == 'regional' %}selected{% endif %}>Profissional (Regional)</option>
+              <option value="nacional" {% if form_data.nivel == 'nacional' %}selected{% endif %}>Profissional (Nacional)</option>
+            </select>
+          </label>
+
+          <label class="field input-box">
+            <span class="label-text">Informe seu Registro profissional (Ex: CREF/Confederação):</span>
+            <input class="input" type="text" name="registro" value="{{ form_data.registro|default:'' }}" placeholder="Número do registro" />
+          </label>
+
+          <label class="field">
+            <span class="label-text">Foto de perfil:</span>
+            <div class="file-row">
+              <input class="file-input" type="file" id="avatar" name="avatar" accept="image/*">
+              <button type="button" id="btn-upload" class="upload-btn">Upload de Arquivos</button>
+              <img src="{% if avatar_url %}{{ avatar_url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="Pré-visualização" class="preview-avatar" id="preview-avatar" data-fallback="{% if avatar_url %}{{ avatar_url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" />
+            </div>
+          </label>
+
+          <div class="actions">
+            <button class="btn btn-primary" type="submit">Finalizar →</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      const fileInput = document.getElementById('avatar');
+      const trigger = document.getElementById('btn-upload');
+      const preview = document.getElementById('preview-avatar');
+
+      if (trigger && fileInput) {
+        trigger.addEventListener('click', function(e){
+          e.preventDefault();
+          fileInput.click();
+        });
+      }
+
+      if (fileInput && preview) {
+        fileInput.addEventListener('change', () => {
+          const file = fileInput.files[0];
+          if (!file) {
+            preview.src = preview.dataset.fallback || "{% static 'img/default-avatar.svg' %}";
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = function(e){ preview.src = e.target.result; };
+          reader.readAsDataURL(file);
+        });
+      }
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const navMediaQuery = window.matchMedia('(max-width: 768px)');
+      const navMobile = document.getElementById('nav-mobile');
+      const navDesktop = document.getElementById('nav-desktop');
+
+      function applyNavMode(isMobile) {
+        if (!navMobile || !navDesktop) {
+          return;
+        }
+        navMobile.hidden = !isMobile;
+        navDesktop.hidden = isMobile;
+        document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+      }
+
+      function handleNavChange(event) {
+        applyNavMode(event.matches);
+      }
+
+      applyNavMode(navMediaQuery.matches);
+      if (typeof navMediaQuery.addEventListener === 'function') {
+        navMediaQuery.addEventListener('change', handleNavChange);
+      } else if (typeof navMediaQuery.addListener === 'function') {
+        navMediaQuery.addListener(handleNavChange);
+      }
+    });
+  </script>
+</body>
+</html>

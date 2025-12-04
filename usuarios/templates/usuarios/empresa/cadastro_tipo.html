@@ -1,0 +1,126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Empresas e Profissionais</title>
+    <link rel="stylesheet" href="{% static 'pages/tela_empresas/css/main.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body class="page-empresa-shell" data-render-mode="{% if request.user_agent.is_mobile %}mobile{% else %}desktop{% endif %}">
+    {% include 'usuarios/components/toast.html' %}
+    {% include 'usuarios/components/messages.html' %}
+
+    <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação mobile">
+        {% include 'usuarios/components/navbar_mobile.html' %}
+    </div>
+    <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegação desktop">
+        {% include 'usuarios/components/sidebar.html' %}
+    </div>
+
+    <div class="page">
+        <header class="site-header">
+            <a href="{% url 'dashboard' %}" class="header-link" aria-label="Voltar">
+                <span class="material-icons icon-voltar">arrow_back</span>
+            </a>
+            <h1>Cadastro de Empresas e Profissionais</h1>
+            <a href="#" class="header-link" aria-label="Ajuda">?</a>
+        </header>
+
+        <main class="container">
+            <section class="card" role="region" aria-label="Formulário de Cadastro">
+                <form class="form" method="post" action="{% url 'empresa_cadastro_tipo' %}">
+                    {% csrf_token %}
+                    <div class="field options">
+                        <span class="label-text">Tipo de Cadastro:</span>
+                        <select class="input" name="tipo-cadastro" id="tipo-cadastro" required>
+                            <option value="" disabled selected hidden>Selecione o tipo de cadastro</option>
+                            <option value="Profissional" {% if profile and profile.tipo == 'profissional' %}selected{% endif %}>Profissional</option>
+                            <option value="Empresa" {% if profile and profile.tipo == 'empresa' %}selected{% endif %}>Empresa</option>
+                            <option value="Mei">MEI</option>
+                        </select>
+                    </div>
+
+                    <label class="field">
+                        <span class="label-text">Informe seu CPF/CNPJ:</span>
+                        <input type="text" name="cpf-cnpj" class="input" placeholder="000.000.000-00 ou 00.000.000/0000-00">
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Informe seu nome ou nome da sua empresa:</span>
+                        <input type="text" name="nome" class="input" placeholder="Nome Completo / Razão Social">
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Email:</span>
+                        <input type="email" name="email" class="input" placeholder="seunome@email.com">
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Informe seu telefone/celular:</span>
+                        <input type="tel" name="telefone" class="input" placeholder="(xx) xxxxx-xxxx">
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Informe uma senha:</span>
+                        <input type="password" name="senha" class="input" placeholder="Mínimo 8 caracteres">
+                    </label>
+
+                    <label class="field">
+                        <span class="label-text">Informe novamente a senha:</span>
+                        <input type="password" name="confirma-senha" class="input" placeholder="Confirme a senha">
+                    </label>
+
+                    <div class="field">
+                        <span class="label-text">Confirmações:</span>
+                        <div class="termos-list">
+                            <label class="termos-item">
+                                <input type="checkbox" name="termos-de-uso" id="termos-de-uso">
+                                <span class="box-check" id="box-uso"></span>
+                                Li e aceito os termos de uso
+                            </label>
+                            <label class="termos-item">
+                                <input type="checkbox" name="uso-de-dados" id="uso-de-dados">
+                                <span class="box-check" id="box-dados"></span>
+                                Li e autorizo uso de dados
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn btn-primary" type="submit">Próximo →</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navMediaQuery = window.matchMedia('(max-width: 768px)');
+            const navMobile = document.getElementById('nav-mobile');
+            const navDesktop = document.getElementById('nav-desktop');
+
+            function applyNavMode(isMobile) {
+                if (!navMobile || !navDesktop) {
+                    return;
+                }
+                navMobile.hidden = !isMobile;
+                navDesktop.hidden = isMobile;
+                document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+            }
+
+            function handleNavChange(event) {
+                applyNavMode(event.matches);
+            }
+
+            applyNavMode(navMediaQuery.matches);
+            if (typeof navMediaQuery.addEventListener === 'function') {
+                navMediaQuery.addEventListener('change', handleNavChange);
+            } else if (typeof navMediaQuery.addListener === 'function') {
+                navMediaQuery.addListener(handleNavChange);
+            }
+        });
+    </script>
+</body>
+</html>

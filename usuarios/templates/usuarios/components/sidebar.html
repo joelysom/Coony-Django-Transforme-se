@@ -182,6 +182,14 @@
     <button type="button" class="sidebar-menu-item" data-route="{% url 'notifications' %}" data-match="{% url 'notifications' %}"><span class="material-symbols-outlined">notifications</span> Notificações</button>
     <button type="button" class="sidebar-menu-item"><span class="material-symbols-outlined">favorite</span> Favoritos</button>
     <button type="button" class="sidebar-menu-item" data-route="{% url 'my_events' %}" data-match="{% url 'my_events' %}"><span class="material-symbols-outlined">calendar_month</span> Meus Eventos</button>
+    {% if user and user.gm_permission_level|default_if_none:0 >= 2 %}
+        <button type="button"
+          class="sidebar-menu-item"
+          data-route="{% url 'empresa_cadastro_tipo' %}"
+          data-match="{% url 'empresa_painel' %}, {% url 'empresa_meus_anuncios' %}, {% url 'empresa_anunciar' %}, {% url 'empresa_cadastro_tipo' %}, {% url 'empresa_cadastro_empresa' %}, {% url 'empresa_cadastro_profissional' %}, {% url 'empresa_buscar_profissionais' %}, /empresas/profissionais/">
+      <span class="material-symbols-outlined">business_center</span> Cadastrar Empresa
+    </button>
+    {% endif %}
     <button type="button" class="sidebar-menu-item" data-route="{% url 'perfil' %}" data-match="{% url 'perfil' %}"><span class="material-symbols-outlined">account_circle</span> Perfil</button>
     <button type="button" class="sidebar-menu-item"><span class="material-symbols-outlined">help</span> Central de Ajuda</button>
     <div class="sidebar-divider"></div>
