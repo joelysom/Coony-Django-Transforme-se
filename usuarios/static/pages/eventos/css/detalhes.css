@@ -2,11 +2,11 @@
 
 :root {
     /* Cores ajustadas (Base Global) */
-    --color-primary-orange: #EC8441;
+    --color-primary-orange: #00B546; /* migrated to green */
     --color-text-dark: #333333; 
     --color-input-bg: #FFFFFF; 
     --color-input-border: #E6E6E6; 
-    --color-background-screen: #F3F0EB; 
+    --color-background-screen: #FFFFFF; 
     --color-frame-dark: #363131; 
     
     /* Dimensões */
@@ -118,7 +118,7 @@ body {
 }
 
 .favorite-toggle.favorited {
-    background-color: #d9593d;
+    background-color: #00B546;
 }
 
 .favorite-toggle.favorited .material-symbols-outlined {
@@ -198,7 +198,7 @@ body {
 }
 
 .badge-corrida {
-    background-color: #EC8441;
+    background-color: #00B546;
 }
 
 .badge-ciclismo {
@@ -218,7 +218,7 @@ body {
 }
 
 .badge-caminhada {
-    background-color: #FFA500;
+    background-color: #00B546;
 }
 
 .event-highlights {
@@ -234,7 +234,7 @@ body {
     padding: 12px 14px;
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    background-color: #fffdfb;
+    background-color: #ffffff;
 }
 
 .highlight-item strong {
@@ -443,7 +443,7 @@ body {
 }
 
 .primary-btn:hover {
-    background-color: #d67538;
+    background-color: #008e35;
 }
 
 .primary-btn:active {
@@ -458,7 +458,7 @@ body {
 }
 
 .secondary-btn:hover {
-    background-color: #fff5f0;
+    background-color: #f7f7f7;
 }
 
 .secondary-btn:active {

@@ -1,8 +1,8 @@
 :root {
-  --fundo-principal: #F3F0EB; /* branco neve */
-  --laranja: #EC8441; /* laranja mecânica */
-  --laranja-hover: #DE7633;
-  --laranja-press: #C96527;
+  --fundo-principal: #ffffff; /* clean white */
+  --laranja: #00B546; /* brand green */
+  --laranja-hover: #00a23d;
+  --laranja-press: #008e35;
   --texto-principal: #000000;
   --texto-secundario: #898989;
   --borda: #E6E6E6;

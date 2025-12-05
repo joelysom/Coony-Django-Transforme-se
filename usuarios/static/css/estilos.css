@@ -1,9 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 :root{
-    --white: #fff;
-    --black: #ED864B; 
-    --lightBulue: #eb9766;
+    --white: #ffffff;
+    --white-soft: #fafafa;
+    --white-muted: #f4f4f4;
+    --black: #00B546; 
+    --lightBulue: #2ED17A;
 }
 
 *{
@@ -18,7 +20,7 @@ body{
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: #f2f4f7;
+    background: var(--white-soft);
     /* reserve space for a fixed footer on wide screens */
     padding-bottom: 0; /* will be set in a media query for wide screens */
 }
@@ -350,7 +352,7 @@ form .linkTxt{
     right: 0;
     width: 850px;
     height: 600px;
-    background: #ED864B;
+    background: #00B546;
     transform: rotate(10deg) skewY(40deg);
     transform-origin: bottom right;
     transition: 1.5s ease;

@@ -93,7 +93,7 @@ body.page-chat {
 .botao-ativo,
 .botao:hover,
 .botao:focus-visible {
-    color: #ed864b;
+    color: #00B546;
     outline: none;
 }
 
@@ -114,8 +114,8 @@ body.page-chat {
 
 .search-input:focus {
     outline: none;
-    border-color: #ed864b;
-    box-shadow: 0 0 0 3px rgba(237, 134, 75, 0.2);
+    border-color: #00B546;
+    box-shadow: 0 0 0 3px rgba(0, 181, 70, 0.2);
 }
 
 .search-results {
@@ -144,7 +144,7 @@ body.page-chat {
 
 .search-result-item:hover,
 .search-result-item:focus-visible {
-    background: #fff7ef;
+    background: #f0fdf4;
 }
 
 .search-result-item strong {
@@ -181,7 +181,7 @@ body.page-chat {
 
 .contact-card:hover,
 .contact-card.active {
-    border-color: #ed864b;
+    border-color: #00B546;
     transform: translateY(-1px);
 }
 
@@ -197,7 +197,7 @@ body.page-chat {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ed864b, #f3c18b);
+    background: linear-gradient(135deg, #00B546, #2ED17A);
     color: #fff;
     font-weight: 700;
     font-size: 18px;
@@ -249,7 +249,7 @@ body.page-chat {
 
 .menu-item:hover,
 .menu-item.active {
-    background-color: #f1883d;
+    background-color: #00B546;
     color: #fff;
 }
 
@@ -318,7 +318,7 @@ body.page-chat {
 
 .header-icons .icon span {
     font-size: 28px;
-    color: #ed864b;
+    color: #00B546;
 }
 
 
@@ -454,7 +454,7 @@ body.page-chat {
 
 .message-action-btn:hover,
 .message-action-btn:focus-visible {
-    color: #ed864b;
+    color: #00B546;
     outline: none;
 }
 
@@ -513,7 +513,7 @@ body.page-chat {
 }
 
 .message.sent .bubble {
-    background-color: #ED864B;
+    background-color: #00B546;
     color: white;
     border-bottom-right-radius: 0;
     min-width: 100px;
@@ -595,9 +595,9 @@ body.page-chat {
     color: #999999 !important;
     border: 1px solid rgba(163, 163, 163, 0.685)!important;
 }
-.botaoEnviarAtivo{background: #ed864b!important;}
+.botaoEnviarAtivo{background: #00B546!important;}
 .chat-footer button {
-    background-color: #ed864b;
+    background-color: #00B546;
     border: none;
     color: #fff;
     border-radius: 48%;
@@ -642,7 +642,7 @@ body.page-chat {
 
 .record-timer {
     font-size: 14px;
-    color: #ed864b;
+    color: #00B546;
     font-weight: 600;
     font-family: "Roboto", sans-serif;
     min-width: 60px;

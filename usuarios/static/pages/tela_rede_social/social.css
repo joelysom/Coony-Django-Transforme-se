@@ -1,8 +1,8 @@
 /* Reset e variáveis */
 :root {
-  --white: #fff;
-  --black: #ED864B;
-  --lightBlue: #eb9766;
+  --white: #ffffff;
+  --black: #00B546;
+  --lightBlue: #009a3f;
   --primary-color: var(--black);
   --secondary-color: #f8f9fa;
   --text-color: #333;
@@ -25,8 +25,6 @@ body {
   color: var(--text-color);
   line-height: 1.6;
 }
-
-/* Layout principal */
 .main-feed {
   margin-right: var(--sidebar-right-width);
   padding: 24px;
@@ -781,7 +779,7 @@ body.media-locked {
 }
 
 .comment-form .comment-send:hover:not(:disabled) {
-  background-color: #c96a2a;
+  background-color: #155724;
 }
 
 /* Small responsive tweaks to keep footer tidy */
@@ -883,7 +881,7 @@ body.media-locked {
 }
 
 .follow-button:hover {
-  background-color: #c96a2a;
+  background-color: #145834;
 }
 
 .see-more {
@@ -1090,7 +1088,7 @@ body.media-locked {
 }
 
 .modal-btn.confirm:hover:not(:disabled) {
-  background-color: #c96a2a;
+  background-color: #145834;
 }
 
 .modal-btn:disabled {

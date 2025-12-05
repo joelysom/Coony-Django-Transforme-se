@@ -1,13 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --white: #fff;
-  --black: #ED864B;
-  --lightBulue: #eb9766;
+  --white: #ffffff;
+  --white-soft: #fafafa;
+  --white-muted: #f4f4f4;
+  --black: #00B546; /* primary brand green */
+  --lightBulue: #2ED17A; /* lighter green accent */
 
-  --text-dark: #333;
-  --text-light: #666;
-  --bg-light: #f2f4f7;
+  --text-dark: #1f2937; /* modern dark gray */
+  --text-light: #667085; /* modern light gray */
+  --bg-light: #f5f7fa; /* subtle white tone */
   --border-light: #e6e9ef;
 }
 
@@ -47,7 +49,7 @@
   height: 48px;
   padding: 10px 14px;
   border-radius: 10px;
-  border: 2px solid rgba(211, 201, 198, 0.95);
+  border: 2px solid var(--border-light);
   background: var(--white);
   font-size: 15px;
   color: var(--text-dark);
@@ -59,12 +61,12 @@
   transform: translateY(-1px);
   border-color: var(--lightBulue);
   box-shadow:
-    0 12px 24px rgba(0,0,0,0.14),
-    0 2px 0 rgba(237,108,75,0.18) inset;
+    0 12px 24px rgba(0,0,0,0.12),
+    0 2px 0 rgba(0,181,70,0.18) inset;
 }
 
 .input::placeholder {
-  color: #bfa99a;
+  color: #98a2b3;
 }
 
 .input.input-error { border-color: #ff4d4d; }

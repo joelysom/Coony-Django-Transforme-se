@@ -1,10 +1,10 @@
 :root {
-  --bg: #f2f4f7;
-  --white: #fff;
-  --primary: #258d19;
-  --text: #1d1d1d;
-  --gray: #666;
-  --border: #ddd;
+  --bg: #f5f7fa;
+  --white: #ffffff;
+  --primary: #00B546;
+  --text: #1f2937;
+  --gray: #667085;
+  --border: #e6e9ef;
 }
 
 /* Reset */
@@ -221,7 +221,7 @@ body {
 }
 .promo-card {
   text-align: center;
-  background: #eef3f8;
+  background: #f0fdf4;
   border: 1px dashed var(--primary);
 }
 .promo-card strong {

@@ -163,7 +163,7 @@ footer {
 
 .footer-links a:hover {
   text-decoration: underline;
-  color: #ED864B;
+  color: #00B546;
 }
 
 
@@ -186,13 +186,13 @@ footer {
 }
 
 .input-field:focus {
-  border-color: #ED864B;
+  border-color: #00B546;
 }
 
 .login-btn {
   width: 100%;
   height: 48px;
-  background-color: #ED864B;
+  background-color: #00B546;
   color: #fff;
   border: none;
   border-radius: 25px;
@@ -220,7 +220,7 @@ footer {
 
 .forgot-password:hover {
   text-decoration: underline;
-  color: #ED864B;
+  color: #00B546;
 }
 
 .divider {
@@ -232,10 +232,10 @@ footer {
 .create-account-btn {
   width: 100%;
   height: 46px;
-  border: 1px solid #ED864B;
+  border: 1px solid #00B546;
   border-radius: 25px;
   background: #fff;
-  color: #ED864B;
+  color: #00B546;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -276,6 +276,6 @@ footer {
 
 .footer-links a:hover {
   text-decoration: underline;
-  color: #ED864B;
+  color: #00B546;
 }
 

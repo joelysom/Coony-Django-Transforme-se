@@ -2,11 +2,11 @@
 
 :root {
     /* Cores ajustadas (Base Global) */
-    --color-primary-orange: #EC8441;
+    --color-primary-orange: #00B546;
     --color-text-dark: #333333; 
     --color-input-bg: #FFFFFF; 
     --color-input-border: #E6E6E6; 
-    --color-background-screen: #F3F0EB; 
+    --color-background-screen: #FFFFFF; 
     --color-frame-dark: #363131; 
     
     /* Dimensões (Base Global) */
@@ -89,7 +89,7 @@ body {
 }
 
 .primary-btn:hover, .button:hover {
-    background-color: #d67538;
+    background-color: #008e35;
 }
 
 .primary-btn:active, .button:active {
@@ -104,7 +104,7 @@ body {
 }
 
 .secondary-btn:hover {
-    background-color: #fff5f0;
+    background-color: #f7f7f7;
 }
 
 .secondary-btn:active {
@@ -143,7 +143,7 @@ body {
 
 .input:focus {
     border-color: var(--color-primary-orange);
-    box-shadow: 0 3px 12px rgba(236, 132, 65, 0.2);
+    box-shadow: 0 3px 12px rgba(0, 181, 70, 0.2);
 }
 
 

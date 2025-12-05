@@ -32,7 +32,7 @@ body {
 .header-icons span {
   margin-left: 0;
   font-size: 26px;
-  color: #a06132;
+  color: #176b3e;
 }
 
 .icon-link {
@@ -43,7 +43,7 @@ body {
   height: 40px;
   border-radius: 50%;
   background: #fff;
-  color: #a06132;
+  color: #176b3e;
   text-decoration: none;
   transition: all 0.2s ease;
   border: 1px solid #ddd;
@@ -51,9 +51,9 @@ body {
 }
 
 .icon-link:hover {
-  background: #f68b4a;
+  background: #00B546;
   color: #fff;
-  border-color: #f68b4a;
+  border-color: #00B546;
 }
 
 .icon-link span {
@@ -116,7 +116,7 @@ body {
 }
 
 .categories .active {
-  background-color: #f68b4a;
+  background-color: #00B546;
   color: white;
 }
 
@@ -144,7 +144,7 @@ body {
   position: absolute;
   top: 10px;
   right: 10px;
-  color: #f68b4a;
+  color: #2ED17A;
   background: #fff;
   border-radius: 50%;
   padding: 6px;
@@ -157,7 +157,7 @@ body {
 }
 
 .favorite.favorited {
-  background-color: #f68b4a;
+  background-color: #00B546;
   color: #ffffff;
   box-shadow: 0 4px 8px rgba(246,139,74,0.18);
   transform: translateY(-1px);
@@ -186,7 +186,7 @@ body {
 
 .event-info .material-symbols-outlined {
   font-size: 20px;
-  color: #f68b4a;
+  color: #00B546;
   display: flex;
   align-items: center;
 }
@@ -214,7 +214,7 @@ body {
 
 .event-info.table-rows .row .icon .material-symbols-outlined {
   font-size: 20px;
-  color: #f68b4a;
+  color: #2ED17A;
   display: inline-flex;
   align-items: center;
 }
@@ -230,7 +230,7 @@ body {
   display: block;
   width: calc(100% - 30px);
   margin: 0 auto;
-  background-color: #f68b4a;
+  background-color: #2ED17A;
   color: white;
   border: none;
   border-radius: 12px;
@@ -241,7 +241,7 @@ body {
 }
 
 .btn:hover {
-  background-color: #e97b3d;
+  background-color: #00a23d;
 }
 
 /* NAVBAR */

@@ -2,11 +2,11 @@
 
 :root {
     /* Cores ajustadas para a imagem de referência */
-    --color-primary-orange: #EC8441;
+    --color-primary-orange: #00B546; /* migrated to green */
     --color-text-dark: #333333; 
     --color-input-bg: #FFFFFF; 
     --color-input-border: #E6E6E6; 
-    --color-background-screen: #F3F0EB; 
+    --color-background-screen: #FFFFFF; 
     --color-frame-dark: #363131; 
     
     /* Dimensões */
@@ -86,7 +86,7 @@ input[type="datetime-local"]:focus,
 select:focus,                         
 textarea:focus {
     border-color: var(--color-primary-orange);
-    box-shadow: 0 3px 12px rgba(236, 132, 65, 0.2);
+    box-shadow: 0 3px 12px rgba(0, 181, 70, 0.2);
 }
 
 select.select-field { 
@@ -258,7 +258,7 @@ textarea {
 }
 
 .primary-btn:hover, .button:hover:not(.file-label) {
-    background-color: #d67538;
+    background-color: #008e35;
 }
 
 .primary-btn:active, .button:active {
@@ -273,7 +273,7 @@ textarea {
 }
 
 .secondary-btn:hover {
-    background-color: #fff5f0;
+    background-color: #f7f7f7;
 }
 
 .secondary-btn:active {

@@ -1,15 +1,15 @@
 :root {
-  --page-bg: radial-gradient(circle at 10% 5%, #fff3ec 0%, #f9ede4 30%, #f3e7de 55%, #f0e2d6 100%);
+  --page-bg: radial-gradient(circle at 10% 5%, #f6fbf7 0%, #f1f8f3 30%, #ecf5ef 55%, #e8f2ec 100%);
   --surface: #ffffff;
-  --panel: #fff7ef;
-  --panel-strong: #fde9dc;
-  --panel-muted: #f4ece5;
+  --panel: #f6fbf7;
+  --panel-strong: #e6f5ea;
+  --panel-muted: #eef7f1;
   --neutral-900: #1e1b16;
   --neutral-700: #5a4f46;
   --neutral-500: #8a7d73;
   --border: rgba(90, 79, 70, 0.15);
-  --primary: #f07c4a;
-  --primary-strong: #d8632f;
+  --primary: #00B546;
+  --primary-strong: #008e35;
   --accent-blue: #3f8cff;
   --accent-purple: #a855f7;
   --accent-pink: #f472b6;

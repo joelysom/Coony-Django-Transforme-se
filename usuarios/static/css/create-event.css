@@ -1,11 +1,11 @@
 :root {
-    --brand-primary: #ED864B;
-    --brand-primary-dark: #c66936;
-    --brand-secondary: #F3F0EB;
+    --brand-primary: #00B546;
+    --brand-primary-dark: #008e35;
+    --brand-secondary: #f5f7fa;
     --brand-surface: #ffffff;
-    --brand-text: #2f2f2f;
-    --brand-muted: #78716c;
-    --brand-border: #e5ddd5;
+    --brand-text: #1f2937;
+    --brand-muted: #667085;
+    --brand-border: #e6e9ef;
 }
 
 * {
