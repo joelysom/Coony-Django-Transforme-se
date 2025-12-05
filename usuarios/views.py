@@ -184,6 +184,11 @@ def _get_professional_by_id(prof_id):
     return None
 
 
+def landing_page(request):
+    """Marketing landing page served at the root URL."""
+    return render(request, 'pages/landing_page/index.html')
+
+
 def index(request):
     """Render desktop version of the page (contains login/register forms)."""
     reg_form = RegistrationForm()
@@ -451,6 +456,46 @@ def my_events(request):
         'status': status,
         'stats': stats,
         'next_event': next_event,
+    })
+
+
+def favoritos(request):
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+
+    search = (request.GET.get('q') or '').strip()
+    modalidade = (request.GET.get('modalidade') or '').strip()
+    nivel = (request.GET.get('nivel') or '').strip()
+
+    base_favoritos = user.favorited_eventos.all()
+    favoritos_qs = base_favoritos.order_by('-data', '-hora', '-criado_em')
+
+    if search:
+        favoritos_qs = favoritos_qs.filter(
+            Q(titulo__icontains=search) |
+            Q(descricao__icontains=search) |
+            Q(local__icontains=search)
+        )
+    if modalidade:
+        favoritos_qs = favoritos_qs.filter(modalidade__iexact=modalidade)
+    if nivel:
+        favoritos_qs = favoritos_qs.filter(nivel_dificuldade__iexact=nivel)
+
+    modalidades = sorted({value for value in base_favoritos.values_list('modalidade', flat=True) if value})
+    niveis = sorted({value for value in base_favoritos.values_list('nivel_dificuldade', flat=True) if value})
+
+    return render(request, 'usuarios/favoritos.html', {
+        'user': user,
+        'favoritos': favoritos_qs,
+        'total_favoritos': base_favoritos.count(),
+        'filters': {
+            'q': search,
+            'modalidade': modalidade,
+            'nivel': nivel,
+        },
+        'modalidades': modalidades,
+        'niveis': niveis,
     })
 
 

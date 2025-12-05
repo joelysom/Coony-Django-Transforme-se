@@ -143,24 +143,24 @@
 
     <!-- Redirect script -->
     <script>
+    const desktopAuthPath = "{% url 'index' %}";
+    const mobileAuthPath = "{% url 'mobile' %}";
+
     function redirectByWidth() {
-    if (window.innerWidth > 768) {
-        // Desktop
-        if (window.location.pathname.includes('/mobile')) {
-        window.location.href = '/';
-        }
-    } else {
-        // Mobile
-        if (!window.location.pathname.includes('/mobile')) {
-        window.location.href = '/mobile/';
-        }
-    }
+      const isMobileViewport = window.innerWidth <= 768;
+      const currentPath = window.location.pathname;
+
+      if (!isMobileViewport && currentPath.startsWith(mobileAuthPath)) {
+        window.location.href = desktopAuthPath;
+        return;
+      }
+
+      if (isMobileViewport && currentPath.startsWith(desktopAuthPath)) {
+        window.location.href = mobileAuthPath;
+      }
     }
 
-    // Roda no carregamento
     redirectByWidth();
-
-    // Roda sempre que a tela é redimensionada
     window.addEventListener("resize", redirectByWidth);
     </script>
 

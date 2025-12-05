@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{% static 'img/Logo-BG.svg' %}" type="image/svg+xml">
-    <link rel="shortcut icon" href="{% static 'img/Logo-BG.svg' %}">
-    <title>Coony: Indique e Ganhe</title>
+    <link rel="icon" href="{% static 'img/Logo.svg' %}" type="image/svg+xml">
+    <link rel="shortcut icon" href="{% static 'img/Logo.svg' %}">
+    <title>Coony: Saúde em Movimento</title>
     <!--Boxicons CDN-->
     <link href="{% static 'css/boxicons.min.css' %}" rel="stylesheet">
     <!--CSS-->
@@ -210,27 +210,25 @@
     <script src="{% static 'script/app.js' %}"></script>
     
     <script>
-    function redirectByWidth() {
-    const currentUrl = window.location.href;
+        const desktopAuthPath = "{% url 'index' %}";
+        const mobileAuthPath = "{% url 'mobile' %}";
 
-    if (window.innerWidth > 768) {
-        // Desktop
-        if (currentUrl.includes('/mobile')) {
-        window.location.href = '/';
+        function redirectByWidth() {
+            const isMobileViewport = window.innerWidth <= 768;
+            const currentPath = window.location.pathname;
+
+            if (!isMobileViewport && currentPath.startsWith(mobileAuthPath)) {
+                window.location.href = desktopAuthPath;
+                return;
+            }
+
+            if (isMobileViewport && currentPath.startsWith(desktopAuthPath)) {
+                window.location.href = mobileAuthPath;
+            }
         }
-    } else {
-        // Mobile
-        if (!currentUrl.includes('/mobile')) {
-        window.location.href = '/mobile/';
-        }
-    }
-    }
 
-    // Executa no carregamento da página
-    window.addEventListener("load", redirectByWidth);
-
-    // Executa sempre que a janela for redimensionada
-    window.addEventListener("resize", redirectByWidth);
+        window.addEventListener("load", redirectByWidth);
+        window.addEventListener("resize", redirectByWidth);
     </script>
 
 </body>

@@ -1,7 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
-from .models import Usuario, Post
+from .models import Usuario, Post, Evento
 
 
 class DeletePostViewTests(TestCase):
@@ -67,3 +68,36 @@ class LoginWithUsernameTests(TestCase):
 		})
 		self.assertRedirects(response, reverse('dashboard'))
 		self.assertEqual(self.client.session.get('usuario_id'), self.user.id)
+
+
+class FavoritosViewTests(TestCase):
+	def setUp(self):
+		self.user = Usuario.objects.create(
+			nome='Ana', telefone='123456789', email='ana@example.com', senha='senha'
+		)
+		self.evento = Evento.objects.create(
+			criador=self.user,
+			titulo='Treino Especial',
+			descricao='Sessão completa',
+			modalidade='Futebol',
+			nivel_dificuldade='Intermediário',
+			data=timezone.localdate(),
+			hora=timezone.localtime().time(),
+			local='Arena Coony'
+		)
+
+	def _login(self):
+		session = self.client.session
+		session['usuario_id'] = self.user.id
+		session.save()
+
+	def test_redirects_without_session(self):
+		response = self.client.get(reverse('favoritos'))
+		self.assertRedirects(response, reverse('index'))
+
+	def test_renders_favorites_for_user(self):
+		self._login()
+		self.evento.favorited_by.add(self.user)
+		response = self.client.get(reverse('favoritos'))
+		self.assertEqual(response.status_code, 200)
+		self.assertContains(response, 'Treino Especial')

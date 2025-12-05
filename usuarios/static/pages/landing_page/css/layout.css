@@ -1,0 +1,96 @@
+/* Container de largura máxima */
+.container {
+  width: min(100% - 2rem, var(--max-width));
+  margin-inline: auto;
+}
+
+/* ============================== HEADER / NAVEGAÇÃO ============================== */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(243, 240, 235, 0.95);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.header__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 0.7rem;
+  gap: 2rem;
+}
+
+/* LOGO COM IMAGEM */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform var(--transition-base);
+}
+
+.logo:hover {
+  transform: translateY(-1px);
+}
+
+/* LOGO RESPONSIVA */
+.logo__img {
+  height: clamp(60px, 7.5vw, 90px);
+  width: auto;
+}
+
+.logo span {
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  color: var(--cor-titulos);
+}
+
+/* NAV DESKTOP */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.7rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.84rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cor-titulos);
+}
+
+.nav a {
+  position: relative;
+  padding: 0.25rem 0;
+  transition: color 160ms ease;
+}
+
+.nav a::after {
+  display: none;
+}
+
+.nav a:hover {
+  color: var(--cor-laranja-escura);
+}
+
+/* BOTÃO CTA HEADER */
+.nav__cta {
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(237, 134, 75, 0.7);
+  padding: 0.45rem 1.4rem;
+  font-size: 0.78rem;
+  color: var(--cor-laranja-escura);
+  background: transparent;
+  transition: 200ms ease;
+}
+
+.nav__cta:hover {
+  background: rgba(237, 134, 75, 0.14);
+  border-color: var(--cor-laranja);
+  color: var(--cor-laranja-escura);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}

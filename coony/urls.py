@@ -18,9 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from usuarios import views as usuarios_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', usuarios_views.landing_page, name='landing_page'),
     path('', include('usuarios.urls')),
 ]
 

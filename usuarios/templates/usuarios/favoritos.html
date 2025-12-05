@@ -1,0 +1,285 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Favoritos — Coony</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <style>
+    :root {
+      --bg: #0d1119;
+      --card: #151b2a;
+      --text: #f2f4f8;
+      --muted: #9aa4c2;
+      --accent: #f68b4a;
+    }
+    body {
+      background: var(--bg);
+      font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+    }
+    .favorites-shell {
+      margin-left: 280px;
+      padding: 40px 48px;
+    }
+    @media (max-width: 768px) {
+      .favorites-shell {
+        margin-left: 0;
+        padding: 24px 18px 110px;
+      }
+      .sidebar-container {
+        display: none !important;
+      }
+    }
+    @media (min-width: 769px) {
+      .navbar-mobile {
+        display: none !important;
+      }
+      body {
+        padding-bottom: 0 !important;
+      }
+    }
+    .favorites-hero {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+    .favorites-hero h1 {
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      margin: 0;
+    }
+    .favorites-hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .favorites-hero span.badge {
+      background: rgba(246, 139, 74, 0.15);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .favorites-filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .favorites-filters input,
+    .favorites-filters select {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text);
+    }
+    .favorites-filters button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .favorite-card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      gap: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      align-items: flex-start;
+    }
+    .favorite-card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 16px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #080b12;
+    }
+    .favorite-card h3 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    .favorite-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .favorite-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .favorite-actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .favorite-actions a,
+    .favorite-actions button {
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      font-weight: 600;
+    }
+    .favorite-actions a {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      text-decoration: none;
+    }
+    .favorite-actions button {
+      background: rgba(246, 139, 74, 0.15);
+      color: var(--accent);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 24px;
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+    .empty-state p {
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .empty-state a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+  {% include 'usuarios/components/sidebar.html' %}
+  {% include 'usuarios/components/navbar_mobile.html' %}
+
+  <div class="favorites-shell">
+    <div class="favorites-hero">
+      <span class="badge">{{ total_favoritos }} no radar</span>
+      <h1>Seus Favoritos</h1>
+      <p>Eventos salvos pela comunidade para você acompanhar com rapidez.</p>
+    </div>
+
+    <form method="get" class="favorites-filters">
+      <input type="text" name="q" placeholder="Buscar por título ou local" value="{{ filters.q }}" />
+      <select name="modalidade">
+        <option value="">Modalidade</option>
+        {% for modalidade in modalidades %}
+          <option value="{{ modalidade }}" {% if filters.modalidade == modalidade %}selected{% endif %}>{{ modalidade }}</option>
+        {% endfor %}
+      </select>
+      <select name="nivel">
+        <option value="">Nível</option>
+        {% for nivel in niveis %}
+          <option value="{{ nivel }}" {% if filters.nivel == nivel %}selected{% endif %}>{{ nivel }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Filtrar</button>
+    </form>
+
+    {% if favoritos %}
+    <section class="favorites-grid" id="favorites-grid">
+      {% for evento in favoritos %}
+      <article class="favorite-card" data-event-id="{{ evento.id }}">
+        <img src="{% if evento.imagem_capa %}{{ evento.imagem_capa.url }}{% else %}{% static 'img/default-avatar.svg' %}{% endif %}" alt="{{ evento.titulo }}" />
+        <div>
+          <h3>{{ evento.titulo }}</h3>
+          <div class="favorite-meta">
+            <span><span class="material-symbols-outlined">calendar_month</span> {{ evento.data|date:'d/m/Y' }} às {{ evento.hora|time:'H:i' }}</span>
+            <span><span class="material-symbols-outlined">stadia_controller</span> {{ evento.modalidade|default:'Modalidade não informada' }}</span>
+            <span><span class="material-symbols-outlined">terrain</span> {{ evento.nivel_dificuldade|default:'Nível não informado' }}</span>
+            <span><span class="material-symbols-outlined">location_on</span> {{ evento.local }}</span>
+          </div>
+          <div class="favorite-actions">
+            <a href="{% url 'evento_detail' evento.id %}">
+              <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span> Ver detalhes
+            </a>
+            <button type="button" class="favorite-remove-btn" data-event-id="{{ evento.id }}">
+              <span class="material-symbols-outlined" style="font-size: 18px;">favorite</span> Remover
+            </button>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </section>
+    {% else %}
+    <section class="empty-state" id="empty-state">
+      <h3>Você ainda não adicionou favoritos</h3>
+      <p>Explore a agenda de eventos e toque no coração para salvá-los aqui.</p>
+      <a href="{% url 'eventos_list' %}"><span class="material-symbols-outlined">explore</span> Descobrir eventos</a>
+    </section>
+    {% endif %}
+  </div>
+
+  <script>
+    const getCookie = (name) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return '';
+    };
+
+    document.querySelectorAll('.favorite-remove-btn').forEach((button) => {
+      button.addEventListener('click', () => {
+        const eventId = button.dataset.eventId;
+        fetch(`{% url 'toggle_favorite_event' 0 %}`.replace('0', eventId), {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+        })
+          .then((response) => response.ok ? response.json() : Promise.reject())
+          .then(() => {
+            const card = button.closest('.favorite-card');
+            card?.remove();
+            if (!document.querySelector('.favorite-card')) {
+              const empty = document.getElementById('empty-state');
+              if (empty) {
+                empty.style.display = 'block';
+              } else {
+                const section = document.createElement('section');
+                section.id = 'empty-state';
+                section.className = 'empty-state';
+                section.innerHTML = `
+                  <h3>Você removeu todos os favoritos</h3>
+                  <p>Continue explorando eventos para montar sua lista personalizada.</p>
+                  <a href="{% url 'eventos_list' %}"><span class="material-symbols-outlined">explore</span> Descobrir eventos</a>
+                `;
+                document.querySelector('.favorites-shell').appendChild(section);
+              }
+            }
+          })
+          .catch(() => window.location.reload());
+      });
+    });
+  </script>
+</body>
+</html>
