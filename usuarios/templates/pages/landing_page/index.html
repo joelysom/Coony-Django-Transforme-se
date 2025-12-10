@@ -6,36 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Projeto Coony – Landing Page</title>
 
-    <link rel="stylesheet" href="{% static 'pages/landing_page/css/base.css' %}">
-    <link rel="stylesheet" href="{% static 'pages/landing_page/css/layout.css' %}">
-    <link rel="stylesheet" href="{% static 'pages/landing_page/css/sections.css' %}">
-    <link rel="stylesheet" href="{% static 'pages/landing_page/css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'pages/landing_page/css/style.css' %}">
   </head>
 
   <body>
     <header class="header">
       <div class="container header__content">
-        <!-- LOGOTIPO -->
         <a href="#topo" class="logo">
           <img
-            src="{% static 'pages/landing_page/imagens-Coony/logo.png' %}"
+            src="{% static 'pages/landing_page/imagens-Coony/Cópia de LOGOTIPO & CORES OFICIAIS (COONY) (1).png' %}"
             alt="Logotipo do Coony"
             class="logo__img"
           />
           <span class="sr-only">Coony</span>
         </a>
 
-        <!-- MENU PRINCIPAL -->
-        <nav class="nav">
+        <nav id="main-nav" class="nav">
           <a href="#sobre">Sobre</a>
           <a href="#inscricao">Inscrição</a>
           <a href="#equipes">Equipes</a>
           <a href="#equipe-pedagogica">Equipe pedagógica</a>
-          <a href="#contato">Contato</a>
-          <a href="{% url 'index' %}" class="nav__cta">Quero me inscrever</a>
+          <a href="{% url 'login' %}" class="nav__cta">Quero me inscrever</a>
         </nav>
 
-        <!-- Botão de menu hamburguer para dispositivos móveis -->
         <button
           class="mobile-menu-btn"
           aria-label="Abrir ou fechar menu de navegação"
@@ -48,44 +41,17 @@
     </header>
 
     <main id="topo">
-      <!-- HERO / SOBRE – seção focada em marketing -->
       <section id="sobre" class="hero">
-        <!-- Camada de wallpaper animado no fundo da seção "Transforme sua rotina com o Coony" -->
-        <div class="hero__bg"></div>
-
         <div class="container hero__grid">
           <div class="hero__text">
-            <span class="hero__tag">Projeto Integrador · Senac</span>
-            <h1>Transforme sua rotina com o Coony</h1>
+            <h1>Transforme sua rotina com o&nbsp;Coony</h1>
             <p class="hero__subtitle">
-              Um app que tira as pessoas do sofá e leva para experiências reais
-              de movimento — com desafios, recompensas e atividades físicas
-              perto de casa.
+              Explore eventos, treinos e desafios que incentivam uma vida
+              mais ativa. O Coony conecta pessoas, academias e
+              instituições em prol de uma rotina saudável e colaborativa.
             </p>
-
-            <ul class="hero__benefits">
-              <li>
-                <strong>Atividades ao seu redor:</strong> encontre eventos
-                esportivos, treinos coletivos e ações de bem-estar na sua
-                região.
-              </li>
-              <li>
-                <strong>Gamificação que engaja:</strong> pontos, conquistas e
-                recompensas exclusivas para manter a motivação em alta.
-              </li>
-              <li>
-                <strong>Integração inteligente:</strong> conecta-se a
-                smartwatches e registra sua evolução de forma simples e visual.
-              </li>
-            </ul>
-
-            <p class="hero__strong">
-              Inscreva-se em poucos cliques e comece hoje a viver melhor com o
-              Coony.
-            </p>
-
             <div class="hero__actions">
-              <a href="{% url 'index' %}" class="btn btn--primary">
+              <a href="{% url 'login' %}" class="btn btn--primary">
                 Quero me inscrever
               </a>
               <a href="#equipes" class="btn btn--ghost">
@@ -93,68 +59,54 @@
               </a>
             </div>
           </div>
-
-          <div class="hero__visual">
-            <div class="hero__image-wrapper hero__float phone-mockup">
-              <img
-                src="{% static 'pages/landing_page/imagens-Coony/interface.png' %}"
-                alt="Aplicativo de saúde e fitness em um smartphone moderno"
-                class="phone-mockup__img"
-              />
-            </div>
-            <p class="hero__caption">
-              Uma plataforma intuitiva para quem deseja se movimentar mais, com
-              suporte, desafios e recompensas reais.
-            </p>
-          </div>
         </div>
       </section>
 
-      <!-- SEÇÃO DE INSCRIÇÃO / COMEÇAR A USAR -->
       <section id="inscricao" class="section section--light inscricao">
         <div class="container inscricao__grid">
           <div class="inscricao__text">
             <span class="inscricao__badge">Comece agora</span>
-            <h2>Inscreva-se no Coony</h2>
+            <h2>Inscreva‑se no Coony</h2>
             <p>
-              Em poucos passos, você cria sua conta e já pode explorar eventos,
-              treinos e desafios. Ideal para alunos, instrutores, academias e
-              instituições que querem incentivar uma rotina mais ativa.
+              Em poucos passos, você cria sua conta e já pode explorar
+              eventos, treinos e desafios. Ideal para alunos, instrutores,
+              academias e instituições que querem incentivar uma rotina
+              mais ativa.
             </p>
             <ul class="inscricao__list">
-              <li>Cadastre-se com e-mail ou telefone.</li>
+              <li>Cadastre‑se com e‑mail ou telefone.</li>
               <li>Crie ou participe de eventos e grupos.</li>
               <li>Acompanhe sua evolução com métricas claras.</li>
             </ul>
-            <a href="#contato" class="btn btn--primary inscricao__cta">
+            <a href="{% url 'login' %}" class="btn btn--primary inscricao__cta">
               Ir para o Aplicativo
             </a>
           </div>
         </div>
       </section>
 
-      <!-- EQUIPES DO PROJETO -->
       <section id="equipes" class="section section--contrast">
         <div class="container">
           <header class="section__header">
             <span class="section__eyebrow">Times multidisciplinares</span>
             <h2>Equipes do Projeto Coony</h2>
             <p>
-              No Projeto Coony, times multidisciplinares uniram criatividade,
-              técnica e visão estratégica para construir um projeto integrador
-              baseado em colaboração e aprendizado coletivo.
+              No Projeto Coony, times multidisciplinares uniram
+              criatividade, técnica e visão estratégica para construir um
+              projeto integrador baseado em colaboração e aprendizado
+              coletivo.
             </p>
           </header>
 
-          <!-- Equipe de Design -->
           <section class="subsection">
             <div class="subsection__header">
               <h3>Equipe de Design</h3>
               <p>
-                A equipe de Design foi responsável por transformar ideias em
-                experiências visuais e funcionais. Com pesquisa e visão centrada
-                no usuário, o time desenvolveu interfaces intuitivas, acessíveis
-                e alinhadas à essência do projeto.
+                A equipe de Design foi responsável por transformar
+                ideias em experiências visuais e funcionais. Com
+                pesquisa e visão centrada no usuário, o time desenvolveu
+                interfaces intuitivas, acessíveis e alinhadas à essência
+                do projeto.
               </p>
             </div>
 
@@ -170,7 +122,7 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Ayrlla Gabriela.jpg' %}"
-                      alt="Membro da equipe de Design"
+                      alt="Ayrlla Gabriela da equipe de Design"
                     />
                   </div>
                   <h4 class="card__title">Ayrlla Gabriela</h4>
@@ -181,7 +133,7 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Flávio Barbosa.jpg' %}"
-                      alt="Membro da equipe de Design"
+                      alt="Flávio Barbosa da equipe de Design"
                     />
                   </div>
                   <h4 class="card__title">Flávio Barbosa</h4>
@@ -192,7 +144,7 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Lucas Lira.jpg' %}"
-                      alt="Membro da equipe de Design"
+                      alt="Lucas Lira da equipe de Design"
                     />
                   </div>
                   <h4 class="card__title">Lucas Lira</h4>
@@ -208,18 +160,19 @@
             </div>
           </section>
 
-          <!-- Equipe de Marketing -->
           <section class="subsection">
             <div class="subsection__header">
               <h3>Equipe de Marketing</h3>
               <p>
-                A Equipe de Marketing transformou ideias em experiências visuais
-                estratégicas para fortalecer nossa presença nas redes sociais e
-                ampliar o alcance da divulgação. Com pesquisa focada no
-                comportamento do público e abordagem centrada no usuário, o time
-                desenvolveu conteúdos e interfaces intuitivas, acessíveis e
-                alinhadas à essência do projeto, garantindo comunicação clara,
-                impacto visual e maior engajamento.
+                A Equipe de Marketing transformou ideias em
+                experiências visuais estratégicas para fortalecer nossa
+                presença nas redes sociais e ampliar o alcance da
+                divulgação. Com pesquisa focada no comportamento do
+                público e abordagem centrada no usuário, o time
+                desenvolveu conteúdos e interfaces intuitivas,
+                acessíveis e alinhadas à essência do projeto,
+                garantindo comunicação clara, impacto visual e maior
+                engajamento.
               </p>
             </div>
 
@@ -235,29 +188,29 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Luan Maison.jpg' %}"
-                      alt="Membro da equipe de Marketing"
+                      alt="Luan Maison da equipe de Marketing"
                     />
                   </div>
                   <h4 class="card__title">Luan Maison</h4>
-                  <p class="card__role">Tech Lead</p>
+                  <p class="card__role">Tech&nbsp;Lead</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
-                      src="{% static 'pages/landing_page/imagens-Coony/users.png' %}"
-                      alt="Membro da equipe de Marketing"
+                      src="{% static 'pages/landing_page/imagens-Coony/do-utilizador.png' %}"
+                      alt="Júlia Barbosa da equipe de Marketing"
                     />
                   </div>
                   <h4 class="card__title">Júlia Barbosa</h4>
-                  <p class="card__role">Tech Lead</p>
+                  <p class="card__role">Tech&nbsp;Lead</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Anna Karenina.jpg' %}"
-                      alt="Membro da equipe de Marketing"
+                      alt="Anna Karenina da equipe de Marketing"
                     />
                   </div>
                   <h4 class="card__title">Anna Karenina</h4>
@@ -268,7 +221,7 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Julia de Souza.jpg' %}"
-                      alt="Membro da equipe de Marketing"
+                      alt="Júlia de Souza da equipe de Marketing"
                     />
                   </div>
                   <h4 class="card__title">Júlia de Souza</h4>
@@ -279,7 +232,7 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Maria Luiza.jpg' %}"
-                      alt="Membro da equipe de Marketing"
+                      alt="Maria Luiza da equipe de Marketing"
                     />
                   </div>
                   <h4 class="card__title">Maria Luiza</h4>
@@ -290,7 +243,7 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Matheus Felipe.jpg' %}"
-                      alt="Membro da equipe de Marketing"
+                      alt="Matheus Felipe da equipe de Marketing"
                     />
                   </div>
                   <h4 class="card__title">Matheus Felipe</h4>
@@ -301,7 +254,7 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Paulo Gabriel.jpg' %}"
-                      alt="Membro da equipe de Marketing"
+                      alt="Paulo Gabriel da equipe de Marketing"
                     />
                   </div>
                   <h4 class="card__title">Paulo Gabriel</h4>
@@ -317,16 +270,16 @@
             </div>
           </section>
 
-          <!-- Equipe de Front-end -->
           <section class="subsection">
             <div class="subsection__header">
-              <h3>Equipe de Front-end</h3>
+              <h3>Equipe de Front‑end</h3>
               <p>
-                A equipe de Front-end foi responsável por dar vida ao que o
-                usuário vê e interage. Com foco em performance, acessibilidade e
-                fidelidade ao design, o time desenvolveu telas, fluxos e
-                componentes que traduzem a experiência do Coony em algo fluido,
-                moderno e responsivo.
+                A equipe de Front‑end foi responsável por dar vida ao que o
+                usuário vê e interage. Com foco em performance,
+                acessibilidade e fidelidade ao design, o time
+                desenvolveu telas, fluxos e componentes que traduzem a
+                experiência do Coony em algo fluido, moderno e
+                responsivo.
               </p>
             </div>
 
@@ -342,44 +295,44 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Paulo Roberto.jpg' %}"
-                      alt="Membro da equipe de Front-end"
+                      alt="Paulo Roberto da equipe de Front‑end"
                     />
                   </div>
                   <h4 class="card__title">Paulo Roberto</h4>
-                  <p class="card__role">Tech Lead</p>
+                  <p class="card__role">Tech&nbsp;Lead</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Layza Ervelly.jpg' %}"
-                      alt="Membro da equipe de Front-end"
+                      alt="Layza Ervelly da equipe de Front‑end"
                     />
                   </div>
                   <h4 class="card__title">Layza Ervelly</h4>
-                  <p class="card__role">Front-end</p>
+                  <p class="card__role">Front‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Myllena Heloisa.jpg' %}"
-                      alt="Membro da equipe de Front-end"
+                      alt="Myllena Heloisa da equipe de Front‑end"
                     />
                   </div>
                   <h4 class="card__title">Myllena Heloisa</h4>
-                  <p class="card__role">Front-end</p>
+                  <p class="card__role">Front‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
-                      src="{% static 'pages/landing_page/imagens-Coony/users.png' %}"
-                      alt="Membro da equipe de Front-end"
+                      src="{% static 'pages/landing_page/imagens-Coony/do-utilizador.png' %}"
+                      alt="João Pedro da equipe de Front‑end"
                     />
                   </div>
                   <h4 class="card__title">João Pedro</h4>
-                  <p class="card__role">Front-end</p>
+                  <p class="card__role">Front‑end</p>
                 </article>
               </div>
               <button
@@ -391,14 +344,14 @@
             </div>
           </section>
 
-          <!-- Equipe de Back-end -->
           <section class="subsection">
             <div class="subsection__header">
-              <h3>Equipe de Back-end</h3>
+              <h3>Equipe de Back‑end</h3>
               <p>
-                A equipe de Back-end estruturou a base lógica e tecnológica que
-                sustenta o Coony, garantindo segurança, estabilidade e
-                eficiência no funcionamento do aplicativo.
+                A equipe de Back‑end estruturou a base lógica e
+                tecnológica que sustenta o Coony, garantindo segurança,
+                estabilidade e eficiência no funcionamento do
+                aplicativo.
               </p>
             </div>
 
@@ -414,132 +367,132 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Joelysom.JPG' %}"
-                      alt="Foto de Joelyson Alcântara"
+                      alt="Joelyson Alcântara da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Joelyson Alcântara</h4>
-                  <p class="card__role">Tech Lead</p>
+                  <p class="card__role">Tech&nbsp;Lead</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Gabriel Matias.jpg' %}"
-                      alt="Foto de Gabriel Matias"
+                      alt="Gabriel Matias da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Gabriel Matias</h4>
-                  <p class="card__role">Back-end</p>
+                  <p class="card__role">Back‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Gerson Nascimento.jpg' %}"
-                      alt="Foto de Gerson Nascimento"
+                      alt="Gerson Nascimento da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Gerson Nascimento</h4>
-                  <p class="card__role">Back-end</p>
+                  <p class="card__role">Back‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Jonatas André.jpg' %}"
-                      alt="Foto de Jônatas André"
+                      alt="Jônatas André da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Jônatas André</h4>
-                  <p class="card__role">Back-end</p>
+                  <p class="card__role">Back‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Luana Maria.jpg' %}"
-                      alt="Foto de Luana Maria"
+                      alt="Luana Maria da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Luana Maria</h4>
-                  <p class="card__role">Back-end</p>
+                  <p class="card__role">Back‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Luan Ventura.jpg' %}"
-                      alt="Foto de Luan Ventura"
+                      alt="Luan Ventura da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Luan Ventura</h4>
-                  <p class="card__role">Back-end</p>
+                  <p class="card__role">Back‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Mariana Gabrielle.jpg' %}"
-                      alt="Foto de Mariana Gabrielle"
+                      alt="Mariana Gabrielle da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Mariana Gabrielle</h4>
-                  <p class="card__role">Back-end</p>
+                  <p class="card__role">Back‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Rayssa Nepomuceno.jpg' %}"
-                      alt="Foto de Rayssa de Paula"
+                      alt="Rayssa de Paula da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Rayssa de Paula</h4>
-                  <p class="card__role">Back-end</p>
+                  <p class="card__role">Back‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Rodrigo Amorim.jpg' %}"
-                      alt="Foto de Rodrigo Amorim"
+                      alt="Rodrigo Amorim da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Rodrigo Amorim</h4>
-                  <p class="card__role">Back-end</p>
+                  <p class="card__role">Back‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Victor Sette.jpg' %}"
-                      alt="Foto de Victor Sette"
+                      alt="Victor Sette da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Victor Sette</h4>
-                  <p class="card__role">Back-end</p>
+                  <p class="card__role">Back‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Weslley Cauan.jpg' %}"
-                      alt="Foto de Weslley Cauan"
+                      alt="Weslley Cauan da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Weslley Cauan</h4>
-                  <p class="card__role">Back-end</p>
+                  <p class="card__role">Back‑end</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
-                      src="{% static 'pages/landing_page/imagens-Coony/users.png' %}"
-                      alt="Foto de Weslley Gualberto"
+                      src="{% static 'pages/landing_page/imagens-Coony/do-utilizador.png' %}"
+                      alt="Weslley Gualberto da equipe de Back‑end"
                     />
                   </div>
                   <h4 class="card__title">Weslley Gualberto</h4>
-                  <p class="card__role">Back-end</p>
+                  <p class="card__role">Back‑end</p>
                 </article>
               </div>
               <button
@@ -551,15 +504,14 @@
             </div>
           </section>
 
-          <!-- Equipe da Documentação -->
           <section class="subsection">
             <div class="subsection__header">
               <h3>Equipe da Documentação</h3>
               <p>
                 A equipe de Documentação registrou processos, decisões e
-                estruturas do projeto de forma clara e organizada, garantindo
-                alinhamento entre as equipes e suporte contínuo para a evolução
-                do Coony.
+                estruturas do projeto de forma clara e organizada,
+                garantindo alinhamento entre as equipes e suporte
+                contínuo para a evolução do Coony.
               </p>
             </div>
 
@@ -575,18 +527,18 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Rodrigo Henrique.jpg' %}"
-                      alt="Membro da equipe de Documentação"
+                      alt="Rodrigo Henrique da equipe de Documentação"
                     />
                   </div>
                   <h4 class="card__title">Rodrigo Henrique</h4>
-                  <p class="card__role">Tech Lead</p>
+                  <p class="card__role">Tech&nbsp;Lead</p>
                 </article>
 
                 <article class="card card--team">
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Clebson Ernande.jpg' %}"
-                      alt="Membro da equipe de Documentação"
+                      alt="Clebson Ernande da equipe de Documentação"
                     />
                   </div>
                   <h4 class="card__title">Clebson Ernande</h4>
@@ -597,7 +549,7 @@
                   <div class="avatar avatar--small">
                     <img
                       src="{% static 'pages/landing_page/imagens-alunos/Rosimere Alcantara.jpg' %}"
-                      alt="Membro da equipe de Documentação"
+                      alt="Rosimere Alcântara da equipe de Documentação"
                     />
                   </div>
                   <h4 class="card__title">Rosimere Alcântara</h4>
@@ -615,16 +567,15 @@
         </div>
       </section>
 
-      <!-- EQUIPE PEDAGÓGICA -->
       <section id="equipe-pedagogica" class="section section--light">
         <div class="container">
           <header class="section__header">
             <span class="section__eyebrow">Apoio pedagógico</span>
             <h2>Equipe pedagógica do Projeto Coony</h2>
             <p>
-              Professores e coordenação dedicados a formar e capacitar pessoas
-              com responsabilidade, sensibilidade e excelência, garantindo
-              suporte real ao desenvolvimento humano.
+              Professores e coordenação dedicados a formar e capacitar
+              pessoas com responsabilidade, sensibilidade e excelência,
+              garantindo suporte real ao desenvolvimento humano.
             </p>
           </header>
 
@@ -633,53 +584,56 @@
               <div class="avatar">
                 <img
                   src="{% static 'pages/landing_page/imagensEquipe-Coordenacao/mere.png' %}"
-                  alt="Foto de Mere, coordenadora"
+                  alt="Mere Coutinho, coordenadora"
                 />
               </div>
               <h3 class="card__title">Mere Coutinho</h3>
               <p class="card__role">Coordenadora</p>
               <p class="card__text">
-                É a pessoa que caminha ao nosso lado com empatia verdadeira. Com
-                sua sensibilidade e cuidado, ela nos guia sem pressa, ouvindo,
-                acolhendo e oferecendo suporte sempre que precisamos. Sua
-                presença nos lembra que aprender e crescer é mais leve quando
-                temos alguém capaz de enxergar o melhor em nós.
+                É a pessoa que caminha ao nosso lado com empatia
+                verdadeira. Com sua sensibilidade e cuidado, ela nos
+                guia sem pressa, ouvindo, acolhendo e oferecendo suporte
+                sempre que precisamos. Sua presença nos lembra que
+                aprender e crescer é mais leve quando temos alguém
+                capaz de enxergar o melhor em nós.
               </p>
             </article>
 
             <article class="card card--pedagogica">
               <div class="avatar">
                 <img
-                  src="{% static 'pages/landing_page/imagensEquipe-Coordenacao/matheusOng.png' %}"
-                  alt="Foto de Matheus, apoio pedagógico"
+                  src="{% static 'pages/landing_page/imagensEquipe-Coordenacao/MATHEUS.PNG.png' %}"
+                  alt="Matheus Martins, apoio pedagógico"
                 />
               </div>
               <h3 class="card__title">Matheus Martins</h3>
-              <p class="card__role">Apoio pedagógico</p>
+              <p class="card__role">Apoio Pedagógico</p>
               <p class="card__text">
-                Psicólogo dedicado e atencioso, nunca deixou que nos sentíssemos
-                sozinhos durante o processo. Ele acompanha cada passo com
-                responsabilidade e preocupação genuína, garantindo que saibamos
-                como estamos, como nos sentimos e como podemos evoluir. Seu
-                olhar cuidadoso nos deu segurança para seguir em frente.
+                 Psicólogo dedicado e atencioso, nunca deixou que nos
+                sentíssemos sozinhos durante o processo. Ele acompanha
+                cada passo com responsabilidade e preocupação
+                genuína, garantindo que saibamos como estamos, como
+                nos sentimos e como podemos evoluir. Seu olhar
+                cuidadoso nos deu segurança para seguir em frente.
               </p>
             </article>
 
             <article class="card card--pedagogica">
               <div class="avatar">
                 <img
-                  src="{% static 'pages/landing_page/imagensEquipe-Coordenacao/MatheusEloim.png' %}"
-                  alt="Foto de Matheus Eloim, professor"
+                  src="{% static 'pages/landing_page/imagensEquipe-Coordenacao/MatheusEloim.png.png' %}"
+                  alt="Matheus Eloim, professor"
                 />
               </div>
               <h3 class="card__title">Matheus Eloim</h3>
               <p class="card__role">Professor</p>
               <p class="card__text">
-                Além de um professor admirável, foi um verdadeiro arquiteto do
-                nosso futuro. Com paciência, firmeza e paixão pelo que faz,
-                ajudou a nos moldar como programadores e como pessoas. Sua
-                educação transformou nossas vidas e nos mostrou que somos
-                capazes de alcançar muito mais do que imaginávamos.
+                Além de um professor admirável, foi um verdadeiro
+                arquiteto do nosso futuro. Com paciência, firmeza e
+                paixão pelo que faz, ajudou a nos moldar como
+                programadores e como pessoas. Sua educação transformou
+                nossas vidas e nos mostrou que somos capazes de
+                alcançar muito mais do que imaginávamos.
               </p>
             </article>
           </div>
@@ -689,8 +643,48 @@
 
     <footer class="footer">
       <div class="container footer__content">
-        <p>© Projeto Coony</p>
-        <p>Desenvolvido por turma Senac · Front-end &amp; Back-end · Django</p>
+        <div class="footer__brand">
+          <img
+            src="{% static 'pages/landing_page/imagens-Coony/Cópia de LOGOTIPO & CORES OFICIAIS (COONY) (1).png' %}"
+            alt="Coony"
+            class="footer__logo"
+          />
+          <p>
+            Coony conecta pessoas, academias e instituições em prol de
+            uma rotina mais ativa.
+          </p>
+        </div>
+
+        <nav class="footer__links" aria-label="Links do rodapé">
+          <h4>Mapa do site</h4>
+          <a href="#sobre">Sobre o Coony</a>
+          <a href="#equipes">Equipes</a>
+          <a href="#inscricao">Inscreva-se</a>
+          <a href="#contato">Contato</a>
+        </nav>
+
+        <div class="footer__social">
+          <h4>Redes sociais</h4>
+          <div class="footer__social-list">
+            <a
+              href="https://www.instagram.com/coonyoficial/"
+              target="_blank"
+              aria-label="Instagram Coony"
+            >
+              <span class="sr-only">Instagram</span>
+              <img
+                src="{% static 'pages/landing_page/imagens-Coony/instagram.png' %}"
+                alt="Instagram"
+                class="footer__icon"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <span>© 2024 Coony. Todos os direitos reservados.</span>
+        <span>Política de Privacidade · Termos de Uso</span>
       </div>
     </footer>
 

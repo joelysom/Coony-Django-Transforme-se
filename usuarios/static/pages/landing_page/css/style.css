@@ -1,0 +1,1445 @@
+/* ============================== FONTES (Google Fonts) ============================== */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap');
+
+/*
+  Esta folha de estilos é praticamente idêntica à versão fornecida pelo
+  usuário. Ela define a paleta de cores, tipografia, espaçamentos e
+  componentes responsivos para a landing page do Projeto Coony. Foram
+  adicionados comentários para facilitar a manutenção e eventuais
+  extensões. Pequenos ajustes de margens e paddings podem ser
+  necessários conforme o conteúdo evoluir.
+*/
+
+:root {
+  /* PALETA */
+  --cor-neve: #F3F0EB;
+  --cor-neve-escura: #E6DFD4;
+  --cor-laranja: #ED864B;
+  --cor-laranja-escura: #E4722F;
+  --cor-escura: #171717;
+  --cor-texto: #333333;
+  --cor-texto-suave: #595959;
+  --cor-borda: rgba(0, 0, 0, 0.06);
+  --cor-titulos: #3A3632;
+
+  /* RADIUS & SOMBRAS */
+  --radius-xl: 2rem;
+  --radius-lg: 1.5rem;
+  --radius-md: 1rem;
+  --radius-pill: 999px;
+  --shadow-soft: 0 16px 35px rgba(15, 10, 5, 0.08);
+  --shadow-elevated: 0 22px 45px rgba(0, 0, 0, 0.14);
+
+  /* LAYOUT */
+  --max-width: 1120px;
+  --transition-fast: 160ms ease-out;
+  --transition-base: 220ms ease-out;
+  --transition-slow: 320ms ease-out;
+
+  /* TIPOGRAFIA */
+  --font-size-base: 16px;
+  --font-size-h1: clamp(2.5rem, 3.4vw, 3.3rem);
+  --font-size-h2: clamp(1.9rem, 2.4vw, 2.4rem);
+  --font-size-h3: clamp(1.4rem, 2vw, 1.9rem);
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--font-size-base);
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(237, 134, 75, 0.03), transparent 55%),
+    radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.02), transparent 50%),
+    var(--cor-neve);
+  color: var(--cor-texto);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Espaçamento de âncora para compensar o header fixo */
+section[id] {
+  scroll-margin-top: 6rem;
+}
+
+/* Classe utilitária para texto apenas para leitores de tela */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================== ELEMENTOS GENÉRICOS ============================== */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+}
+
+/* Oculta o botão de menu hamburguer por padrão; será exibido apenas em telas menores */
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: 0;
+}
+
+.mobile-menu-btn .menu-line {
+  display: block;
+  width: 20px;
+  height: 2px;
+  margin: 3px 0;
+  background: #333;
+  border-radius: 999px;
+}
+
+.container {
+  width: min(100% - 2rem, var(--max-width));
+  margin-inline: auto;
+}
+
+/* ============================== ESTADOS DE FOCO ============================== */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--cor-laranja);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* ============================== MAIN (BANNER COMO FUNDO) ============================== */
+/* Versão única e correta da .hero — usa banner-coony como fundo */
+.hero {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 6rem 0;
+    /* IMAGEM CORRETA */
+    background-image: url("../imagens-Coony/banner-coony5.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /*
+      Animação sutil no background para dar sensação de movimento
+      contínuo. A imagem de fundo se desloca horizontalmente ao
+      longo do tempo. O tempo de duração e a direção podem ser
+      ajustados conforme necessidade.
+    */
+    animation: heroMove 30s linear infinite alternate;
+
+    /*
+      Camada de overlay para aumentar o contraste entre o texto
+      e a imagem de fundo. Ajuste a opacidade conforme o grau de
+      escurecimento desejado.
+    */
+    position: relative;
+}
+
+/* Overlay escuro sobre a imagem de fundo para melhorar legibilidade */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Coloca o conteúdo da hero acima do overlay */
+.hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes heroMove {
+  0% {
+    background-position: center top;
+  }
+  50% {
+    background-position: center bottom;
+  }
+  100% {
+    background-position: center top;
+  }
+}
+
+/* overlay opcional: descomente se quiser aplicar */
+/*
+  O pseudo-elemento da classe .main não é mais necessário porque
+  incluímos um overlay dedicado na .hero. Caso deseje manter um
+  overlay em todas as seções principais, ajuste a opacidade
+  diretamente na .hero::before.
+*/
+
+
+/* garante que o conteúdo fique acima do overlay */
+.main > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================== HEADER / NAVEGAÇÃO ============================== */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(243, 240, 235, 0.95);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.header__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 0.7rem;
+  gap: 2rem;
+}
+
+/* LOGO COM IMAGEM */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform var(--transition-base);
+}
+
+.logo:hover {
+  transform: translateY(-1px);
+}
+
+/* LOGO RESPONSIVA */
+.logo__img {
+  height: clamp(60px, 7.5vw, 90px);
+  width: auto;
+}
+
+.logo span {
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  color: var(--cor-titulos);
+}
+
+/* NAV DESKTOP */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.7rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.84rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cor-titulos);
+}
+
+.nav a {
+  position: relative;
+  padding: 0.25rem 0;
+  transition: color 160ms ease;
+}
+
+.nav a::after {
+  display: none;
+}
+
+.nav a:hover {
+  color: var(--cor-laranja-escura);
+}
+
+/* BOTÃO CTA HEADER */
+.nav__cta {
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(237, 134, 75, 0.7);
+  padding: 0.45rem 1.4rem;
+  font-size: 0.78rem;
+  color: var(--cor-laranja-escura);
+  background: transparent;
+  transition: 200ms ease;
+}
+
+.nav__cta:hover {
+  background: rgba(237, 134, 75, 0.14);
+  border-color: var(--cor-laranja);
+  color: var(--cor-laranja-escura);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ============================== HERO / SOBRE ============================== */
+.hero {
+  padding-block: 4.2rem 3.2rem;
+  position: relative;
+  /*
+    A propriedade overflow foi removida para que elementos de
+    fundo não sejam cortados inadvertidamente. A propriedade
+    isolation não é necessária aqui e foi retirada para evitar
+    interferências em camadas internas.
+  */
+  overflow: visible;
+}
+
+.hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 3.1rem;
+  align-items: center;
+}
+
+.hero__visual {
+  overflow: visible;
+}
+
+@media (max-width: 600px) {
+  .hero__visual::before {
+    transform: translateX(-50%) scale(0.88) !important;
+    bottom: -3% !important;
+  }
+}
+
+.hero__text {
+  animation: fadeUp 700ms var(--transition-base) both;
+}
+
+.hero__visual {
+  animation: fadeUp 750ms var(--transition-base) both;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+  align-items: center;
+}
+
+/* Blob orgânico atrás do mockup (substitui o cartão quadrado) */
+.hero__visual::before {
+  /*
+    Remove o pseudo-elemento que criava uma bolha laranja atrás do
+    conteúdo visual na seção hero. Se você tiver uma imagem ou
+    mockup a exibir, remova esta regra e inclua a imagem no HTML.
+  */
+  display: none;
+}
+
+/* HERO TEXT STYLES */
+.hero__text h1 {
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: var(--font-size-h1);
+  line-height: 1.05;
+  margin-bottom: 1rem;
+  /*
+    Sobrescreve a cor do título apenas na seção hero para
+    contrastar com o fundo escurecido. Ajuste conforme o
+    esquema de cores desejado para o hero sem afetar o site
+    inteiro.
+  */
+  color: #FFFFFF;
+  letter-spacing: 0.01em;
+}
+
+.hero__subtitle {
+  font-size: 1.03rem;
+  /*
+    Sobrescreve a cor do subtítulo no hero. Aqui utilizamos
+    o laranja principal da paleta para manter a identidade do
+    projeto sem alterar outras seções do site.
+  */
+  color: var(--cor-laranja);
+  max-width: 38rem;
+  margin-bottom: 1.35rem;
+}
+
+.hero__text p {
+  /*
+    Ajuste de cor do parágrafo no hero para harmonizar com o
+    subtítulo. Mantém a legibilidade sem interferir no
+    restante do site.
+  */
+  color: #f3f0eb;
+  max-width: 38rem;
+  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.hero__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.9rem;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, rgba(237, 134, 75, 0.16), rgba(237, 134, 75, 0.05));
+  color: var(--cor-laranja);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 0.9rem;
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* HERO IMAGE WRAPPER — sem cartão 3D */
+.hero__image-wrapper {
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  transform: translateY(0);
+  transition:
+    transform var(--transition-slow),
+    filter var(--transition-slow);
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.hero__image-wrapper img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  transform-origin: center;
+  transition: transform 320ms ease-out;
+}
+
+.hero__image-wrapper:hover img {
+  transform: scale(1.02);
+}
+
+/* Mockup de smartphone — apenas sombra do aparelho */
+.phone-mockup {
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.phone-mockup__img {
+  border-radius: 1.5rem;
+  width: 100%;
+  height: auto;
+  display: block;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.16);
+}
+
+.hero__caption {
+  font-size: 0.86rem;
+  color: var(--cor-texto-suave);
+  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* WALLPAPER ANIMADO NO FUNDO DA SEÇÃO HERO (se for usado) */
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    radial-gradient(circle at 10% 0%, rgba(237, 134, 75, 0.34), transparent 55%),
+    radial-gradient(circle at 90% 100%, rgba(0, 0, 0, 0.25), transparent 60%),
+    url('imagens-coony/wallpaper-coony.gif');
+  background-size: 320% 320%, 260% 260%, cover;
+  background-repeat: no-repeat;
+  background-position: 0% 40%, 100% 60%, center;
+  opacity: 0.55;
+  filter: saturate(1.05) contrast(1.03);
+  animation: heroWallpaperMove 26s linear infinite alternate;
+}
+
+@keyframes heroWallpaperMove {
+  0% {
+    background-position: 0% 40%, 100% 60%, center;
+  }
+  50% {
+    background-position: 30% 45%, 70% 55%, center;
+  }
+  100% {
+    background-position: 60% 50%, 40% 50%, center;
+  }
+}
+
+.hero__float {
+  animation: float 4.4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* ============================== SEÇÃO INSCRIÇÃO ============================== */
+/* ==================== SEÇÃO INSCRIÇÃO ==================== */
+.inscricao {
+  background: #ffffff;
+  position: relative;
+  padding-bottom: 4rem; /* Espaço extra se quiser evitar que o texto encoste na imagem */
+}
+
+.inscricao::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 430px;          /* Ajuste a largura da ilustração */
+  height: 430px;         /* Ajuste a altura da ilustração */
+  background-image: url("../imagens-Coony/corredor2.png"); /* Caminho do arquivo */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  opacity: 0.9;          /* Ajuste a opacidade se necessário */
+  pointer-events: none;  /* Evita que a imagem bloqueie interações */
+}
+
+@media (max-width: 700px) {
+  .inscricao::after {
+    width: 140px;
+    height: 120px;
+    opacity: 0.6; /* Menor e mais sutil em telas pequenas */
+  }
+}
+
+.inscricao__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.inscricao__badge {
+  display: inline-flex;
+  padding: 0.32rem 0.9rem;
+  border-radius: var(--radius-pill);
+  background: rgba(237, 134, 75, 0.12);
+  color: var(--cor-laranja);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.inscricao__text h2 {
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: var(--font-size-h2);
+  margin-bottom: 0.8rem;
+  color: var(--cor-titulos);
+}
+
+.inscricao__text p {
+  color: var(--cor-texto-suave);
+  max-width: 34rem;
+}
+
+.inscricao__list {
+  list-style: none;
+  margin: 1rem 0 1.25rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.inscricao__list li {
+  position: relative;
+  padding-left: 1rem;
+}
+
+.inscricao__list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--cor-laranja);
+}
+
+.inscricao__cta {
+  margin-top: 0.5rem;
+}
+
+
+
+
+/* ============================ BOTÕES ============================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.78rem 1.5rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* BOTÃO PRINCIPAL */
+.btn--primary {
+  background: var(--cor-laranja);
+  color: #fff;
+  border-color: var(--cor-laranja-escura);
+  box-shadow: 0 6px 14px rgba(237, 134, 75, 0.4);
+}
+
+.btn--primary:hover {
+  background: var(--cor-laranja-escura);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(237, 134, 75, 0.45);
+}
+
+.btn--primary:active {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+/* Botão Fantasma */
+.btn--ghost {
+  background: transparent;
+  color: var(--cor-laranja-escura);
+  border-color: rgba(237, 134, 75, 0.7);
+  box-shadow: 0 4px 12px rgba(237, 134, 75, 0.2);
+}
+
+.btn--ghost:hover {
+  background: rgba(237, 134, 75, 0.14);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(237, 134, 75, 0.35);
+}
+
+/*
+  Ajuste de cores de botões na seção hero para garantir
+  legibilidade sobre o fundo escuro. Essas regras só se aplicam aos
+  botões dentro da seção hero e não afetam o resto do site.
+*/
+.hero .btn--primary {
+  /*
+    Estilo customizado para o botão principal na hero.
+    Usa um gradiente semitransparente para harmonizar com o
+    plano de fundo e adiciona sombra para destacar o botão
+    sobre a imagem.
+  */
+  background: linear-gradient(90deg, rgba(237, 134, 75, 0.95) 0%, rgba(228, 114, 47, 0.95) 100%);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.hero .btn--ghost {
+  /*
+    Botão fantasma customizado na hero. Usa um fundo
+    semitransparente com efeito de vidro (glass) e contorno
+    laranja. A cor do texto é clara para se destacar.
+  */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(237, 134, 75, 0.6);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.hero .btn--ghost:hover {
+  background: rgba(237, 134, 75, 0.25);
+  border-color: rgba(237, 134, 75, 0.8);
+}
+
+/* ============================== SEÇÕES GENÉRICAS ============================== */
+.section {
+  padding-block: 3.5rem;
+}
+
+.section--light {
+  background: #ffffff;
+}
+
+.section--contrast {
+  background:
+    radial-gradient(circle at top left, rgba(237, 134, 75, 0.06), transparent 55%),
+    #F7EFE7;
+}
+
+.section--compact {
+  padding-block: 2.5rem;
+}
+
+/* HEADER DAS SEÇÕES (TIMES / EQUIPES) */
+.section__header {
+  max-width: 42rem;
+  margin-inline: auto;
+  margin-bottom: 2.6rem;
+  text-align: center;
+  animation: fadeUp 650ms var(--transition-base) both;
+}
+
+.section__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(237, 134, 75, 0.12);
+  color: var(--cor-laranja);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  margin-bottom: 0.55rem;
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.section__header h2 {
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: var(--font-size-h2);
+  margin-bottom: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.015em;
+  color: var(--cor-titulos);
+}
+
+.section__header p {
+  color: var(--cor-texto-suave);
+  margin-inline: auto;
+  font-size: 0.96rem;
+  line-height: 1.7;
+  font-weight: 400;
+  max-width: 40rem;
+  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ============================== CARROSSEL ============================== */
+/*
+  Estiliza o carrossel para que o conjunto de cartões fique
+  centralizado no container. Os botões de navegação são reposicionados
+  nas laterais com um estilo moderno. A propriedade gap controla o
+  espaçamento entre os elementos.
+*/
+.carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 2.5rem;
+  padding-inline: 1rem;
+  position: relative;
+}
+
+.carousel__items {
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  padding: 1rem 0 1.5rem;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  scrollbar-color: transparent transparent;
+  width: auto;
+}
+
+.carousel__items::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel__items::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.carousel__items::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+}
+
+.carousel__items > .card {
+  min-width: 260px;
+  scroll-snap-align: center;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.carousel__items > .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.08);
+}
+
+/* botões laterais */
+.carousel__button {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--cor-laranja), var(--cor-laranja-escura));
+  color: #ffffff;
+  font-size: 1.6rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), opacity var(--transition-base);
+  /* Impede que o botão seja achatado quando usado dentro de um flex container */
+  flex-shrink: 0;
+}
+
+.carousel__button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.carousel__button--prev {
+  /* Posicionamento ajustado por gap do flex container */
+  order: -1;
+}
+
+.carousel__button--next {
+  /* Posicionamento ajustado por gap do flex container */
+  order: 1;
+}
+
+/* em telas menores, tira o padding lateral e some com os botões */
+@media (max-width: 600px) {
+  .carousel {
+    padding-inline: 0.5rem;
+  }
+
+  .carousel__button {
+    display: none;
+  }
+}
+
+/* ============================== GRID / CARDS ============================== */
+.grid {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.grid--3 {
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  justify-items: center;
+}
+
+.grid--4 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  justify-items: center;
+}
+
+/* CARDS / AVATARES */
+.card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 1.6rem 1.45rem;
+  border: 1px solid var(--cor-borda);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base),
+    background-color var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(237, 134, 75, 0.08), transparent 55%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-slow);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+  border-color: rgba(237, 134, 75, 0.4);
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
+.card--pedagogica {
+  text-align: center;
+}
+
+.card__title {
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.05rem;
+  margin-top: 0.9rem;
+  font-weight: 700;
+  color: var(--cor-titulos);
+}
+
+.card__role {
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--cor-laranja-escura);
+  margin-top: 0.2rem;
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.card__text {
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+  margin-top: 0.75rem;
+  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Avatares */
+.avatar {
+  width: 132px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-inline: auto;
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 0 2px rgba(237, 134, 75, 0.45);
+  transform: translateY(0);
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card:hover .avatar {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(237, 134, 75, 0.6);
+}
+
+.avatar--small {
+  width: 86px;
+  border-width: 3px;
+  box-shadow: 0 0 0 2px rgba(237, 134, 75, 0.55);
+}
+
+/* Cards de equipe dentro do carrossel */
+.card--team {
+  text-align: left;
+  padding-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.card--team .avatar--small {
+  margin-inline: 0;
+}
+
+.card--team:nth-child(2) {
+  text-align: center;
+  align-items: center;
+}
+
+.card--team:nth-child(2) .avatar--small {
+  margin-inline: auto;
+}
+
+.card--team:nth-child(3) {
+  text-align: left;
+}
+
+/* ============================== SUBSEÇÕES (EQUIPES) ============================== */
+.subsection + .subsection {
+  margin-top: 3rem;
+  padding-top: 3rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.06);
+}
+
+.subsection__header {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+  max-width: 46rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.subsection__header h3 {
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: var(--font-size-h3);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--cor-titulos);
+  position: relative;
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+/* Linha decorativa abaixo do título das subseções */
+.subsection__header h3::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--cor-laranja), var(--cor-laranja-escura));
+  border-radius: 1.5px;
+}
+
+.subsection__header p {
+  color: var(--cor-texto-suave);
+  max-width: 40rem;
+  margin-inline: auto;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ============================== CONTATO (placeholder para futura seção) ============================== */
+.contato {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.8rem;
+}
+
+.contato__text h2 {
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.6rem;
+  margin-bottom: 0.4rem;
+  color: var(--cor-titulos);
+}
+
+.contato__text p {
+  color: var(--cor-texto-suave);
+  font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* BLOCO ENTRE EM CONTATO COMPACTO (se for usado futuramente) */
+.section.section--light.section--compact {
+  background: #faf7f2;
+  border-top: 1px solid var(--cor-borda);
+  padding-block: 2rem;
+}
+
+.contato__text p {
+  max-width: 32rem;
+  font-size: 0.92rem;
+}
+
+.contato__actions .btn {
+  padding-inline: 1.4rem;
+  font-size: 0.8rem;
+}
+
+/* ============================== RODAPÉ REFINADO ============================== */
+.footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.03);
+  background:
+    radial-gradient(circle at top left, rgba(237, 134, 75, 0.13), transparent 55%),
+    #fff;
+}
+
+/* Conteúdo principal do footer (três colunas) */
+.footer__content {
+  padding-block: 2.4rem;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) minmax(0, 1.2fr);
+  gap: 2.2rem;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+}
+
+/* Bloco de marca/descrição */
+.footer__brand p {
+  max-width: 22rem;
+  margin-top: 0.6rem;
+  line-height: 1.7;
+}
+
+.footer__logo {
+  height: 42px;
+  width: auto;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+/* Títulos das colunas (links / redes) */
+.footer__links h4,
+.footer__social h4 {
+  font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--cor-titulos);
+  margin-bottom: 0.8rem;
+}
+
+/* Links rápidos */
+.footer__links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.footer__links a {
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.footer__links a:hover {
+  color: var(--cor-laranja-escura);
+  transform: translateX(2px);
+}
+
+/* Redes sociais */
+.footer__social-list {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 0.2rem;
+}
+
+.footer__social-list a {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  background: rgba(237, 134, 75, 0.12);
+  color: var(--cor-laranja-escura);
+  border: 1px solid rgba(237, 134, 75, 0.45);
+  box-shadow: 0 4px 10px rgba(237, 134, 75, 0.2);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.footer__social-list a:hover {
+  background: linear-gradient(135deg, var(--cor-laranja), var(--cor-laranja-escura));
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(237, 134, 75, 0.4);
+}
+
+/* Faixa inferior com direitos autorais */
+.footer__bottom {
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  padding-block: 1rem;
+  font-size: 0.8rem;
+  color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.footer__bottom span {
+  white-space: nowrap;
+}
+
+/* ============================== FOOTER – RESPONSIVO ============================== */
+@media (max-width: 800px) {
+  .footer__content {
+    grid-template-columns: 1fr 1fr;
+    padding-block: 2rem;
+  }
+
+  .footer__brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer__content {
+    grid-template-columns: 1fr;
+    gap: 1.8rem;
+  }
+
+  .footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer__bottom span {
+    white-space: normal;
+  }
+}
+
+.footer__social-icon img {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+
+/* ============================== ANIMAÇÕES ============================== */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================== RESPONSIVIDADE ============================== */
+@media (max-width: 1024px) {
+  .header__content {
+    padding-block: 0.6rem;
+  }
+}
+
+/* MOBILE / TABLET – até 900px */
+@media (max-width: 900px) {
+  .header__content {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+  }
+
+  /* MENU VIRA HAMBÚRGUER */
+  .nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background: rgba(243, 240, 235, 0.97);
+    padding: 1rem 0;
+    gap: 0.8rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .nav.is-open {
+    display: flex;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+
+  .nav__cta {
+    width: fit-content;
+    margin-top: 0.5rem;
+  }
+
+  .hero__grid,
+  .inscricao__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero {
+    padding-top: 3.1rem;
+  }
+
+  .hero__text {
+    order: 1;
+  }
+
+  .hero__visual {
+    order: 2;
+  }
+
+  .hero__text,
+  .hero__visual {
+    text-align: left;
+  }
+
+  .contato {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* Ajustes do blob para telas pequenas */
+  .hero__visual::before {
+    width: 115%;
+    bottom: -4%;
+  }
+
+  /*
+    Ajuste de layout no mobile: empilha as ações verticalmente e
+    centraliza os elementos. Isso evita que os botões saiam do
+    viewport e melhora a legibilidade do herói em telas menores.
+  */
+  .hero__actions {
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .hero__actions .btn {
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero__grid {
+    gap: 2.4rem;
+  }
+
+  .hero__actions {
+    justify-content: flex-start;
+  }
+
+  .hero__subtitle,
+  .hero__benefits,
+  .hero__strong {
+    max-width: 100%;
+  }
+
+  /*
+    Ajuste de tamanho do título e subtítulo em telas menores que
+    720px para evitar quebra de linhas longas. O clamp já
+    controla parte da responsividade, mas este valor reduzido
+    melhora ainda mais a legibilidade.
+  */
+  .hero__text h1 {
+    font-size: 2.2rem;
+  }
+  .hero__subtitle {
+    font-size: 0.96rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .section {
+    padding-block: 2.75rem;
+  }
+
+  .hero {
+    padding-top: 3.1rem;
+  }
+
+  .logo__img {
+    height: 46px;
+  }
+
+  .card {
+    padding-inline: 1.25rem;
+  }
+
+  .footer__content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero__image-wrapper {
+    max-width: 260px;
+  }
+
+  /* Evita background-attachment: fixed no mobile (caso fosse usado) */
+  .main {
+    background-attachment: scroll;
+  }
+
+  /*
+    Oculta o visual do mockup ou qualquer imagem extra da seção hero
+    em telas muito pequenas para evitar sobreposição com o texto.
+  */
+  .hero__visual,
+  .hero__image-wrapper {
+    display: none !important;
+  }
+
+  /* Remove mockups de telefone em outras classes quando houver */
+  .phone-mockup {
+    display: none !important;
+  }
+
+  /* Centraliza o texto e ações na seção hero em telas muito pequenas */
+  .hero__text {
+    text-align: center;
+    align-items: center;
+  }
+  .hero__actions {
+    align-items: center;
+  }
+}
+
+/* Respeita quem prefere menos movimento */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    padding-top: 2rem !important;
+    min-height: auto !important;
+    display: block !important;
+  }
+
+  .hero__grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+
+  .hero__visual,
+  .hero__text {
+    justify-content: center;
+    align-items: center;
+    text-align: center !important;
+  }
+
+  .hero__visual figure {
+    margin-inline: auto;
+  }
+
+  .hero__caption {
+    text-align: center !important;
+  }
+
+  /* Impede imagem de descer demais */
+  .hero__visual::before {
+    bottom: -2% !important;
+    opacity: 0.88 !important;
+  }
+}
