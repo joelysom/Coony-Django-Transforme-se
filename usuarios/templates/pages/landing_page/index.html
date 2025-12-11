@@ -9,6 +9,88 @@
     <title>Projeto Coony – Landing Page</title>
 
     <link rel="stylesheet" href="{% static 'pages/landing_page/css/style.css' %}">
+    <style>
+      .coony-ads {
+        background: radial-gradient(circle at top right, rgba(246, 139, 74, 0.15), transparent 55%), #0f1825;
+        color: #fff;
+      }
+      .coony-ads .section__header h2 {
+        color: #fff;
+      }
+      .coony-ads .section__header p {
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .coony-ads .ads-carousel {
+        position: relative;
+        margin-top: 2.5rem;
+      }
+      .coony-ads .ads-track {
+        display: flex;
+        gap: 1.5rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 1rem;
+        scrollbar-width: none;
+      }
+      .coony-ads .ads-track::-webkit-scrollbar {
+        display: none;
+      }
+      .coony-ads .ad-poster {
+        flex: 0 0 calc(33.333% - 1rem);
+        border-radius: 20px;
+        overflow: hidden;
+        aspect-ratio: 16 / 9;
+        box-shadow: 0 24px 50px rgba(0, 0, 0, 0.25);
+        scroll-snap-align: start;
+      }
+      .coony-ads .ad-poster img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .coony-ads .ads-carousel__control {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: rgba(15, 24, 37, 0.85);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: opacity 0.3s ease;
+      }
+      .coony-ads .ads-carousel__control:hover {
+        opacity: 0.8;
+      }
+      .coony-ads .ads-carousel__control--prev {
+        left: -12px;
+      }
+      .coony-ads .ads-carousel__control--next {
+        right: -12px;
+      }
+      @media (max-width: 1024px) {
+        .coony-ads .ad-poster {
+          flex: 0 0 calc(50% - 1rem);
+        }
+        .coony-ads .ads-carousel__control--prev {
+          left: 8px;
+        }
+        .coony-ads .ads-carousel__control--next {
+          right: 8px;
+        }
+      }
+      @media (max-width: 720px) {
+        .coony-ads .ad-poster {
+          flex: 0 0 80%;
+        }
+      }
+    </style>
   </head>
 
   <body>
@@ -641,6 +723,48 @@
           </div>
         </div>
       </section>
+
+      <section id="anuncios" class="section coony-ads">
+        <div class="container">
+          <header class="section__header">
+            <span class="section__eyebrow">Conectar marcas e comunidade</span>
+            <h2>Parceiros e anúncios em destaque</h2>
+            <p>
+              Espaço dedicado para iniciativas que acreditam no ecossistema Coony.
+              Divulgue serviços, eventos ou produtos alinhados ao estilo de vida ativo.
+            </p>
+          </header>
+
+          <div class="ads-carousel" id="adsCarousel">
+            <button class="ads-carousel__control ads-carousel__control--prev" type="button" data-direction="prev" aria-label="Ver anúncios anteriores">
+              <span aria-hidden="true">&#8249;</span>
+            </button>
+            <div class="ads-track">
+              <figure class="ad-poster">
+                <img src="{% static 'pages/landing_page/imagens-Coony/Cópia de LOGOTIPO & CORES OFICIAIS (COONY) (1).png' %}" alt="Campanha institucional Coony" loading="lazy" />
+              </figure>
+              <figure class="ad-poster">
+                <img src="{% static 'pages/landing_page/imagens-Coony/instagram.png' %}" alt="Promoção social Coony" loading="lazy" />
+              </figure>
+              <figure class="ad-poster">
+                <img src="{% static 'pages/landing_page/imagens-Coony/do-utilizador.png' %}" alt="Experiências da comunidade" loading="lazy" />
+              </figure>
+              <figure class="ad-poster">
+                <img src="{% static 'pages/landing_page/imagensEquipe-Coordenacao/mere.png' %}" alt="Mentoria Mere Coutinho" loading="lazy" />
+              </figure>
+              <figure class="ad-poster">
+                <img src="{% static 'pages/landing_page/imagens-alunos/Luan Maison.jpg' %}" alt="Eventos parceiros" loading="lazy" />
+              </figure>
+              <figure class="ad-poster">
+                <img src="{% static 'pages/landing_page/imagens-alunos/Paulo Roberto.jpg' %}" alt="Academias conectadas" loading="lazy" />
+              </figure>
+            </div>
+            <button class="ads-carousel__control ads-carousel__control--next" type="button" data-direction="next" aria-label="Ver próximos anúncios">
+              <span aria-hidden="true">&#8250;</span>
+            </button>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer class="footer">
@@ -690,6 +814,29 @@
       </div>
     </footer>
 
+    <script>
+      (function () {
+        const carousel = document.getElementById('adsCarousel');
+        if (!carousel) {
+          return;
+        }
+        const track = carousel.querySelector('.ads-track');
+        const prev = carousel.querySelector('[data-direction="prev"]');
+        const next = carousel.querySelector('[data-direction="next"]');
+
+        const getScrollAmount = () => {
+          const poster = track.querySelector('.ad-poster');
+          return poster ? poster.getBoundingClientRect().width + 24 : 320;
+        };
+
+        const scrollByDirection = (direction) => {
+          track.scrollBy({ left: direction * getScrollAmount(), behavior: 'smooth' });
+        };
+
+        prev?.addEventListener('click', () => scrollByDirection(-1));
+        next?.addEventListener('click', () => scrollByDirection(1));
+      })();
+    </script>
     <script src="{% static 'pages/landing_page/js/script.js' %}"></script>
   </body>
 </html>
