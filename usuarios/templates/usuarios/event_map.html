@@ -328,9 +328,16 @@
   </style>
 </head>
 <body>
+  <!-- Navegacao/Sidebar: incluir ambas e alternar via JS -->
+  <div id="nav-mobile" class="nav-shell" {% if not request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegacao mobile">
+    {% include 'usuarios/components/navbar_mobile.html' %}
+  </div>
+  <div id="nav-desktop" class="nav-shell" {% if request.user_agent.is_mobile %}hidden{% endif %} aria-label="Navegacao desktop">
+    {% include 'usuarios/components/sidebar.html' %}
+  </div>
+
   {% include 'usuarios/components/toast.html' %}
   {% include 'usuarios/components/messages.html' %}
-  {% include 'usuarios/components/sidebar.html' %}
 
   <div class="app-container">
     <div class="map-page-shell">
@@ -373,6 +380,32 @@
   {{ eventos_geo|json_script:"eventos-data" }}
   {{ map_defaults|json_script:"map-defaults" }}
   <script>
+    // Alterna navbar/sidebar em tempo real conforme largura
+    const navMobile = document.getElementById('nav-mobile');
+    const navDesktop = document.getElementById('nav-desktop');
+    const navMediaQuery = window.matchMedia('(max-width: 768px)');
+
+    function applyNavMode(isMobile) {
+      if (!navMobile || !navDesktop) {
+        return;
+      }
+      navMobile.hidden = !isMobile;
+      navDesktop.hidden = isMobile;
+      document.body.dataset.currentNav = isMobile ? 'mobile' : 'desktop';
+    }
+
+    function handleNavChange(e) {
+      applyNavMode(e.matches);
+    }
+
+    applyNavMode(navMediaQuery.matches);
+
+    if (typeof navMediaQuery.addEventListener === 'function') {
+      navMediaQuery.addEventListener('change', handleNavChange);
+    } else if (typeof navMediaQuery.addListener === 'function') {
+      navMediaQuery.addListener(handleNavChange);
+    }
+
     const eventos = JSON.parse(document.getElementById('eventos-data').textContent || '[]');
     const mapDefaults = JSON.parse(document.getElementById('map-defaults').textContent || '{}');
     const map = L.map('coony-map').setView([mapDefaults.lat || 0, mapDefaults.lng || 0], mapDefaults.zoom || 12);
