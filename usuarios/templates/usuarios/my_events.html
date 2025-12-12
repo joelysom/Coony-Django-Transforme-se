@@ -71,8 +71,8 @@
         <label class="input-field select" aria-label="Filtrar por status">
           <span class="material-symbols-outlined" aria-hidden="true">flag</span>
           <select name="status">
-            <option value="future" {% if status == 'future' %}selected{% endif %}>Próximos eventos</option>
             <option value="all" {% if status == 'all' %}selected{% endif %}>Todos</option>
+            <option value="future" {% if status == 'future' %}selected{% endif %}>Próximos eventos</option>
             <option value="past" {% if status == 'past' %}selected{% endif %}>Eventos passados</option>
           </select>
         </label>

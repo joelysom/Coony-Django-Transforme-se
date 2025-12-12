@@ -466,13 +466,13 @@ def my_events(request):
         return redirect('index')
 
     search = request.GET.get('q', '').strip()
-    status = request.GET.get('status', 'future')
+    status = request.GET.get('status', 'all')
 
     now = timezone.localtime()
     future_filter = Q(data__gt=now.date()) | (Q(data=now.date()) & Q(hora__gte=now.time()))
     past_filter = Q(data__lt=now.date()) | (Q(data=now.date()) & Q(hora__lt=now.time()))
 
-    eventos_qs = user.eventos.all()
+    eventos_qs = Evento.objects.filter(criador=user)
     stats = {
         'total': eventos_qs.count(),
         'upcoming': eventos_qs.filter(future_filter).count(),
@@ -493,7 +493,11 @@ def my_events(request):
         )
 
     eventos = eventos_qs.order_by('data', 'hora')
-    next_event = user.eventos.filter(future_filter).order_by('data', 'hora').first()
+    next_event = (Evento.objects
+                  .filter(criador=user)
+                  .filter(future_filter)
+                  .order_by('data', 'hora')
+                  .first())
 
     return render(request, 'usuarios/my_events.html', {
         'user': user,
