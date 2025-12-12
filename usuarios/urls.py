@@ -11,6 +11,7 @@ urlpatterns = [
     path('dashboard/mobile/', views.dashboard_mobile, name='dashboard_mobile'),
     path('social/', views.social, name='social'),
     path('eventos/', views.eventos_list, name='eventos_list'),
+    path('eventos/mapa/', views.eventos_mapa, name='eventos_mapa'),
     path('eventos/<int:evento_id>/', views.evento_detail, name='evento_detail'),
     path('eventos/criar/', views.create_event, name='create_event'),
     path('eventos/meus/', views.my_events, name='my_events'),

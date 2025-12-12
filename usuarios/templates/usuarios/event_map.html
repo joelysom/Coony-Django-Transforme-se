@@ -1,0 +1,510 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="{% static 'img/Logo.svg' %}" type="image/svg+xml">
+  <link rel="shortcut icon" href="{% static 'img/Logo.svg' %}">
+  <title>Eventos no mapa — Coony</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  >
+  <style>
+    :root {
+      --page-bg: #f9f7f3;
+      --card-bg: #ffffff;
+      --card-accent: #fff3ec;
+      --text-primary: #333333;
+      --text-secondary: #777777;
+      --brand-orange: #f68b4a;
+      --brand-blue: #0f8ec7;
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --shadow-soft: 0 15px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0 0 0 280px;
+      font-family: 'Poppins', sans-serif;
+      background: var(--page-bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-container {
+      width: 100%;
+    }
+
+    .map-page-shell {
+      display: flex;
+      flex: 1;
+      gap: 1.5rem;
+      padding: 2rem clamp(1rem, 4vw, 3rem) 2.5rem;
+      color: var(--text-primary);
+    }
+
+    .map-card {
+      flex: 2;
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .map-card header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .map-card header h1 {
+      font-size: clamp(1.6rem, 2vw, 2rem);
+      margin: 0;
+    }
+
+    .map-card header p {
+      margin: 0.25rem 0 0;
+      color: var(--text-secondary);
+    }
+
+    .map-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .map-actions a,
+    .map-actions button {
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .map-actions a {
+      background: #fff7f2;
+      color: var(--brand-orange);
+      text-decoration: none;
+      border: 1px solid rgba(246, 139, 74, 0.25);
+    }
+
+    .map-actions button {
+      background: var(--brand-orange);
+      color: #fff;
+    }
+
+    .map-actions button:active,
+    .map-actions button:focus,
+    .map-actions a:active {
+      transform: translateY(1px);
+    }
+
+    .map-wrapper {
+      position: relative;
+      width: 100%;
+      min-height: 540px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    #coony-map {
+      width: 100%;
+      height: 100%;
+      min-height: 540px;
+    }
+
+    .coony-event-pin {
+      background: transparent;
+      border: none;
+    }
+
+    .coony-event-pin span {
+      width: 30px;
+      height: 30px;
+      display: block;
+      border-radius: 50% 50% 50% 0;
+      background: linear-gradient(135deg, #ffc38a, #f56f1d);
+      position: relative;
+      transform: rotate(-45deg);
+      box-shadow: 0 6px 14px rgba(245, 111, 29, 0.35);
+    }
+
+    .coony-event-pin span::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      top: 9px;
+      left: 9px;
+    }
+
+    .leaflet-popup-content-wrapper {
+      border-radius: 18px;
+      background: #ffffff;
+      color: var(--text-primary);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .leaflet-popup-content {
+      margin: 0;
+    }
+
+    .popup-card {
+      width: 240px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .popup-card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 16px;
+      margin-bottom: 0.75rem;
+    }
+
+    .popup-card h3 {
+      margin: 0 0 0.25rem;
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    .popup-card p {
+      margin: 0 0 0.4rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .popup-card a {
+      align-self: flex-start;
+      margin-top: 0.2rem;
+      color: var(--brand-orange);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #fff7f2;
+      border-radius: 999px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.85rem;
+      color: var(--brand-orange);
+    }
+
+    .status-pill[data-state="success"] {
+      color: #2a8a4b;
+      background: #e8f6ee;
+    }
+
+    .status-pill[data-state="error"] {
+      color: #c23a3a;
+      background: #fdecec;
+    }
+
+    .nearby-card {
+      flex: 1;
+      background: var(--card-accent);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      min-width: 320px;
+      border: 1px solid rgba(246, 139, 74, 0.15);
+    }
+
+    .nearby-card header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .nearby-card header p {
+      margin: 0.25rem 0 0;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .nearby-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nearby-list li {
+      background: #fff;
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+    }
+
+    .nearby-list strong {
+      font-size: 1rem;
+    }
+
+    .nearby-list span {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .nearby-list a {
+      color: var(--brand-orange);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      align-self: flex-start;
+      margin-top: 0.3rem;
+    }
+
+    .empty-state {
+      margin: 2rem 0 0;
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--text-secondary);
+      text-align: center;
+      border: 1px dashed rgba(246, 139, 74, 0.5);
+    }
+
+    @media (max-width: 1100px) {
+      .map-page-shell {
+        flex-direction: column;
+      }
+      .nearby-card {
+        min-width: unset;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .map-card,
+      .nearby-card {
+        border-radius: var(--radius-md);
+        padding: 1.25rem;
+      }
+      .map-wrapper,
+      #coony-map {
+        min-height: 420px;
+      }
+    }
+  </style>
+</head>
+<body>
+  {% include 'usuarios/components/toast.html' %}
+  {% include 'usuarios/components/messages.html' %}
+  {% include 'usuarios/components/sidebar.html' %}
+
+  <div class="app-container">
+    <div class="map-page-shell">
+    <section class="map-card" aria-label="Mapa interativo de eventos">
+      <header>
+        <div>
+          <p class="status-pill" data-geostatus data-state="idle">Aguardando localização do usuário</p>
+          <h1>Mapa vivo da comunidade</h1>
+          <p>Ative sua localização para destravar eventos perto de você.</p>
+        </div>
+        <div class="map-actions">
+          <button type="button" id="locate-me">Centralizar em mim</button>
+          <a href="{% url 'eventos_list' %}">Voltar para a listagem</a>
+          <a href="{% url 'create_event' %}" style="background: rgba(255,255,255,0.15);">Criar evento</a>
+        </div>
+      </header>
+      <div class="map-wrapper">
+        <div id="coony-map" role="region" aria-label="Mapa de eventos"></div>
+      </div>
+    </section>
+
+    <aside class="nearby-card" aria-live="polite">
+      <header>
+        <h2>Eventos próximos</h2>
+        <p>Listamos atividades em um raio de 25 km a partir da sua localização.</p>
+      </header>
+      <ol class="nearby-list" id="nearby-list"></ol>
+      <div class="empty-state" id="nearby-empty" hidden>
+        Nenhum evento com coordenadas foi encontrado neste raio ainda. Experimente aproximar o mapa ou cadastrar novos pontos.
+      </div>
+    </aside>
+    </div>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  {{ eventos_geo|json_script:"eventos-data" }}
+  {{ map_defaults|json_script:"map-defaults" }}
+  <script>
+    const eventos = JSON.parse(document.getElementById('eventos-data').textContent || '[]');
+    const mapDefaults = JSON.parse(document.getElementById('map-defaults').textContent || '{}');
+    const map = L.map('coony-map').setView([mapDefaults.lat || 0, mapDefaults.lng || 0], mapDefaults.zoom || 12);
+    const nearbyList = document.getElementById('nearby-list');
+    const nearbyEmpty = document.getElementById('nearby-empty');
+    const locateBtn = document.getElementById('locate-me');
+    const statusPill = document.querySelector('[data-geostatus]');
+    const userLayer = L.layerGroup().addTo(map);
+    const RADIUS_KM = 25;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    const eventLayer = L.layerGroup().addTo(map);
+
+    const eventIcon = L.divIcon({
+      className: 'coony-event-pin',
+      html: '<span></span>',
+      iconSize: [30, 38],
+      iconAnchor: [15, 38],
+      popupAnchor: [0, -34]
+    });
+
+    eventos.forEach((evento) => {
+      if (typeof evento.latitude !== 'number' || typeof evento.longitude !== 'number') {
+        return;
+      }
+      const marker = L.marker([evento.latitude, evento.longitude], { icon: eventIcon }).addTo(eventLayer);
+      const popupHtml = `
+        <div class="popup-card">
+          <img src="${evento.imagem_url}" alt="${evento.titulo}">
+          <h3>${evento.titulo}</h3>
+          <p>${evento.data} • ${evento.hora}</p>
+          <p>${evento.local}</p>
+          <a href="${evento.detail_url}" target="_blank" rel="noopener">Ver detalhes</a>
+        </div>
+      `;
+      marker.bindPopup(popupHtml, { closeButton: false, autoPanPaddingTopLeft: [50, 50] });
+      marker.on('mouseover', () => marker.openPopup());
+      marker.on('mouseout', () => marker.closePopup());
+    });
+
+    if (!eventos.length) {
+      nearbyEmpty.hidden = false;
+      nearbyEmpty.textContent = 'Ainda não existem eventos com coordenadas cadastradas.';
+    }
+
+    const toRad = (value) => (value * Math.PI) / 180;
+    const distanceBetween = (lat1, lon1, lat2, lon2) => {
+      const R = 6371;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    };
+
+    const renderNearby = (coords) => {
+      if (!coords) {
+        nearbyList.innerHTML = '';
+        return;
+      }
+      const withDistance = eventos
+        .filter((evento) => typeof evento.latitude === 'number' && typeof evento.longitude === 'number')
+        .map((evento) => ({
+          ...evento,
+          distance: distanceBetween(coords.lat, coords.lng, evento.latitude, evento.longitude),
+        }))
+        .filter((evento) => evento.distance <= RADIUS_KM)
+        .sort((a, b) => a.distance - b.distance);
+
+      nearbyList.innerHTML = '';
+      nearbyEmpty.hidden = withDistance.length > 0;
+
+      if (!withDistance.length) {
+        nearbyEmpty.textContent = 'Não mapeamos eventos nesse raio ainda. Continue explorando!';
+        return;
+      }
+
+      withDistance.forEach((evento) => {
+        const item = document.createElement('li');
+        item.innerHTML = `
+          <strong>${evento.titulo}</strong>
+          <span>${evento.data} • ${evento.modalidade} • ${evento.distance.toFixed(1)} km de você</span>
+          <a href="${evento.detail_url}">Ver detalhes</a>
+        `;
+        nearbyList.appendChild(item);
+      });
+    };
+
+    const handleLocationSuccess = (position) => {
+      const { latitude, longitude } = position.coords;
+      statusPill.dataset.state = 'success';
+      statusPill.textContent = 'Localização encontrada';
+      userLayer.clearLayers();
+      L.circleMarker([latitude, longitude], {
+        radius: 10,
+        color: '#ff8c42',
+        fillColor: '#ff8c42',
+        fillOpacity: 0.7,
+      }).addTo(userLayer).bindPopup('Você está aqui');
+      map.setView([latitude, longitude], 14);
+      renderNearby({ lat: latitude, lng: longitude });
+    };
+
+    const handleLocationError = (error) => {
+      statusPill.dataset.state = 'error';
+      statusPill.textContent = 'Não foi possível acessar a sua localização';
+      console.warn(error);
+    };
+
+    const requestLocation = () => {
+      if (!navigator.geolocation) {
+        statusPill.dataset.state = 'error';
+        statusPill.textContent = 'Seu navegador não suporta geolocalização';
+        return;
+      }
+      statusPill.dataset.state = 'loading';
+      statusPill.textContent = 'Coletando localização...';
+      navigator.geolocation.getCurrentPosition(handleLocationSuccess, handleLocationError, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+      });
+    };
+
+    locateBtn.addEventListener('click', requestLocation);
+
+    // Autodispara na primeira visita para facilitar
+    requestLocation();
+  </script>
+</body>
+</html>
+</html>

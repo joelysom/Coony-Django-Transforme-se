@@ -229,6 +229,8 @@ class Evento(models.Model):
     distancia = models.CharField(max_length=40, blank=True)
     max_participantes = models.PositiveIntegerField(null=True, blank=True)
     imagem_capa = models.ImageField(upload_to='eventos/capa/', blank=True)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     favorited_by = models.ManyToManyField('Usuario', related_name='favorited_eventos', blank=True)
     imagem_detalhe_1 = models.ImageField(upload_to='eventos/detalhes/', blank=True)
     imagem_detalhe_2 = models.ImageField(upload_to='eventos/detalhes/', blank=True)

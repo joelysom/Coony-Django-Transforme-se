@@ -90,6 +90,18 @@
           </div>
 
           <div class="form-field">
+            <label for="{{ form.latitude.id_for_label }}">{{ form.latitude.label }}</label>
+            {{ form.latitude }}
+            {% if form.latitude.errors %}<span class="field-error">{{ form.latitude.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
+            <label for="{{ form.longitude.id_for_label }}">{{ form.longitude.label }}</label>
+            {{ form.longitude }}
+            {% if form.longitude.errors %}<span class="field-error">{{ form.longitude.errors|join:', ' }}</span>{% endif %}
+          </div>
+
+          <div class="form-field">
             <label for="{{ form.distancia.id_for_label }}">{{ form.distancia.label }}</label>
             {{ form.distancia }}
             {% if form.distancia.errors %}<span class="field-error">{{ form.distancia.errors|join:', ' }}</span>{% endif %}

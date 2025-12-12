@@ -4,6 +4,8 @@ from decimal import Decimal, InvalidOperation
 import json
 from django.core.exceptions import MultipleObjectsReturned
 
+from django.conf import settings
+from django.templatetags.static import static
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.db import IntegrityError
@@ -367,6 +369,50 @@ def eventos_list(request):
         'user': user,
         'eventos': eventos,
     })
+
+
+def eventos_mapa(request):
+    """Renderiza o mapa de eventos com Leaflet."""
+    user = _get_logged_user(request)
+    if not user:
+        return redirect('index')
+
+    eventos_com_coordenadas = []
+    queryset = Evento.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True)
+    for evento in queryset:
+        try:
+            latitude = float(evento.latitude)
+            longitude = float(evento.longitude)
+        except (TypeError, ValueError):
+            continue
+
+        imagem_url = evento.imagem_capa.url if evento.imagem_capa else static('img/default-avatar.svg')
+
+        eventos_com_coordenadas.append({
+            'id': evento.id,
+            'titulo': evento.titulo,
+            'modalidade': evento.modalidade,
+            'nivel': evento.nivel_dificuldade,
+            'data': evento.data.strftime('%d/%m/%Y'),
+            'hora': evento.hora.strftime('%H:%M'),
+            'local': evento.local,
+            'latitude': latitude,
+            'longitude': longitude,
+            'imagem_url': imagem_url,
+            'detail_url': reverse('evento_detail', args=[evento.id]),
+        })
+
+    center_lat, center_lng = getattr(settings, 'MAP_DEFAULT_CENTER', (0, 0))
+    context = {
+        'user': user,
+        'eventos_geo': eventos_com_coordenadas,
+        'map_defaults': {
+            'lat': center_lat,
+            'lng': center_lng,
+            'zoom': getattr(settings, 'MAP_DEFAULT_ZOOM', 12),
+        },
+    }
+    return render(request, 'usuarios/event_map.html', context)
 
 
 def evento_detail(request, evento_id):

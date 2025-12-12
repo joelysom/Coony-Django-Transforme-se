@@ -39,6 +39,11 @@
           display: flex; 
           align-items: center; 
       }
+      .eventos-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+      }
   </style>
 </head>
 <body>
@@ -53,7 +58,10 @@
                 <p>
                     Encontre e participe de atividades esportivas em Recife e região
                 </p>
-                <a href="{% url 'create_event' %}" class="button"><span class="material-symbols-outlined">add</span> Criar Evento</a>
+                <div class="eventos-actions">
+                    <a href="{% url 'eventos_mapa' %}" class="button secondary-btn"><span class="material-symbols-outlined">map</span> Ver no mapa</a>
+                    <a href="{% url 'create_event' %}" class="button"><span class="material-symbols-outlined">add</span> Criar Evento</a>
+                </div>
             </header>
 
             <section class="filtro-section">
